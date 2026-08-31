@@ -1,0 +1,16 @@
+# Environment / secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OS junk
+.DS_Store
+Thumbs.db
+Desktop.ini
+*~
