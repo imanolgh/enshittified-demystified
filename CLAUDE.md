@@ -43,6 +43,7 @@ docs/            # project planning documents; read, never edit
 ```
 
 ## Working rules
+- **Git commits are the developer's alone.** Never run `git commit` (or push, amend, rebase, tag) unless the developer explicitly asks for that specific commit in that moment. Staging with `git add` when asked is fine; the commit itself is theirs.
 - Every connector needs 2–3 REAL fixture files in `tests/fixtures/<connector>/` and a conformance test before it's "done". No fixtures, no done.
 - When a source changes shape in production: update the fixture to the new reality FIRST, then the fix.
 - Scrape etiquette: per-domain Redis token bucket, identified user agent, robots.txt, prefer official APIs/bulk files.
