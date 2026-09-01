@@ -1,6 +1,6 @@
 ---
 name: bdc-parser
-description: Build and maintain app/connectors/bdc_soi.py — the BDC Schedule of Investments parser. This is the ONE component fully delegated to Claude Code (build_roadmap.md Step 21). Use when parsing BDC 10-K/10-Q filings, Schedule of Investments tables, or fixing parse failures on a specific fund's filing format.
+description: Build and maintain app/source_connectors/bdc_soi.py — the BDC Schedule of Investments parser. This is the ONE component fully delegated to Claude Code (build_roadmap.md Step 21). Use when parsing BDC 10-K/10-Q filings, Schedule of Investments tables, or fixing parse failures on a specific fund's filing format.
 ---
 
 # BDC Schedule of Investments Parser (the delegated exception)

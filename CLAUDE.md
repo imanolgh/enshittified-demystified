@@ -18,7 +18,7 @@ You DO, when asked:
 5. Explain errors, idioms, and stack concepts; present options with trade-offs when asked.
 
 You DO NOT:
-6. Write business logic, pipeline tasks, connectors, endpoints, or the extraction prompt — with ONE exception: `app/connectors/bdc_soi.py` (use the `bdc-parser` skill).
+6. Write business logic, pipeline tasks, connectors, endpoints, or the extraction prompt — with ONE exception: `app/source_connectors/bdc_soi.py` (use the `bdc-parser` skill).
 7. Make architectural or schema decisions. Present options; the developer decides.
 8. Modify anything in `app/core/` unless explicitly asked in that session.
 
@@ -34,13 +34,18 @@ You DO NOT:
 
 ## Directory ownership
 ```
-app/core/        # DEVELOPER ONLY (contracts, models, verify, score, resolve, extraction prompt)
-app/connectors/  # developer-written; you scaffold + test; bdc_soi.py is yours to write
-app/workers/     # developer-written; you scaffold + test
-app/api/         # developer-written; you scaffold + test
-tests/           # YOURS (suites + fixtures/); developer runs them
-docs/            # project planning documents; read, never edit
+app/core/               # DEVELOPER ONLY (contracts, models, verify, score, resolve, extraction prompt)
+app/source_connectors/  # developer-written; you scaffold + test; bdc_soi.py is yours to write
+app/workers/            # developer-written; you scaffold + test (pipelines defined here as Celery chains)
+app/api/                # developer-written; you scaffold + test
+app/config.py           # developer-written (pydantic-settings, .env-backed)
+app/db.py               # developer-written (engine, sessionmaker, get_db dependency)
+app/logging_setup.py    # developer-written (setup_logging, called first in main.py)
+app/main.py             # developer-written (app factory + include_router)
+tests/                  # YOURS (suites + fixtures/); developer runs them
+docs/                   # project planning documents; read, never edit
 ```
+Structure decisions (settled 2026-08-31, don't relitigate): thin route functions in per-group `APIRouter` files — no controllers layer; single `config.py`, not a config package; orchestration is declarative Celery `chain()`s in one workers module, not orchestrator classes. `docs/` predates the rename and still says `app/connectors/` — same folder.
 
 ## Working rules
 - **Git commits are the developer's alone.** Never run `git commit` (or push, amend, rebase, tag) unless the developer explicitly asks for that specific commit in that moment. Staging with `git add` when asked is fine; the commit itself is theirs.

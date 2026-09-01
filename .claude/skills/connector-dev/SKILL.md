@@ -1,6 +1,6 @@
 ---
 name: connector-dev
-description: Assist the developer while they hand-write a data connector (scaffolding, house-style review, selector configs, fixture prep). Use when working on anything in app/connectors/ — NPPES, Places, EDGAR, sponsor/DSO scrapers, SoS, Form 5500, press RSS — EXCEPT bdc_soi.py (that has its own skill).
+description: Assist the developer while they hand-write a data connector (scaffolding, house-style review, selector configs, fixture prep). Use when working on anything in app/source_connectors/ — NPPES, Places, EDGAR, sponsor/DSO scrapers, SoS, Form 5500, press RSS — EXCEPT bdc_soi.py (that has its own skill).
 ---
 
 # Connector Development Assistance
@@ -8,7 +8,7 @@ description: Assist the developer while they hand-write a data connector (scaffo
 The developer writes every connector by hand. Your contributions are bounded: scaffolding, inventories, selector configs, review against house style, and handing off to the conformance-tests skill. You never write the connector's logic.
 
 ## The house style (established in Phase 1–2; hold all connectors to it)
-- One module per source in `app/connectors/`; a single public entrypoint the Celery task calls.
+- One module per source in `app/source_connectors/`; a single public entrypoint the Celery task calls.
 - All HTTP through the shared httpx client factory with: tenacity retry/backoff on 429/5xx, per-domain Redis token bucket, identified user agent, explicit timeouts.
 - Output is ONLY `RawDocument` instances (plus optional resolution-enrichment structs) from `app/core/contracts.py` — never raw dicts, never direct DB writes; storage goes through `store_document` (sha256 dedup).
 - Scrapers: static-first (httpx + selectolax); Playwright only when the page demands it; every crawl records sha256 for the diff loop.

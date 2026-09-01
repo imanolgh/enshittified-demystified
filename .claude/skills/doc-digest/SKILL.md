@@ -21,4 +21,4 @@ Purpose: the developer integrates from your brief, never from the vendor's docs.
 - Cite URLs for every factual claim about the source.
 - If docs conflict with observed behavior, say so explicitly — observed wins, flagged.
 - If a source has both an API and a bulk file (NPPES, Form ADV), cover BOTH and recommend which serves seeding vs. freshness (per decisions.md §11: bulk for seeding, API for freshness).
-- Never write the connector itself. End the brief with "Ready for you to write `app/connectors/<name>.py` — want scaffolding?"
+- Never write the connector itself. End the brief with "Ready for you to write `app/source_connectors/<name>.py` — want scaffolding?"
