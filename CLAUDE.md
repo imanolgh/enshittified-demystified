@@ -56,5 +56,10 @@ Structure decisions (settled 2026-08-31, don't relitigate): thin route functions
 - Log per-call cost for paid APIs (Places, Anthropic) from day one.
 - Quality bar for anything you produce: the developer must be able to re-explain it from memory the next morning. Prefer boring, explicit code over clever code.
 
+## Documentation rules
+- Before generating code or answering questions that depend on FastAPI, Pydantic v2, SQLAlchemy 2.0, Alembic, or Celery API specifics, look up the current official docs via the Context7 MCP server (`context7` tools) rather than relying on training data.
+- Never emit deprecated patterns (Pydantic v1 syntax, legacy FastAPI idioms). When unsure whether a pattern is current, check Context7 first.
+- If the Context7 server is unavailable, say so explicitly and flag any answer drawn from training data as unverified against current docs.
+
 ## Commands
 - `uv run uvicorn app.main:app --reload` · `uv run celery -A app.workers worker -Q intake,resolve,retrieve,extract,verify,publish` · `uv run celery -A app.workers beat` · `uv run alembic upgrade head` · `uv run pytest` · `docker compose up -d`
