@@ -43,7 +43,7 @@ app/db.py               # developer-written (engine, sessionmaker, get_db depend
 app/logging_setup.py    # developer-written (setup_logging, called first in main.py)
 app/main.py             # developer-written (app factory + include_router)
 tests/                  # YOURS (suites + fixtures/); developer runs them
-docs/                   # project planning documents; read, never edit
+docs/                   # living project docs; editable when asked (opened up 2026-09-04) — requirements pivot, docs follow
 ```
 Structure decisions (settled 2026-08-31, don't relitigate): thin route functions in per-group `APIRouter` files — no controllers layer; single `config.py`, not a config package; orchestration is declarative Celery `chain()`s in one workers module, not orchestrator classes. `docs/` predates the rename and still says `app/connectors/` — same folder.
 
