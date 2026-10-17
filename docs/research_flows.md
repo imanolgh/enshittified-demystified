@@ -31,7 +31,7 @@ For row: *"Bright Smiles Dental, 123 Grand St, Croton-on-Hudson, NY"* (fictional
 2. **NPPES API** (free): `https://npiregistry.cms.hhs.gov/api/?organization_name=Bright+Smiles+Dental&state=NY` → returns organization NPI **1234567890**, authorized official "J. Chen DDS", and — the gold — "Other Organization Name" field listing **"Smile Partners Management LLC"** (a management-company alias).
 3. **NY SoS scrape** for both names → Bright Smiles Dental PLLC (active) + Smile Partners Management LLC, foreign LLC, registered agent = CT Corporation.
 4. **Meilisearch/rapidfuzz** match against existing entities → "Smile Partners Management" matches an existing DSO entity at 0.94 → link instead of create.
-5. Write: entity `ent_8821` (business) with aliases, `operates_under` hint → `ent_privileged DSO ent_0455`. Item status → `resolved`.
+5. Write: entity `ent_8821` (business) with aliases, plus a resolution hint linking it to DSO entity `ent_0455` (a *hint* for retrieval, not a claim — the `operates_location_of` claim must still come from a stored document in Steps 3–4). Item status → `resolved`.
 
 **Failure branches:** Places returns 3 plausible matches → item status `ambiguous`, lands in review queue with candidates; no NPPES hit for a vet named "Pet Palace" → continue with Places + SoS only (NPPES is dental/medical, vets resolve via state veterinary license boards where scraped).
 
@@ -40,7 +40,7 @@ Category `dental` + DSO link triggers this connector set for `ent_8821` + `ent_0
 
 | Task | Call | Typical yield |
 |---|---|---|
-| `retrieve_dso_roster` | Playwright fetch of smilepartners.com/locations | Location page listing Croton office → confirms operates_under |
+| `retrieve_dso_roster` | Playwright fetch of smilepartners.com/locations | Location page listing Croton office → `operates_location_of` claim |
 | `retrieve_portfolio_pages` | Fetch known sponsor domains whose portfolio mentions "Smile Partners" (from sponsor registry crawl index) | e.g., sponsor page: "Smile Partners — Partnered 2022" |
 | `retrieve_press` | Google News RSS `q="Smile Partners Management"` + wire archives | PR: "Sponsor X announces growth investment in Smile Partners" |
 | `retrieve_edgar_fts` | `https://efts.sec.gov/LATEST/search-index?q=%22Smile+Partners%22` | Form D from 2022 raise, if any |
