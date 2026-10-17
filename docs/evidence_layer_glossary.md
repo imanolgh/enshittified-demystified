@@ -26,7 +26,7 @@ The SEC's free public database of every filing ever submitted. Has a free full-t
 ### BDC — Business Development Company
 A special type of publicly traded fund that lends to private companies — essentially **private credit funds that trade on the stock market**. Because they're public, they must disclose their entire loan portfolio quarterly in a table called the **Schedule of Investments** (which company they lent to, how much, at what rate, and whether it's being repaid).
 **Puzzle piece:** the core dataset of the PC evidence layer — "Fund X lends to Company Y" comes straight from these tables.
-**Stage:** 2 (fetch the 10-K/10-Q), Python sidecar table parsing, then 3.
+**Stage:** 2 (fetch the 10-K/10-Q), in-process table parsing (pdfplumber/camelot), then 3.
 
 ### Form ADV & IAPD — Investment Adviser Public Disclosure
 Every investment adviser (including PE and PC fund managers) must register with the SEC on **Form ADV**, listing their funds and assets under management. **IAPD** is the free public website/bulk-download where these live.
@@ -49,7 +49,7 @@ A law requiring companies to notify states before mass layoffs. States publish t
 ### CAFR / ACFR — (Annual) Comprehensive Financial Report
 The audited annual report every **public pension system** (teachers, state employees) publishes as a PDF. Contains the pension's asset allocation — including what percentage sits in private equity and private credit.
 **Puzzle piece:** how you prove "Oregon's pension is 28% alternatives" with a page-number citation. The public-pension half of MyRetirementX-Ray.
-**Stage:** 2 (PDF download), Python sidecar parsing, then 3.
+**Stage:** 2 (PDF download), in-process PDF parsing (pdfplumber/camelot), then 3.
 
 ### NAIC — National Association of Insurance Commissioners
 The body through which insurance companies file their financial statements. Insurers are big private credit holders; their filings show that exposure.
@@ -142,14 +142,14 @@ The generic term for one system exposing endpoints another system can call. Used
 AI models like Claude. In this architecture, strictly a **reading-comprehension engine**: it extracts claims from documents your pipeline fetched, and never asserts anything it can't quote (Stage 3).
 
 ### FastAPI
-A modern Python web framework for building APIs quickly. In the plan, the framework for the small **Python sidecar service** that parses PDFs and tables — because Python's document-processing libraries are far ahead of PHP's.
+A modern Python web framework for building APIs quickly. **The whole application is built on it** — API, pipeline, review, and serving. Python was chosen over Laravel/PHP because its scraping, PDF/table-parsing, dataframe, and LLM libraries are far ahead (decisions.md §1).
 
 ### pdfplumber / camelot
 Python libraries for extracting text and, critically, **tables** from PDFs. What actually reads a BDC's Schedule of Investments or a pension CAFR allocation table into structured data.
 **Stage:** between 2 and 3.
 
 ### AWS Textract
-Amazon's managed document/table-extraction service — the "pay per page instead of running Python yourself" alternative to the sidecar.
+Amazon's managed document/table-extraction service — the "pay per page" alternative that a PHP stack would have needed. **Not used:** pdfplumber/camelot parse in-process in Python.
 
 ### S3 — (Amazon) Simple Storage Service
 Cloud file storage. Where every retrieved source document is stored **immutably** — your permanent evidence archive and legal defense. (Any S3-compatible storage works.)
@@ -161,16 +161,16 @@ A cryptographic hash — a fingerprint of a file. Stored with every document so 
 Your database. **JSONB** is Postgres's indexed-JSON column type (flexible metadata like deal values). A **CTE** (Common Table Expression) — specifically a *recursive* CTE — is the SQL feature that walks chains: clinic → DSO → sponsor → fund → pension, in one query. It's what makes the ownership-chain and money-flow views possible without a specialty graph database.
 
 ### Redis
-In-memory data store; backs Laravel's queues and the per-domain rate limiting on your scrapers.
+In-memory data store; the Celery message broker and the per-domain rate-limit token buckets on your scrapers.
 
-### Laravel Horizon
-Laravel's dashboard for monitoring queued jobs — throughput, failures, retries. Your pipeline observability.
+### Celery / Celery Beat / Flower
+**Celery** runs the pipeline's background tasks (resolve, retrieve, extract, verify, publish) as declarative chains on Redis-backed queues. **Celery Beat** schedules the recurring crawls. **Flower** is the dashboard for monitoring them — throughput, failures, retries. Your pipeline observability.
 
-### Laravel Filament
-An admin-panel builder for Laravel. The fastest route to the Stage 6 human review interface (claim + highlighted quote + approve/reject).
+### Review panel
+The Stage 6 human review interface (claim beside document text, quote highlighted, approve/edit/reject with audit rows). Hand-built as a few FastAPI endpoints plus minimal pages or a small Vue page (build_roadmap.md Step 26).
 
-### Laravel Scout + Meilisearch / Typesense
-**Scout** is Laravel's search abstraction; **Meilisearch** and **Typesense** are fast open-source search engines it can drive. Powers fuzzy matching of business names/aliases in Stage 1 and consumer search in Stage 7.
+### Meilisearch + rapidfuzz
+**Meilisearch** is a fast open-source search engine (driven from its Python client); **rapidfuzz** is a Python library for cheap local fuzzy-string scoring. Together they power fuzzy matching of business names/aliases in Stage 1 and consumer search in Stage 7.
 
 ### CSV / JSON
 Comma-Separated Values (spreadsheet-style bulk data — how Form 5500 arrives) and JavaScript Object Notation (the structured format the LLM emits claims in and your APIs speak).
@@ -187,9 +187,9 @@ The preview image shown when a link is shared on social platforms. Mentioned for
 | 1 — Entity Resolution | Google Places, NPPES/NPI, state SoS, OpenCorporates, Meilisearch |
 | 2 — Retrieval (PE) | Sponsor portfolio pages, EDGAR (8-K, Form D), press wires, Google News RSS, GDELT, DSO rosters, WARN, CourtListener/RECAP |
 | 2 — Retrieval (PC) | EDGAR (BDC 10-K/10-Q, N-2), Form ADV/IAPD, DOL Form 5500 bulk, pension CAFRs, NAIC (later) |
-| 2→3 — Parsing | Python sidecar (FastAPI + pdfplumber/camelot) or AWS Textract |
+| 2→3 — Parsing | pdfplumber/camelot, in-process |
 | 3 — Extraction | Anthropic API (Claude) |
-| 4 — Verification | Pure PHP string matching (no external service — by design) |
-| 5 — Scoring | Pure PHP business rules |
-| 6 — Review | Filament |
-| 7 — Serving | Laravel API + Postgres recursive CTEs + Vue frontend |
+| 4 — Verification | Pure-Python string matching (no external service — by design) |
+| 5 — Scoring | Pure-Python business rules (SQLAlchemy) |
+| 6 — Review | Hand-built FastAPI review panel |
+| 7 — Serving | FastAPI routers + Postgres recursive CTEs + Vue frontend |

@@ -94,8 +94,11 @@ documents                      -- immutable once written
   url, retrieved_at, sha256, storage_path, mime_type, raw_text (nullable), meta JSONB
 
 claims                         -- atomic, cited assertions
-  id, subject_entity_id, predicate (acquired_by|owned_by|majority_stake|minority_stake|
-      lends_to|holds_position|allocates_to|operates_location_of|renamed_from),
+  id, subject_entity_id, predicate (acquired_by|owned_by|lends_to|holds_position|
+      allocates_to|operates_location_of|renamed_from),
+      -- ruled 2026-09-14: majority/minority stake is degree, not relationship —
+      -- it lives in `value` (e.g. {"stake_pct": 65, "stake_type": "majority"}), matching
+      -- how lends_to @ rate and allocates_to @ % already work. Canonical set: CLAUDE.md.
   object_entity_id, event_date (nullable), value JSONB (amounts, %, rates),
   document_id, verbatim_quote TEXT, quote_verified BOOL, quote_offset,
   extraction_model, extracted_at, status (auto_verified|needs_review|rejected|retracted)
@@ -212,8 +215,10 @@ Form 5500 deserves emphasis: it's a **bulk annual CSV download**, not a scrape �
 
 ## 8. Build Order (prototype → wedge → scale)
 
+> **Build order note (ruled 2026-10-16):** where this section and `build_roadmap.md` differ, the roadmap wins. In particular the first connector is **press-release RSS** (roadmap Step 10) — the simplest source on which to learn the full pipeline; sponsor portfolio pages follow in Step 14.
+
 **Phase 1 — Prove the trust loop (1–2 weeks of effort)**
-Alembic migrations for the schema above; one connector (sponsor portfolio pages for ~20 known DSO/vet rollup sponsors); `extract_claims` + `verify_citations` tasks; a *minimal* review view (Starlette-Admin or Streamlit is fine at this stage). Add roughly a week to the estimate for stack ramp-up. Success = a claim card for a real clinic with verified quotes. **The citation-verification loop is the premise — prototype it first.**
+Alembic migrations for the schema above; one connector (press-release RSS per build_roadmap.md Step 10; originally planned as sponsor portfolio pages for ~20 known DSO/vet rollup sponsors); `extract_claims` + `verify_citations` tasks; a *minimal* review view (Starlette-Admin or Streamlit is fine at this stage). Add roughly a week to the estimate for stack ramp-up. Success = a claim card for a real clinic with verified quotes. **The citation-verification loop is the premise — prototype it first.**
 
 **Phase 2 — Healthcare wedge**
 Load the NPPES bulk census (national); add the NPPES API, state SoS for launch states, press-release RSS, and lazy Google Places resolution. Match DSO/sponsor rosters against the census for the national baseline, then run a deep batch of every dental + vet practice in one metro. Measure: % auto-verified, % unknown, % needing review — these numbers tell you real coverage and review staffing needs.

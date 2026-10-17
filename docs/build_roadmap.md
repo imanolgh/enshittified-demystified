@@ -37,11 +37,11 @@ Write this contract into `CLAUDE.md` on Day 0 so every session starts with the s
    ```
    app/
      core/            # domain: contracts.py, models.py, verify.py, score.py, resolve.py
-     connectors/      # one module per source — all hand-written except bdc_soi.py
+     source_connectors/  # one module per source — all hand-written except bdc_soi.py
      workers/         # celery app, tasks, beat schedule
      api/             # routers
    tests/             # Claude Code's territory; fixtures/ holds golden files
-   docs/              # commit the ten .md project documents here
+   docs/              # the project .md documents (index: docs/README.md)
    CLAUDE.md
    alembic/
    docker-compose.yml
@@ -72,7 +72,7 @@ The foundation week-and-a-half. Slowest, most educational, entirely yours. Each 
 
 **Step 9 — Entity resolution v1 (Days 7–8).** `resolve_entity`: exact match → rapidfuzz scored match against entities+aliases → create, or → review on ambiguity. Enrichment sources plug in during Phase 2; logic first, sources second. *Teaches: the resolve-or-review pattern; keeping thresholds as settings.*
 
-**Step 10 — First connector: press RSS (Days 8–9).** Hand-write `connectors/press_rss.py`: httpx → parse feed → fetch article → selectolax text → `RawDocument` → store. Wire the full Celery chain `retrieve → extract → verify → publish` and run it on a real DSO acquisition press release. *Teaches: httpx, async patterns, and the complete pipeline in miniature.*
+**Step 10 — First connector: press RSS (Days 8–9).** Hand-write `app/source_connectors/press_rss.py`: httpx → parse feed → fetch article → selectolax text → `RawDocument` → store. Wire the full Celery chain `retrieve → extract → verify → publish` and run it on a real DSO acquisition press release. *Teaches: httpx, async patterns, and the complete pipeline in miniature.*
 
 **✅ Phase 1 exit:** one real claim from one real press release, quote-verified, published as a `reported` edge — every line of the path written by you, re-explainable from memory.
 
@@ -100,7 +100,7 @@ Each connector: Claude Code digests the docs and drafts the fixture files' *shap
 
 **Step 18 — First real batch (Days 18–19).** ~200 dental+vet practices, one metro — now drawn *from the census* rather than a hand-built CSV, exercising deep per-entity research (press, SoS, EDGAR) on top of the census/roster baseline. Build the batch outcome report (resolved / verified-chain / reported / no_evidence / review counts). Fix the top failure classes it reveals — this run's job is to find your resolution-threshold and prompt bugs.
 
-**Seeding strategy, stated once (see decisions.md §12):** national coverage is built **top-down** — sponsor/DSO rosters enumerate the PE layer, the NPPES bulk census supplies the denominator, and their join is the launch map. Bottom-up per-entity research is reserved for metro showcase depth (this step), on-demand user searches, and non-healthcare Tier-1 verticals where no census file exists (vets via state license boards + rosters).
+**Seeding strategy, stated once (see decisions.md §11):** national coverage is built **top-down** — sponsor/DSO rosters enumerate the PE layer, the NPPES bulk census supplies the denominator, and their join is the launch map. Bottom-up per-entity research is reserved for metro showcase depth (this step), on-demand user searches, and non-healthcare Tier-1 verticals where no census file exists (vets via state license boards + rosters).
 
 **✅ Phase 2 exit:** national healthcare census loaded and matched against rosters (the map lights up nationally), metro batch producing verified ownership chains queryable via `GET /api/entities/{id}/card`, honest `no_evidence_found` majority, and you can describe every connector's quirks from memory.
 
@@ -148,7 +148,9 @@ Reserved for what the batches revealed, plus the first deferred items if time al
 
 ## 8. Explicitly Deferred
 
-CAFRs at scale · N-PORT + the paid 401(k) analysis product · on-demand user research (scenario A2) · OpenCorporates · states 2–50 SoS · WARN, licensing boards, GDELT, CourtListener · NAIC · community submissions · all frontend. Every deferral has a slot: deferred connectors follow a house pattern you've already built by hand; deferred products compose over edges that already exist.
+These are deferred from *this engine build* — not necessarily from launch. CAFRs at scale · N-PORT + the paid 401(k) analysis product · OpenCorporates · states 2–50 SoS · WARN, licensing boards other than vet boards, GDELT, CourtListener · NAIC · community submissions · all frontend. Every deferral has a slot: deferred connectors follow a house pattern you've already built by hand; deferred products compose over edges that already exist.
+
+**Launch requires more than this roadmap (ruled 2026-10-16).** Finishing the 29 steps produces a launch-ready *engine*; launching also requires the pre-launch-seeding.md workstreams W1–W8. Two items are therefore **pulled out of the deferred list and required before launch**: on-demand user research (scenario A2 — the "Unknown — research on request" coverage state depends on it) and **state veterinary license boards for the launch states** (W4 — vets have no NPPES census, so without boards there is no vet denominator).
 
 ---
 

@@ -45,7 +45,7 @@ app/main.py             # developer-written (app factory + include_router)
 tests/                  # YOURS (suites + fixtures/); developer runs them
 docs/                   # living project docs; editable when asked (opened up 2026-09-04) — requirements pivot, docs follow
 ```
-Structure decisions (settled 2026-08-31, don't relitigate): thin route functions in per-group `APIRouter` files — no controllers layer; single `config.py`, not a config package; orchestration is declarative Celery `chain()`s in one workers module, not orchestrator classes. `docs/` predates the rename and still says `app/connectors/` — same folder.
+Structure decisions (settled 2026-08-31, don't relitigate): thin route functions in per-group `APIRouter` files — no controllers layer; single `config.py`, not a config package; orchestration is declarative Celery `chain()`s in one workers module, not orchestrator classes. The connectors folder is `app/source_connectors/` (renamed from `connectors/`); never create `app/connectors/`.
 
 ## Working rules
 - **Git commits are the developer's alone.** Never run `git commit` (or push, amend, rebase, tag) unless the developer explicitly asks for that specific commit in that moment. Staging with `git add` when asked is fine; the commit itself is theirs.

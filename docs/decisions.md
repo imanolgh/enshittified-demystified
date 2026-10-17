@@ -43,7 +43,7 @@
 
 **Regulatory line:** Reports show evidence, explain mechanisms (gates, PIK, fees), and cite filings — they **never recommend actions**. Recommendation is investment advice and can trigger RIA registration. Wording must stay informational; confirm with a securities attorney before charging for the personalized product.
 
-**Pricing model:** A one-time ~$50 deep-dive is plausible but weak while most plans still show minimal exposure. The primary product is the **monitoring subscription** ($5–8/mo): "your plan is clean today; we watch its filings and alert you when private-markets vehicles appear." The deep-dive is the premium tier for users already known to be exposed. Marginal cost per analysis is near zero because reports compose from already-published edges.
+**Pricing model (superseded 2026-10-16 — canonical pricing is monetizationideas.md §3):** one consolidated **Premium tier at ~$8/mo or ~$79/yr** (unlimited follows + alerts, retirement monitor with monthly brief, annual cited deep-dive included, priority on-demand research). The headline exposure number is free; the standalone full cited deep-dive is **$29–49**. The reasoning that still holds: the deep-dive alone is weak while most plans show minimal exposure, so monitoring ("your plan is clean today; we watch its filings and alert you when private-markets vehicles appear") is the primary product. Marginal cost per analysis is near zero because reports compose from already-published edges.
 
 ## 6. Map Delivery: Standalone Web App First, Extension Second
 

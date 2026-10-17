@@ -168,7 +168,7 @@ A family of one-input, one-share-card micro-tools, each targeting a documented s
 - "Is this brand still worth buying used?" (acquisition-date checker)
 - "How exposed is my state's pension?"
 
-Each ranks for its own query and funnels to the main app. Lightweight Laravel/Vue builds — a lookup table, a search endpoint, an OG-image generator per tool.
+Each ranks for its own query and funnels to the main app. Lightweight builds on the main FastAPI backend (+ Vue) — a lookup table, a search endpoint, an OG-image generator per tool.
 
 ## 4C: The "Not Owned By Private Equity" Independent-Business Channel
 
@@ -207,7 +207,7 @@ The consumer lookup requested three times verbatim — launched with **local hea
 
 - **Market size/growth:** Universal — everyone with a dentist, a vet, or a lease; PE consolidation compounds the addressable outrage quarterly. Demand pre-validated by a viral video, a viral ledger, and three verbatim requests.
 - **Competitive advantage sustainability:** STRONG. The verified-contribution flywheel (3B) and certification lock-in (5C) are real moats; the ownership-type taxonomy wins the accuracy fights the incumbent is losing; the incumbent's own comment thread is the roadmap.
-- **Implementation feasibility:** HIGH. V1 = seeded database (portfolio pages, press releases, DSO/state registrations) + submission queue + map UI, buildable on a Laravel/Vue stack, launched in one vertical or one metro for credible coverage. Creator distribution (4A) is near-free.
+- **Implementation feasibility:** HIGH. V1 = seeded database (portfolio pages, press releases, DSO/state registrations) + submission queue + map UI, buildable on the FastAPI (Python) + Vue stack, launched in one vertical or one metro for credible coverage. Creator distribution (4A) is near-free.
 - **Category dominance potential:** VERY HIGH — the category has no name yet; whoever names "ownership transparency" owns it.
 - **Key risks:** Data gaps (mitigate: honest unknowns, vertical focus), legal pressure (mitigate: citation-required listings, two-source rule), outrage-cycle dependence (mitigate: alerts + certification create durable utility).
 
