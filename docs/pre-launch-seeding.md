@@ -71,7 +71,7 @@ Any business type is searchable from day one — the search box is not category-
 | Employer → 401(k) plan lineup lookup + **free headline exposure number** | ✅ Yes | Form 5500/EFAST bulk load (Scenario B1a) — effectively every private-sector plan |
 | BDC loan books as `lends_to` edges (incl. the PE↔PC cross-links where borrowers resolve) | ✅ Yes | ~150 BDC latest 10-K/10-Qs parsed (B1b) |
 | Public pension lookup (CAFR allocations) | 🔜 Fast-follow, not launch | Top-100 CAFRs; roadmap Phase 5+. UI at launch: "public pension coverage coming — get notified" |
-| Paid deep-dive analysis / monitor | 🔜 Post-launch | Composes over the above once monetization ships |
+| Deep-dive analysis / retirement monitor | ✅ At launch, free during the ~3-month founding-member beta; paid after (monetizationideas.md §3A) | Composes over the above; requires the securities-attorney wording review and billing/tiers built before launch |
 
 ---
 
@@ -119,3 +119,4 @@ Any business type is searchable from day one — the search box is not category-
 - [ ] Every claim card resolves to stored source documents; retraction/changelog path tested
 - [ ] Beat schedules running: roster diffs, press polls, EDGAR polls — launch data doesn't rot
 - [ ] Spot-check pass (W7) signed off by you personally
+- [ ] Founding-member beta ready (monetizationideas.md §3A): alerts, monthly digest, retirement brief and deep-dive working; securities-attorney wording review done; billing and account tiers built and tested; beta end date shown in-app

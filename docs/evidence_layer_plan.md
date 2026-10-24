@@ -37,6 +37,7 @@ The AI is a reading-comprehension engine over documents you fetched. Hallucinati
 | Bulk data | **pandas** / **polars** | `COPY` + raw SQL via `DB::` | Form 5500 CSVs → clean → Postgres |
 | LLM | **Anthropic Python SDK** (Sonnet-class bulk, Opus-class escalation) | Anthropic PHP SDK / plain HTTP | Structured outputs pair with Pydantic |
 | Search / fuzzy match | **Meilisearch** Python client + **rapidfuzz** | Laravel Scout + Meilisearch | Entity/alias matching (Stage 1) and consumer search (Stage 7) |
+| Classifier (experimental) | **Jev** (TypeSafe AI "System One" model) behind a hand-written `classify()` interface in `app/core/` | — (no equivalent) | Fast, cheap, calibrated true/false and pick-from-a-list answers for routing and second-opinion checks. **Never creates claims.** Adoption decided per role in build_roadmap.md Step 27b |
 | Admin / review UI | **Starlette-Admin** or **SQLAdmin** (+ custom review views), or a small Vue panel; Streamlit acceptable for a scrappy internal v1 | **Filament** | The honest gap of the Python path — Filament had this nearly free; budget real days here |
 | Auth / API | FastAPI dependencies + `fastapi-users` (or hand-rolled JWT) | Sanctum + API Resources | Serves claim cards and graph endpoints to Vue |
 | Frontend | Vue 3 | same | FastAPI's OpenAPI schema can generate the TS client |
@@ -156,11 +157,13 @@ Celery Beat (≈ Laravel Scheduler): recurring crawls of sponsor portfolio pages
 ### Stage 3 — LLM Extraction (`extract_claims`, was `ExtractClaimsJob`)
 Runs per entity once its retrieval chord completes (the `chord()` callback ≈ `Bus::batch()->then(...)`).
 
+*(Experimental, Step 27b)* **Jev pre-filter:** before extraction, Jev answers a true/false question per document ("does this contain ownership, acquisition or lending evidence about X?"). Only positives are sent to Claude. It is adopted only if A/B testing shows near-zero loss of evidence-bearing documents.
+
 1. Assemble the document set (text + parsed tables) for the entity, chunked to context limits.
 2. Call Claude (Anthropic Python SDK) with a strict system prompt; the response is parsed straight into Pydantic `Claim` models — anything that fails validation is dropped and logged before it can reach the DB:
    - Emit claims only in the fixed predicate vocabulary.
    - **Every claim must include a verbatim quote copied exactly from the provided document.**
-   - Classify ownership_type per the taxonomy (pe_fund vs conglomerate vs family etc.).
+   - Classify ownership_type per the taxonomy (pe_fund vs conglomerate vs family etc.). *(Experimental, Step 27b: Jev independently picks the ownership type from the same 9-value list; disagreements with Claude go to review.)*
    - If the documents contain no ownership/exposure evidence, return an explicit `no_evidence_found` result — a first-class outcome, not an error.
 3. Model tiering: Sonnet-class for bulk; escalate to Opus-class when documents conflict or classification is ambiguous.
 4. Write raw response to the claim rows (`extraction_model`, `extracted_at`).
@@ -170,6 +173,7 @@ Pure Python, no AI:
 1. For each claim, string-search `verbatim_quote` (whitespace-normalized) in the stored document text.
 2. Found → `quote_verified = true`, record offset. Not found → **auto-reject** the claim and log for prompt tuning.
 3. Sanity checks: cited document actually mentions the subject alias; event_date is plausible; numeric values in `value` appear in the quote for PC claims.
+4. *(Experimental, Step 27b)* **Jev claim-support check:** for claims that passed steps 1–3, Jev answers "does this verified quote support predicate P between S and O?" Low confidence routes the claim to a `review_item` instead of auto-publication. Jev can only send a claim to review; it can never verify or publish one by itself.
 
 ### Stage 5 — Confidence Scoring & Edge Publication (`score_and_publish`, was `ScoreAndPublishJob`)
 1. Group verified claims by (subject, predicate, object).
@@ -238,6 +242,7 @@ Cross-link the layers (sponsor → PC lender → pension LP where public evidenc
 
 - No PitchBook/Preqin data (licensing + provenance premise).
 - No LLM answers beyond the corpus — "no evidence found" is always preferred over inference.
+- No claims from a classifier. Jev (if adopted) routes work and labels or flags quote-verified claims; it cannot produce quotes, so it can never be the source of a published fact.
 - No silent corrections, no unsourced edges, no solo-published community tips.
 - No claims of completeness — the honest `unknown` state is load-bearing for trust.
 

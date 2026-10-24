@@ -25,7 +25,7 @@ A second principle shapes every price: **event frequency.** Subscriptions surviv
 
 ---
 
-## 3. Consolidated Tier Structure (recommended)
+## 3. Consolidated Tier Structure (canonical)
 
 Two small overlapping subscriptions (#1 + #3) sell worse than one; subscription fatigue is real. Consolidate into a single premium tier.
 
@@ -37,18 +37,50 @@ Two small overlapping subscriptions (#1 + #3) sell worse than one; subscription 
 
 ### Premium — ~$8/mo or ~$79/yr
 - Unlimited follows + acquisition alerts (in-app always; email and/or SMS per user preference)
+- Monthly digest (re-check confirmations for followed businesses + metro acquisition roundup)
 - Retirement monitor with the monthly brief
 - Annual cited deep-dive report included
-- Priority on-demand research for businesses not yet in the graph
+- *(minor perk)* Priority on-demand research for businesses not yet in the graph
+
+**Positioning (2026-10-16):** Premium is sold on monitoring — alerts, the digest, the retirement brief and the deep-dive. Priority research is a minor perk only and should not be marketed as a reason to subscribe. Most evidence-bearing businesses are pre-seeded, many on-demand results are an honest "no PE evidence found", and on-demand research stays free for everyone; Premium only moves it up the queue. A "no evidence found" result should lead the user to "follow this business so you know if that changes."
 
 ### Supply side (independent businesses pay, users never do)
 - **Certified Independent** verification: $200–500/yr (marketgaps.md 5C)
 - Featured placement among alternatives — scrupulously disclosed as sponsored (this audience checks)
 - Affiliate revenue on alternative click-throughs / bookings
 
+### Research/Pro — ~$20–30/mo (post-launch, ruled 2026-10-16)
+- Market-wide intelligence for professionals (journalists, lawyers, investors, litigation funders): quarterly BDC loan-book diffs (new borrowers, departed loans, non-accrual and PIK trends), full rollup dossiers, cross-layer exposure maps, and eventually the insurer/NAIC exposure map as flagship.
+- **Sequencing gate:** launches only after the graph has real depth (several quarters of BDC diffs, dossiers worth reading). Selling thin reports to the most demanding audience would burn trust.
+- **Keep the tiers distinct:** Premium is *personal* (your businesses, your funds); Research/Pro is *market-wide*.
+- Willingness-to-pay evidence: Octus and Grant's are cited approvingly in the corpus as useful but expensive. Research/Pro sits well under $1,000+/yr institutional products and above consumer pricing.
+- A usage meter suits this tier (e.g. 3 free dossiers or loan-book views per month), because its audience looks things up often.
+
 ### Later
 - **B2B graph & API licensing** (marketgaps.md 3C): journalists, academics, union pension committees, litigation funders — the largest long-run line ("research that would make a ton of money")
 - One-time premium reports: family retirement audit ($99+), full rollup dossiers
+
+---
+
+## 3A. Launch Phase — ~3-Month Free Premium Beta (agreed 2026-10-17)
+
+Before any billing, every user gets Premium free during a founding-member beta. Evidence stays free throughout and after.
+
+- **Label it from day one:** "Founding members: Premium free until [date]." Send a reminder 2–3 weeks before it ends. No surprise paywall.
+- **What's free during the beta:** unlimited follows and alerts, the monthly digest, the retirement monitor brief, and the included deep-dive.
+- **Gentle downgrade after the beta:** free users keep 2–3 active follows. Extra follows are **saved and paused, not deleted**; the user picks which stay active, and subscribing reactivates the rest in one click. Deep-dives already received stay with the user; the next one comes a year later with Premium.
+- **Founding-member incentive:** a locked-in lower price for beta joiners (e.g. ~$5/mo or $49/yr), so early users become defenders of the price change.
+- **Trigger, not just a date:** about 3 months is the target. Turn billing on only once alerts have fired for real users and the digest has gone out reliably; otherwise extend the beta.
+- **Must be ready before the beta starts:** the securities-attorney review of the retirement brief and deep-dive wording (decisions.md §5), and built and tested billing/account tiers, so the switch is a config change.
+- **Make monitoring visible:** most users won't receive a real acquisition alert within 3 months, so the digest's re-check confirmations ("we checked your 6 businesses on these dates; no changes") carry the value.
+- **MyRetirementX-Ray at launch:** the employer → plan lookup and the free headline exposure number launch with the PE map (they're seeded and free forever). The Premium pieces (monitor brief, deep-dive) are available from launch for free as part of the beta, and become paid when billing turns on.
+
+## 3B. Metering Rules
+
+- **Never meter claim cards**, sources, ownership chains or alternatives. Shared links must always land on visible evidence, since sharing is the growth loop.
+- **Acceptable meters**, if wanted later: (a) depth, meaning full dossier/money-flow graph views beyond the claim card; (b) on-demand research for businesses not yet in the graph, which has real per-request cost; (c) Research/Pro usage.
+- **Considered but not adopted for the consumer app:** a Simply Wall St–style "N free searches, then pay" meter. Reasons: consumers search rarely (a few businesses a few times a year), growth is driven by shared links, and the evidence-is-free principle. Simply Wall St's model fits the Research/Pro audience instead.
+- **Also considered and advised against:** free-until-viral, then charging existing users to keep using the product. Taking away free access that people relied on is the bait-and-switch this audience is primed to punish; the founding-member beta above gets the same revenue without it.
 
 ---
 

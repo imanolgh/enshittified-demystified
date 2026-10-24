@@ -37,11 +37,11 @@ Write this contract into `CLAUDE.md` on Day 0 so every session starts with the s
    ```
    app/
      core/            # domain: contracts.py, models.py, verify.py, score.py, resolve.py
-     source_connectors/  # one module per source — all hand-written except bdc_soi.py
+     connectors/      # one module per source — all hand-written except bdc_soi.py
      workers/         # celery app, tasks, beat schedule
      api/             # routers
    tests/             # Claude Code's territory; fixtures/ holds golden files
-   docs/              # the project .md documents (index: docs/README.md)
+   docs/              # commit the ten .md project documents here
    CLAUDE.md
    alembic/
    docker-compose.yml
@@ -72,7 +72,7 @@ The foundation week-and-a-half. Slowest, most educational, entirely yours. Each 
 
 **Step 9 — Entity resolution v1 (Days 7–8).** `resolve_entity`: exact match → rapidfuzz scored match against entities+aliases → create, or → review on ambiguity. Enrichment sources plug in during Phase 2; logic first, sources second. *Teaches: the resolve-or-review pattern; keeping thresholds as settings.*
 
-**Step 10 — First connector: press RSS (Days 8–9).** Hand-write `app/source_connectors/press_rss.py`: httpx → parse feed → fetch article → selectolax text → `RawDocument` → store. Wire the full Celery chain `retrieve → extract → verify → publish` and run it on a real DSO acquisition press release. *Teaches: httpx, async patterns, and the complete pipeline in miniature.*
+**Step 10 — First connector: press RSS (Days 8–9).** Hand-write `connectors/press_rss.py`: httpx → parse feed → fetch article → selectolax text → `RawDocument` → store. Wire the full Celery chain `retrieve → extract → verify → publish` and run it on a real DSO acquisition press release. *Teaches: httpx, async patterns, and the complete pipeline in miniature.*
 
 **✅ Phase 1 exit:** one real claim from one real press release, quote-verified, published as a `reported` edge — every line of the path written by you, re-explainable from memory.
 
@@ -131,6 +131,26 @@ Each connector: Claude Code digests the docs and drafts the fixture files' *shap
 **Step 26 — Review panel (Days 31–33).** Hand-build it as a small set of FastAPI endpoints + minimal server-rendered pages or a tiny Vue page — consistent with owning your stack, and honestly not much slower than fighting SQLAdmin's customization for the one view that matters: claim beside document text, quote highlighted, approve/edit/reject writing audit rows. *Teaches: the full request→template/SPA loop in your own API.*
 
 **Step 27 — Full metro batch (Days 34–36).** The 2,000-entity run (research_flows.md A1). Watch Flower; tune workers per queue and rate budgets; measure outcome distribution and LLM spend per entity; fix the top 3 failure classes.
+
+**Step 27b — Jev A/B experiment (added 2026-10-17).** Run the same metro batch, or a fixed sample of it (e.g. 300–500 entities) with its document sets frozen, through two pipelines:
+- **A: baseline.** The Claude-only pipeline exactly as built.
+- **B: with Jev** (TypeSafe AI System One classifier) in these roles only:
+  1. **Pre-filter:** a true/false probability on "does this document contain ownership, acquisition or lending evidence about X?"; only positives go to `extract_claims`.
+  2. **Ownership-type classification:** a Choice over the 9-value `ownership_type` taxonomy, compared against Claude's label.
+  3. **Claim-support check:** after `verify_citations` passes, a true/false probability on "does this verified quote support predicate P between S and O?" Low confidence → `review_item`.
+  4. *(optional)* **Entity-match confidence** for resolution ambiguity routing.
+
+Hand-write a thin `classify()` interface in `app/core/` so the vendor is swappable and Jev never touches the DB directly. **Invariant: Jev never creates a claim.** It only routes work and labels claims that already carry a verified verbatim quote.
+
+**Measure, A vs. B:**
+- Pre-filter recall: evidence-bearing documents Jev wrongly dropped. Use A's verified claims as ground truth; the target is ~0 lost `verified` edges.
+- Ownership-type agreement rate, and a hand-check of disagreements.
+- How many weak-but-quote-verified claims the claim-support check catches.
+- Review-queue size, LLM spend per entity, and wall-clock time.
+
+**Decision gate (yours):** adopt each role independently. Keep the pre-filter only if recall is near-perfect at a chosen confidence threshold. Keep the claim-support check if it catches real errors without flooding review. Record the results and rulings in `decisions.md`.
+
+*Note: Jev was early access with vendor-only benchmarks as of 2026-10; confirm API access, limits and pricing before this step.*
 
 **Step 28 — Retraction + changelog (Day 36).** `POST /internal/edges/{id}/retract` → end-date edge, append event, claims untouched; changelog = query over events. Small; it's the credibility story.
 

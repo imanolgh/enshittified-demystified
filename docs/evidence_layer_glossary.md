@@ -169,6 +169,11 @@ In-memory data store; the Celery message broker and the per-domain rate-limit to
 ### Review panel
 The Stage 6 human review interface (claim beside document text, quote highlighted, approve/edit/reject with audit rows). Hand-built as a few FastAPI endpoints plus minimal pages or a small Vue page (build_roadmap.md Step 26).
 
+### Jev (TypeSafe AI) — experimental
+A non-generative "System One" AI model: instead of writing text, it answers questions with a fixed answer space. It supports three question types: **Choice** (pick one of up to 255 options), **Score** (a level on a scale), and true/false probability. Every answer comes with a calibrated confidence. It's very fast (~70–500 ms), very cheap (~$0.042 per million input tokens, output free), with a 64K context, English-first, and was in early access as of 2026-10.
+**Puzzle piece:** a cheap, independent second opinion. Candidate roles are pre-filtering documents before extraction, classifying ownership type, checking that a verified quote supports its claim, and scoring entity matches for review routing. **It can't replace the LLM extractor:** it returns no verbatim quotes and can't name entities it wasn't given as options. **Rule:** it never creates claims.
+**Stage:** 3 (pre-filter, ownership type), 4 (claim-support check), 1 (match confidence, optional). Tested in build_roadmap.md Step 27b.
+
 ### Meilisearch + rapidfuzz
 **Meilisearch** is a fast open-source search engine (driven from its Python client); **rapidfuzz** is a Python library for cheap local fuzzy-string scoring. Together they power fuzzy matching of business names/aliases in Stage 1 and consumer search in Stage 7.
 
@@ -188,8 +193,8 @@ The preview image shown when a link is shared on social platforms. Mentioned for
 | 2 — Retrieval (PE) | Sponsor portfolio pages, EDGAR (8-K, Form D), press wires, Google News RSS, GDELT, DSO rosters, WARN, CourtListener/RECAP |
 | 2 — Retrieval (PC) | EDGAR (BDC 10-K/10-Q, N-2), Form ADV/IAPD, DOL Form 5500 bulk, pension CAFRs, NAIC (later) |
 | 2→3 — Parsing | pdfplumber/camelot, in-process |
-| 3 — Extraction | Anthropic API (Claude) |
-| 4 — Verification | Pure-Python string matching (no external service — by design) |
+| 3 — Extraction | Anthropic API (Claude); Jev pre-filter + ownership-type check (experimental) |
+| 4 — Verification | Pure-Python string matching (no external service — by design); Jev claim-support check routes to review only (experimental) |
 | 5 — Scoring | Pure-Python business rules (SQLAlchemy) |
 | 6 — Review | Hand-built FastAPI review panel |
 | 7 — Serving | FastAPI routers + Postgres recursive CTEs + Vue frontend |
