@@ -89,9 +89,9 @@ Any business type is searchable from day one — the search box is not category-
 
 **W6 — PC bulk loads.** Form 5500 (B1a) + 150-BDC parse (B1b) + borrower resolution pass (the graph join).
 
-**W7 — QA & honesty pass.** Hand-spot-check 50 random entities per coverage state against their sources; verify every "no evidence" entity really matched against the full roster set; confirm checked-dates render; confirm A2 on-demand works end to end for an unseeded category.
+**W7 — QA & honesty pass.** *(System QA, not fact review — ADR 0002: findings become fixes to code, fixtures, thresholds or the prompt, then a re-run; no fact is hand-edited.)* Hand-spot-check 50 random entities per coverage state against their sources; verify every "no evidence" entity really matched against the full roster set; confirm checked-dates render; confirm A2 on-demand works end to end for an unseeded category.
 
-**W8 — Review-queue drain.** Launch gate: single-source and conflict queues at a size you can actually work weekly, not a backlog measured in thousands.
+**W8 — Review-queue drain.** *(Superseded 2026-10-26 by ADR 0002 — no review queue; replace with a launch gate on the share of `reported` and `sources_disagree` results.)* Launch gate: single-source and conflict queues at a size you can actually work weekly, not a backlog measured in thousands.
 
 ---
 

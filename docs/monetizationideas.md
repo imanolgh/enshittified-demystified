@@ -45,7 +45,7 @@ Two small overlapping subscriptions (#1 + #3) sell worse than one; subscription 
 **Positioning (2026-10-16):** Premium is sold on monitoring — alerts, the digest, the retirement brief and the deep-dive. Priority research is a minor perk only and should not be marketed as a reason to subscribe. Most evidence-bearing businesses are pre-seeded, many on-demand results are an honest "no PE evidence found", and on-demand research stays free for everyone; Premium only moves it up the queue. A "no evidence found" result should lead the user to "follow this business so you know if that changes."
 
 ### Supply side (independent businesses pay, users never do)
-- **Certified Independent** verification: $200–500/yr (marketgaps.md 5C)
+- **Certified Independent** verification: $200–500/yr (marketgaps.md 5C) *(Not in the MVP — ruled 2026-10-26.)* Later feature; granted only by automated checks against official records (ADR 0001).
 - Featured placement among alternatives — scrupulously disclosed as sponsored (this audience checks)
 - Affiliate revenue on alternative click-throughs / bookings
 

@@ -18,6 +18,8 @@ The fifteen project documents in this folder, in reading order, with the role of
 | 12 | `architecture-study-notes.md` | Study notes — layering/folder-structure Q&A between developer and Claude Code |
 | 13 | `python-types-primer.md` | Python data structures and type annotations, angled at a PHP/Laravel background |
 | 14 | `step1-contracts-guide.md` | Guide for roadmap Step 1 (`app/core/contracts.py`), incl. the 7-predicate ruling |
+| — | `../GLOSSARY.md` | Canonical domain vocabulary (ownership, owners, evidence) — built by `/grill-with-docs`; wins over `evidence_layer_glossary.md` where they differ |
+| — | `adr/` | Architecture decision records, `NNNN-slug.md`. 0001 ownership categories computed by code; 0002 no manual review; 0003 one source type per publisher |
 | 15 | (this file) | Index |
 
 Claude Code: consult these on demand and treat them as authoritative context. Since 2026-09-04 they are editable when the developer asks (requirements pivot, docs follow). If code and docs conflict, flag it to the developer rather than silently following either.

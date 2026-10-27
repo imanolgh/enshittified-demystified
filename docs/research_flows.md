@@ -33,7 +33,7 @@ For row: *"Bright Smiles Dental, 123 Grand St, Croton-on-Hudson, NY"* (fictional
 4. **Meilisearch/rapidfuzz** match against existing entities → "Smile Partners Management" matches an existing DSO entity at 0.94 → link instead of create.
 5. Write: entity `ent_8821` (business) with aliases, plus a resolution hint linking it to DSO entity `ent_0455` (a *hint* for retrieval, not a claim — the `operates_location_of` claim must still come from a stored document in Steps 3–4). Item status → `resolved`.
 
-**Failure branches:** Places returns 3 plausible matches → item status `ambiguous`, lands in review queue with candidates; no NPPES hit for a vet named "Pet Palace" → continue with Places + SoS only (NPPES is dental/medical, vets resolve via state veterinary license boards where scraped).
+**Failure branches:** Places returns 3 plausible matches and address/phone/NPI tiebreakers don't separate them → item status `ambiguous`, candidates stored, no claims linked, search shows "couldn't confirm which business this is"; retried automatically when an identity source refreshes (ADR 0002); no NPPES hit for a vet named "Pet Palace" → continue with Places + SoS only (NPPES is dental/medical, vets resolve via state veterinary license boards where scraped).
 
 ### Step 3 — Retrieval Fan-out (`retrieve_*` tasks, Celery `chord`)
 Category `dental` + DSO link triggers this connector set for `ent_8821` + `ent_0455`:
@@ -65,17 +65,17 @@ Assemble the 6–12 documents (text-extracted) → one Claude call (Sonnet-class
 Malformed items fail Pydantic → logged, dropped, batch flagged if failure rate >5%.
 
 ### Step 5 — Mechanical Verification (`verify_citations`)
-Pure Python: normalize whitespace, substring-match each `quote` in its doc's stored text. Match → `quote_verified=true` + offset. No match → claim auto-rejected + logged for prompt tuning. Sanity checks: subject alias appears in doc; event_date within doc's plausible range.
+Pure Python: normalize whitespace, substring-match each `quote` in its doc's stored text. Match → offset recorded, claim `accepted` once all checks pass. No match → claim `rejected` (reason `quote_not_found`) + logged for prompt tuning. Sanity checks: subject alias appears in doc; event_date within doc's plausible range.
 
 ### Step 6 — Scoring & Publication (`score_and_publish`)
-- `acquired_by(SmilePartners → SponsorX)`: supported by press release (wire) **and** sponsor portfolio page (different domains/source_types) → **edge published, confidence `verified`**, ownership_type `pe_backed`.
+- `acquired_by(SmilePartners → SponsorX)`: supported by press release (wire) **and** sponsor portfolio page (different domains/source_types) → **edge published, confidence `verified`**. Sponsor X's owner kind is `pe_firm`, so Bright Smiles' category is computed as `pe_owned`, separation degree 2 (ADR 0001).
 - `operates_location_of(BrightSmiles → SmilePartners)`: DSO roster **and** NPPES other-name field → **verified**.
 - Result the consumer app can now serve: *Bright Smiles → Smile Partners (DSO) → Sponsor X (PE)* — full chain, 4 receipts.
-- A different item in the batch with only one source → edge `reported` + `review_item(single_source)`.
+- A different item in the batch with only one source → edge `reported`, labeled as one source (ADR 0002).
 
 ### Step 7 — Batch Outcome Report
 Batch dashboard after ~a day of wall-clock (rate-limit bound):
-`resolved 94% · verified chain 31% · reported 9% · no_evidence_found 52% · needs_review 8%`.
+`resolved 94% · verified chain 31% · reported 9% · no_evidence_found 52% · ambiguous 8%`.
 The 52% "no evidence" entities publish as **"No PE evidence found (checked {date})"** — the honest state, and in Tier-1 verticals a meaningful "likely independent" signal.
 
 ---
@@ -121,7 +121,7 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 
 ### B1a — Form 5500 universe (the weekend win)
 1. `load_form5500(year=2025)`: download DOL EFAST bulk CSVs (plan header + Schedule H) — no scraping, no LLM.
-2. polars/pandas: filter defined-contribution plans → normalize sponsor employer names → upsert `entities(type=plan)` + `allocates_to` **structured claims** with `source_type=form5500_bulk`.
+2. polars/pandas: filter defined-contribution plans → normalize sponsor employer names → upsert `entities(type=retirement_plan)` + `allocates_to` **structured claims** with `source_type=form5500` (meta `retrieval: bulk`).
 3. Bulk-load claims skip LLM extraction entirely (the government CSV *is* the structure) but still carry document provenance (file, row, year) and publish as `verified` (single authoritative source rule: official filings self-verify).
 4. Outcome: essentially every private-sector plan in the U.S. is queryable by employer name.
 
@@ -129,8 +129,8 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 1. `discover_bdcs`: EDGAR company search, SIC/filer type → list of ~150 BDC CIK numbers → entities.
 2. Per BDC: `retrieve_edgar_filing(cik, "10-K")` via `https://data.sec.gov/submissions/CIK{cik}.json` → latest 10-K/10-Q → S3.
 3. `parse_soi`: pdfplumber/camelot extract the **Schedule of Investments** tables (often 30–80 pages) → normalized rows: borrower name, instrument, rate (spot PIK terms), principal, fair value, non-accrual flag.
-4. `extract_claims` (LLM pass over *parsed table JSON*, not raw PDF): emits `lends_to` claims — one per borrower — each quoting its table row text; plus fund-level facts (total PIK %, non-accrual %).
-5. Verification quirk: quotes match against the *parsed table text* stored on the document row; a numeric cross-check asserts the quoted principal equals the structured value.
+4. `bdc_soi` (the delegated parser, Step 21 — no LLM) emits `lends_to` claims directly — one per borrower — each quoting its table row text; plus fund-level facts (total PIK %, non-accrual %). The LLM runs only over the filing's narrative text (MD&A commentary), as for any other `sec_filing` document. *(Ruled 2026-10-26: parser only, no LLM fallback for unparseable tables; revisit with the per-filing failure-rate data after Step 21.)*
+5. Verification quirk: quotes match against the *parsed table text* stored on the document row; a numeric cross-check asserts the quoted principal equals the structured value. A failing row's claim is rejected; above a per-filing failure-rate threshold the filing is withheld as unparseable and an operational alert fires (ADR 0002).
 6. Borrower names → `resolve_entity` (no Places — these aren't storefronts; EDGAR/SoS/fuzzy only). This is where PC meets PE: **"Borrower: Smile Partners Management LLC" resolves to `ent_0455`** — and the cross-layer edge `lends_to(BDC_Fund → SmilePartners)` joins the graphs.
 
 ### B1c — Top-100 public pension CAFRs
@@ -177,6 +177,6 @@ Diffing is the theme: ongoing PC work is **compare-new-filing-to-old-edges**, em
 
 **Event log:** every edge publication/retraction/confidence-change appends to an `events` table — the single feed powering Acquisition Alarm, plan-change alerts, the public changelog, and cache invalidation for claim cards.
 
-**Review queue inflow:** ambiguous resolutions (A1), single-source edges (A1/A3), extraction conflicts, community submissions, numeric cross-check failures (B1b). Everything else flows lights-out.
+**No review queue (ADR 0002):** everything flows lights-out. Ambiguous resolutions (A1) publish as "couldn't confirm which business"; single-source edges publish as `reported`; conflicts show as "sources disagree"; numeric cross-check failures (B1b) are rejected, with an operational alert when a filing's failure rate crosses the threshold.
 
 **The flywheel, restated as data flow:** user searches (A2) prioritize crawling → crawling publishes edges → edges make searches instant → filings refresh (A3/B3) emit events → events drive alerts → alert subscribers fund the crawling.

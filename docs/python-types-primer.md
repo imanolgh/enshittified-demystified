@@ -96,7 +96,7 @@ Laravel's `collect()->filter()->map()->values()` chain, built into the language.
 **List comprehension** — produces a list:
 
 ```python
-verified = [c for c in claims if c.quote_verified]        # filter
+accepted = [c for c in claims if c.status == "accepted"]  # filter
 names    = [c.subject for c in claims]                    # map
 shas     = [d.sha256 for d in docs if d.raw_text]         # both at once
 ```
@@ -122,7 +122,7 @@ Style rule for this project: one loop, at most one `if` — matching the "boring
 |---|---|---|
 | `str`, `int`, `float`, `bool` | scalars; Pydantic coerces or rejects per its rules | everywhere |
 | `datetime`, `date` (from `datetime` module) | timestamps vs calendar dates — distinct types | `retrieved_at: datetime` (tz-aware, validator-enforced) vs `event_date: date \| None` |
-| `Enum` / `StrEnum` | closed vocabularies; `StrEnum` members are real strings, so they serialize and print as plain strings | `Predicate`, `SourceType`, `EntityType`, `OwnershipType`, `Confidence` |
+| `Enum` / `StrEnum` | closed vocabularies; `StrEnum` members are real strings, so they serialize and print as plain strings | `Predicate`, `SourceType`, `EntityType`, `OwnerKind`, `BusinessCategory`, `Confidence` |
 | `Any` (from `typing`) | opt out of checking — use sparingly, on purpose | `dict[str, Any]` for `value`/`meta` |
 | `None` | PHP's null; also a function's implicit return | defaults, sentinels |
 | `Self` (from `typing`) | "this class" — return type of `@model_validator(mode="after")` | the extraction envelope's consistency check |

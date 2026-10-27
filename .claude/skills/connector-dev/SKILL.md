@@ -5,6 +5,8 @@ description: Assist the developer while they hand-write a data connector (scaffo
 
 # Connector Development Assistance
 
+> **Outdated (2026-10-26):** Claude now writes connectors from the spec (CLAUDE.md role contract). This skill's "assistant only" boundaries no longer apply; its house-style, fixture and etiquette rules still do. Rewrite pending.
+
 The developer writes every connector by hand. Your contributions are bounded: scaffolding, inventories, selector configs, review against house style, and handing off to the conformance-tests skill. You never write the connector's logic.
 
 ## The house style (established in Phase 1–2; hold all connectors to it)

@@ -13,10 +13,10 @@ Tests are your territory end to end. The developer runs them (after every change
 - **When a source changes shape in production: update the fixture to the new reality FIRST (capture a fresh real sample), watch the test fail, then fix. Fixtures track truth; commits show fixture-then-fix order.**
 
 ## Core pipeline tests (highest value in the repo)
-- `verify_citations`: quote present; quote absent (auto-reject); whitespace/smart-quote normalization; quote spanning a line break; quote appearing twice (first offset wins); quote in tables text. Include the developer's own edge-case list — ask for it if you don't have it.
-- `score_and_publish`: two independent sources → verified; same press release syndicated on two domains → counts once; single source → reported + review_item; conflict → review only; official-filing source self-verifies; `events` row per publication; retraction end-dates without deleting claims.
+- `verify_citations`: quote present (→ `accepted`); quote absent (→ `rejected`, `rejection_reason = quote_not_found`); whitespace/smart-quote normalization; quote spanning a line break; quote appearing twice (first offset wins); quote in tables text. Include the developer's own edge-case list — ask for it if you don't have it.
+- `score_and_publish`: two independent sources → verified; same press release syndicated on two domains → counts once; single source → reported; conflict → sources_disagree, nothing published as fact; official-filing source self-verifies; `events` row per publication; retraction end-dates without deleting claims.
 - Idempotency: re-run the same extraction/filing twice → zero duplicate claims (DB unique index holds).
-- Entity resolution: exact hit, fuzzy hit above threshold, ambiguous → review, miss → create.
+- Entity resolution: exact hit, fuzzy hit above threshold, ambiguous → `ambiguous` status with candidates stored and nothing linked (ADR 0002), miss → create.
 
 ## Conventions
 - pytest; httpx `TestClient` for API tests; a Postgres test database via the compose stack (no SQLite substitution — CTEs and JSONB must match production).

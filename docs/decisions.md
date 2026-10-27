@@ -61,7 +61,7 @@
 
 ## 8. Anti-Hallucination Architecture (restated as a decision)
 
-**Decision:** The LLM never discovers facts. Deterministic connectors retrieve documents; the LLM extracts claims *from those documents only*, each with a verbatim quote; code mechanically verifies the quote against the stored document and auto-rejects any claim whose quote isn't found. Two independent sources publish an edge as `verified`; one source publishes as `reported` and opens review; conflicts never auto-publish. "No evidence found" is a first-class, published outcome.
+**Decision:** The LLM never discovers facts. Deterministic connectors retrieve documents; the LLM extracts claims *from those documents only*, each with a verbatim quote; code mechanically verifies the quote against the stored document and auto-rejects any claim whose quote isn't found. Two independent sources publish an edge as `verified`; one source publishes as `reported`; conflicts never auto-publish. *(Updated 2026-10-26 by ADR 0002 (`docs/adr/0002-no-manual-review.md`): no review queue — single-source facts stay `reported`, conflicts show as "sources disagree".)* "No evidence found" is a first-class, published outcome.
 
 ## 9. Two-Service Architecture and "Distributed Systems Experience"
 
@@ -72,7 +72,7 @@
 - Immutable S3 archive of every source document (URL, retrieval date, sha256).
 - Two-source rule enforced in code, not policy.
 - Corrections are public retractions with a changelog — never silent edits.
-- Community submissions count as one source; they corroborate but never solo-publish a `verified` edge.
+- ~~Community submissions count as one source~~ — community submissions are not in the MVP (ruled 2026-10-26).
 - Scrape etiquette: rate limits, identified user agent, robots.txt, official APIs/bulk data preferred (EDGAR, NPPES, Form 5500, CourtListener are all free and official).
 - Confidence is labeled honestly (`verified` / `reported` / `estimated` / `unknown`); the honest unknown state is load-bearing for credibility.
 
@@ -91,3 +91,13 @@
 ## 12. Learning & Review Plan
 
 Reading order for the document set: `painpoints.md` → `marketgaps.md` → `evidence_layer_glossary.md` (light pass, then reference) → `evidence_layer_plan.md` → `research_flows.md` (trace scenarios A1 and B1 by hand) → `stack_fastapi.md` → `stack_laravel.md` (optional contrast) → this file. Audio/podcast summaries (e.g., NotebookLM) for the conceptual layer; pen-and-paper flow tracing for mechanical precision; then self-written notes reviewed for gaps.
+
+## 13. Authorship: Claude Builds From a Spec; the Developer Decides (2026-10-26)
+
+**Decision:** The developer no longer hand-writes code. A series of grill sessions settles every contradiction, open item and open question in `docs/`; then a wayfinder map produces a spec from which Claude writes the whole API — application code, connectors, pipeline tasks, endpoints, migrations, the extraction prompt draft, and tests.
+
+**What stays the developer's:** every architectural, schema, vocabulary and product-behavior decision, approval of the extraction prompt, and every git commit. Claude never decides on its own; a question the spec doesn't answer stops the build and goes to the developer.
+
+**What is dropped:** the learning goal of §1 and build_roadmap.md ("FastAPI expertise earned by building every piece by hand"), the learning ledger, and the "assistant, not author" contract. The quality bar stays: the developer must be able to re-explain any module the next morning.
+
+**What does not change:** every architecture invariant (§8, CLAUDE.md), the public-sources rule (§3), and the guardrails (§10). The overhaul changes who types, not what the system guarantees.

@@ -196,5 +196,5 @@ The preview image shown when a link is shared on social platforms. Mentioned for
 | 3 — Extraction | Anthropic API (Claude); Jev pre-filter + ownership-type check (experimental) |
 | 4 — Verification | Pure-Python string matching (no external service — by design); Jev claim-support check routes to review only (experimental) |
 | 5 — Scoring | Pure-Python business rules (SQLAlchemy) |
-| 6 — Review | Hand-built FastAPI review panel |
+| 6 — Review | None — no manual review (ADR 0002) |
 | 7 — Serving | FastAPI routers + Postgres recursive CTEs + Vue frontend |

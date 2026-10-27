@@ -137,6 +137,8 @@ That competitor also defines the whitespace. It covers national consumer brands 
 
 ## 3B: "The Verified Ledger" — Community Contributions with Editorial Verification
 
+*(Not in the MVP — ruled 2026-10-26.)*
+
 **Explanation:** Solve the coverage problem with the mechanism users explicitly requested of the incumbent ("Would be great if there was a mechanism for community contributions"): employees, patients, and locals submit ownership tips; moderators verify against filings/press releases/registrations before publishing; contributors build reputation. Glassdoor's moat, applied to ownership.
 
 **Key differentiator:** This is the defensible asset. Portfolio pages are scrapeable by anyone; thousands of verified insider submissions (the ER physician confessing chart-signing fraud, the plant employee reporting the acquisition) are not. The corpus proves the supply side exists — insiders volunteer this constantly.
@@ -191,6 +193,8 @@ Interactive visualization of the interconnection web nobody aggregates: which ba
 **Potential: HIGH ceiling, hard build.**
 
 ## 5C: "Certified Independent" — The Positive-Signal Category Creator
+
+*(Not in the MVP — ruled 2026-10-26.)* Later feature.
 
 Flip from exposing PE to certifying independence: a verified mark (B-Corp/Fair-Trade model) that businesses earn by proving non-PE ownership and pledging disclosure upon sale. The corpus shows the demand on both sides: consumers fleeing to independents in every healthcare story, and the "Not owned by private equity!" marketing instinct. Chicken-and-egg on recognition — which is why it launches *on top of* 2A's consumer attention rather than standalone.
 

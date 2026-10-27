@@ -2,6 +2,8 @@
 ### Step-by-step instructions for building the evidence engine end to end — FastAPI stack, hand-written, Claude Code as research assistant and boilerplate generator
 ### Companion to: evidence_layer_plan.md (architecture), research_flows.md (scenarios), stack_fastapi.md (tooling), decisions.md (rationale)
 
+> **Approach superseded 2026-10-26.** The developer no longer hand-writes code: grill sessions settle every open item, then a wayfinder spec drives the build and Claude writes all the code (see CLAUDE.md role contract). The hand-writing learning goal is dropped; the "re-explain it the next morning" quality bar stays. This roadmap remains the reference for "Step N" and for the design content in its steps until the spec replaces it; read every "you write / hand-write" and "Teaches:" line as history.
+
 ---
 
 ## 0. The Approach in One Paragraph
@@ -56,7 +58,7 @@ The foundation week-and-a-half. Slowest, most educational, entirely yours. Each 
 
 **Step 1 — Contracts (Day 1).** Hand-write `app/core/contracts.py`: `RawDocument`, `ExtractedClaim` (with the predicate `str, Enum`: `acquired_by, owned_by, operates_location_of, lends_to, allocates_to, holds_position, renamed_from`), `ResolvedEntity`, `ClaimCardOut`, `EdgeOut`. *Teaches: Pydantic v2 models, enums, validators.* This file is the constitution — every connector emits these types or its output doesn't exist.
 
-**Step 2 — Database schema (Days 1–2).** Design on paper first (you already have evidence_layer_plan.md §4). Hand-write the SQLAlchemy models: `entities`, `entity_aliases`, `documents`, `claims` (unique index on hash(subject, predicate, object, doc_sha, quote) — idempotency as a constraint, not a convention), `edges`, `review_items`, `ingest_batches/items`, `events` (append-only). Claude Code may generate repetitive column boilerplate *from your written design*; you review every line. Learn the Alembic loop: edit model → `revision --autogenerate` → **read the generated migration** → `upgrade head`. *Teaches: SQLAlchemy 2.0 declarative, relationships, Alembic.*
+**Step 2 — Database schema (Days 1–2).** Design on paper first (you already have evidence_layer_plan.md §4). Hand-write the SQLAlchemy models: `entities`, `entity_aliases`, `documents`, `claims` (unique index on hash(subject, predicate, object, doc_sha, quote) — idempotency as a constraint, not a convention), `edges`, `ingest_batches/items`, `events` (append-only). Claude Code may generate repetitive column boilerplate *from your written design*; you review every line. Learn the Alembic loop: edit model → `revision --autogenerate` → **read the generated migration** → `upgrade head`. *Teaches: SQLAlchemy 2.0 declarative, relationships, Alembic.*
 
 **Step 3 — FastAPI skeleton + the claims door (Days 2–3).** App factory, `pydantic-settings` config, DB session dependency, health route. Then the single most important small thing in the system: `POST /internal/claims` — the one door through which ALL connector output enters. Validation happens here or nothing gets in. *Teaches: routers, `Depends()`, request/response models, dependency-injected sessions.*
 
@@ -66,11 +68,11 @@ The foundation week-and-a-half. Slowest, most educational, entirely yours. Each 
 
 **Step 6 — `verify_citations` (Days 4–5).** The soul of the product, ~40 lines: whitespace-normalize, substring-search `claim.quote` in stored document text, set verified+offset or auto-reject. Design the edge cases yourself (quote spans a line break; smart quotes vs straight; quote appears twice), then have Claude Code write the test suite around *your* cases plus its own. *Teaches: nothing fancy — and that's the point; the trust mechanism is deliberately boring code you fully own.*
 
-**Step 7 — `extract_claims` (Days 5–6).** Anthropic SDK call. **You write the prompt** — it is product, not plumbing: claims only from provided documents, verbatim quotes mandatory, `no_evidence_found` is a valid answer, ownership-type classification per your taxonomy. Parse the response through Pydantic; drop-and-log failures. *Teaches: the SDK, structured outputs, the validate-at-the-boundary pattern end to end.*
+**Step 7 — `extract_claims` (Days 5–6).** Anthropic SDK call. **You write the prompt** — it is product, not plumbing: claims only from provided documents, verbatim quotes mandatory, `no_evidence_found` is a valid answer. *(Ownership-type classification removed 2026-10-26 by ADR 0001 — code computes categories; the prompt may only extract quoted owner self-descriptions.)* Parse the response through Pydantic; drop-and-log failures. *Teaches: the SDK, structured outputs, the validate-at-the-boundary pattern end to end.*
 
-**Step 8 — `score_and_publish` (Days 6–7).** Group verified claims; two independent sources (different source_type or domain) → `verified` edge; one → `reported` + review_item; conflict → review only; official-filing source types self-verify (you'll use this in Phase 3). Append an `events` row on every publication. *Teaches: transactional business logic in SQLAlchemy sessions.*
+**Step 8 — `score_and_publish` (Days 6–7).** Group verified claims; two independent sources (different source_type or domain) → `verified` edge; one → `reported`; conflict → "sources disagree", never published as fact (ADR 0002); then recompute affected business categories and separation degrees (ADR 0001); official-filing source types self-verify (you'll use this in Phase 3). Append an `events` row on every publication. *Teaches: transactional business logic in SQLAlchemy sessions.*
 
-**Step 9 — Entity resolution v1 (Days 7–8).** `resolve_entity`: exact match → rapidfuzz scored match against entities+aliases → create, or → review on ambiguity. Enrichment sources plug in during Phase 2; logic first, sources second. *Teaches: the resolve-or-review pattern; keeping thresholds as settings.*
+**Step 9 — Entity resolution v1 (Days 7–8).** `resolve_entity`: exact match → rapidfuzz scored match against entities+aliases → create, or → `ambiguous` (candidates stored, nothing linked; ADR 0002) after deterministic tiebreakers fail. Enrichment sources plug in during Phase 2; logic first, sources second. *Teaches: the resolve-or-refuse pattern; keeping thresholds as settings.*
 
 **Step 10 — First connector: press RSS (Days 8–9).** Hand-write `connectors/press_rss.py`: httpx → parse feed → fetch article → selectolax text → `RawDocument` → store. Wire the full Celery chain `retrieve → extract → verify → publish` and run it on a real DSO acquisition press release. *Teaches: httpx, async patterns, and the complete pipeline in miniature.*
 
@@ -98,7 +100,7 @@ Each connector: Claude Code digests the docs and drafts the fixture files' *shap
 
 **Step 17 — Wire resolution + the census match (Day 18).** `resolve_entity` now matches against the NPPES census first (free, local), then falls back to Places → NPPES API for misses. Then run the **census match**: DSO-roster locations (Step 14–15) matched against census entities — every match publishes an `operates_location_of` claim; every unmatched census entity carries "no PE evidence found (checked {date})". This one join is what lights up the national healthcare map. Test manually with a dozen tricky names (franchises, "Dental" vs "Dentistry", DBAs).
 
-**Step 18 — First real batch (Days 18–19).** ~200 dental+vet practices, one metro — now drawn *from the census* rather than a hand-built CSV, exercising deep per-entity research (press, SoS, EDGAR) on top of the census/roster baseline. Build the batch outcome report (resolved / verified-chain / reported / no_evidence / review counts). Fix the top failure classes it reveals — this run's job is to find your resolution-threshold and prompt bugs.
+**Step 18 — First real batch (Days 18–19).** ~200 dental+vet practices, one metro — now drawn *from the census* rather than a hand-built CSV, exercising deep per-entity research (press, SoS, EDGAR) on top of the census/roster baseline. Build the batch outcome report (resolved / verified-chain / reported / no_evidence / ambiguous / sources_disagree counts). Fix the top failure classes it reveals — this run's job is to find your resolution-threshold and prompt bugs.
 
 **Seeding strategy, stated once (see decisions.md §11):** national coverage is built **top-down** — sponsor/DSO rosters enumerate the PE layer, the NPPES bulk census supplies the denominator, and their join is the launch map. Bottom-up per-entity research is reserved for metro showcase depth (this step), on-demand user searches, and non-healthcare Tier-1 verticals where no census file exists (vets via state license boards + rosters).
 
@@ -112,7 +114,7 @@ Each connector: Claude Code digests the docs and drafts the fixture files' *shap
 
 **Step 20 — EDGAR submissions client + BDC discovery (Day 22).** By-CIK filing fetch in your house REST style; build the ~150-BDC list.
 
-**Step 21 — BDC Schedule of Investments parser (Days 23–25). THE DELEGATED EXCEPTION.** Hand Claude Code: 3 real 10-Ks from different BDCs as fixtures, your `ExtractedClaim` contract, and requirements — parsed rows → `lends_to` claims quoting row text, numeric cross-check (quoted principal == structured value), `no_evidence` on unparseable tables rather than guesses. Your review is output-based: open each filing PDF beside the emitted claims and hand-check 20 rows per fixture; iterate 2–3 rounds on its failures. You own the *acceptance*, not the pdfplumber internals — and that's the deliberate trade recorded in decisions.md.
+**Step 21 — BDC Schedule of Investments parser (Days 23–25). THE DELEGATED EXCEPTION.** *(Ruled 2026-10-26: the parser is the only source of SoI `lends_to` claims — no LLM fallback; revisit with failure-rate data after this step.)* Hand Claude Code: 3 real 10-Ks from different BDCs as fixtures, your `ExtractedClaim` contract, and requirements — parsed rows → `lends_to` claims quoting row text, numeric cross-check (quoted principal == structured value; a failing row's claim is not emitted, and above a per-filing failure-rate threshold the whole filing is withheld as unparseable with an operational alert — ADR 0002), `no_evidence` on unparseable tables rather than guesses. Your review is output-based: open each filing PDF beside the emitted claims and hand-check 20 rows per fixture; iterate 2–3 rounds on its failures. You own the *acceptance*, not the pdfplumber internals — and that's the deliberate trade recorded in decisions.md.
 
 **Step 22 — Borrower resolution = the graph join (Day 26).** Parser output → `resolve_entity` (no Places; not storefronts). Watch for a borrower matching a DSO/sponsor the PE side knows — the `lends_to` edge that joins the graphs. Verify the full chain: clinic → DSO → sponsor ← lends_to ← BDC fund.
 
@@ -128,7 +130,7 @@ Each connector: Claude Code digests the docs and drafts the fixture files' *shap
 
 **Step 25 — Events → alerts stub (Day 30).** Minimal consumer of the `events` table (log/email yourself). Acquisition Alarm is a UI on this later; plumbing done now.
 
-**Step 26 — Review panel (Days 31–33).** Hand-build it as a small set of FastAPI endpoints + minimal server-rendered pages or a tiny Vue page — consistent with owning your stack, and honestly not much slower than fighting SQLAdmin's customization for the one view that matters: claim beside document text, quote highlighted, approve/edit/reject writing audit rows. *Teaches: the full request→template/SPA loop in your own API.*
+**Step 26 — Review panel (Days 31–33).** *(Superseded 2026-10-26 by ADR 0002 — no manual review; these days are free for re-planning.)* Hand-build it as a small set of FastAPI endpoints + minimal server-rendered pages or a tiny Vue page — consistent with owning your stack, and honestly not much slower than fighting SQLAdmin's customization for the one view that matters: claim beside document text, quote highlighted, approve/edit/reject writing audit rows. *Teaches: the full request→template/SPA loop in your own API.*
 
 **Step 27 — Full metro batch (Days 34–36).** The 2,000-entity run (research_flows.md A1). Watch Flower; tune workers per queue and rate budgets; measure outcome distribution and LLM spend per entity; fix the top 3 failure classes.
 
@@ -136,8 +138,8 @@ Each connector: Claude Code digests the docs and drafts the fixture files' *shap
 - **A: baseline.** The Claude-only pipeline exactly as built.
 - **B: with Jev** (TypeSafe AI System One classifier) in these roles only:
   1. **Pre-filter:** a true/false probability on "does this document contain ownership, acquisition or lending evidence about X?"; only positives go to `extract_claims`.
-  2. **Ownership-type classification:** a Choice over the 9-value `ownership_type` taxonomy, compared against Claude's label.
-  3. **Claim-support check:** after `verify_citations` passes, a true/false probability on "does this verified quote support predicate P between S and O?" Low confidence → `review_item`.
+  2. ~~**Ownership-type classification**~~ — dropped 2026-10-26: ADR 0001 removed LLM classification, so there is no label to compare.
+  3. **Claim-support check:** after `verify_citations` passes, a true/false probability on "does this verified quote support predicate P between S and O?" Low confidence → claim status `unsupported`: kept, never counted toward an edge (ADR 0002).
   4. *(optional)* **Entity-match confidence** for resolution ambiguity routing.
 
 Hand-write a thin `classify()` interface in `app/core/` so the vendor is swappable and Jev never touches the DB directly. **Invariant: Jev never creates a claim.** It only routes work and labels claims that already carry a verified verbatim quote.
@@ -146,9 +148,9 @@ Hand-write a thin `classify()` interface in `app/core/` so the vendor is swappab
 - Pre-filter recall: evidence-bearing documents Jev wrongly dropped. Use A's verified claims as ground truth; the target is ~0 lost `verified` edges.
 - Ownership-type agreement rate, and a hand-check of disagreements.
 - How many weak-but-quote-verified claims the claim-support check catches.
-- Review-queue size, LLM spend per entity, and wall-clock time.
+- Claim-support false rejections (good claims marked `unsupported`), LLM spend per entity, and wall-clock time.
 
-**Decision gate (yours):** adopt each role independently. Keep the pre-filter only if recall is near-perfect at a chosen confidence threshold. Keep the claim-support check if it catches real errors without flooding review. Record the results and rulings in `decisions.md`.
+**Decision gate (yours):** adopt each role independently. Keep the pre-filter only if recall is near-perfect at a chosen confidence threshold. Keep the claim-support check if it catches real errors with few false rejections. Record the results and rulings in `decisions.md`.
 
 *Note: Jev was early access with vendor-only benchmarks as of 2026-10; confirm API access, limits and pricing before this step.*
 
@@ -168,7 +170,7 @@ Reserved for what the batches revealed, plus the first deferred items if time al
 
 ## 8. Explicitly Deferred
 
-These are deferred from *this engine build* — not necessarily from launch. CAFRs at scale · N-PORT + the paid 401(k) analysis product · OpenCorporates · states 2–50 SoS · WARN, licensing boards other than vet boards, GDELT, CourtListener · NAIC · community submissions · all frontend. Every deferral has a slot: deferred connectors follow a house pattern you've already built by hand; deferred products compose over edges that already exist.
+These are deferred from *this engine build* — not necessarily from launch. CAFRs at scale · N-PORT + the paid 401(k) analysis product · OpenCorporates · states 2–50 SoS · WARN, licensing boards other than vet boards, GDELT, CourtListener · NAIC · community submissions (not in the MVP, 2026-10-26) · all frontend. Every deferral has a slot: deferred connectors follow a house pattern you've already built by hand; deferred products compose over edges that already exist.
 
 **Launch requires more than this roadmap (ruled 2026-10-16).** Finishing the 29 steps produces a launch-ready *engine*; launching also requires the pre-launch-seeding.md workstreams W1–W8. Two items are therefore **pulled out of the deferred list and required before launch**: on-demand user research (scenario A2 — the "Unknown — research on request" coverage state depends on it) and **state veterinary license boards for the launch states** (W4 — vets have no NPPES census, so without boards there is no vet denominator).
 

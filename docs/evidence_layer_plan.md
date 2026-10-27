@@ -13,7 +13,7 @@ The system's trust guarantee comes from one rule enforced in code, not policy:
 Pipeline in one line:
 
 ```
-Entity Resolution → Source Retrieval (deterministic) → LLM Extraction (cited) → Mechanical Citation Verification → Confidence Scoring → Graph Storage → Human Review Queue (exceptions only)
+Entity Resolution → Source Retrieval (deterministic) → LLM Extraction (cited) → Mechanical Citation Verification → Confidence Scoring → Graph Storage → ~~Human Review Queue~~ *(removed: no manual review, ADR 0002 (`docs/adr/0002-no-manual-review.md`))*
 ```
 
 The AI is a reading-comprehension engine over documents you fetched. Hallucination becomes a catchable failure mode instead of a trust catastrophe.
@@ -84,14 +84,16 @@ The AI is a reading-comprehension engine over documents you fetched. Hallucinati
 
 ```
 entities
-  id, canonical_name, entity_type (business|brand|sponsor|fund|dso|pension|insurer|lender),
+  id, canonical_name, entity_type (business|brand|investment_firm|fund|rollup|retirement_plan|insurer),
+      -- 2026-10-26: what a thing is, not its role; no person entities; owner_kind per ADR 0001
   jurisdiction, place_id (nullable), npi (nullable), status, created_at
 
 entity_aliases
   id, entity_id, alias, alias_type (dba|legal_name|former_name|domain), source_document_id
 
 documents                      -- immutable once written
-  id, source_type (edgar|sos|portfolio_page|press_release|cafr|form5500|news|court|submission),
+  id, source_type (nppes|form5500|form_adv|sec_filing|irs_exempt_org|sos|license_board|cafr|
+      company_site|press_release|news),   -- ADR 0003; fetch method (bulk|api) + connector go in meta
   url, retrieved_at, sha256, storage_path, mime_type, raw_text (nullable), meta JSONB
 
 claims                         -- atomic, cited assertions
@@ -101,28 +103,37 @@ claims                         -- atomic, cited assertions
       -- it lives in `value` (e.g. {"stake_pct": 65, "stake_type": "majority"}), matching
       -- how lends_to @ rate and allocates_to @ % already work. Canonical set: CLAUDE.md.
   object_entity_id, event_date (nullable), value JSONB (amounts, %, rates),
-  document_id, verbatim_quote TEXT, quote_verified BOOL, quote_offset,
-  extraction_model, extracted_at, status (auto_verified|needs_review|rejected|retracted)
+  document_id, verbatim_quote TEXT, quote_offset,
+  extraction_model, extracted_at,
+  status (pending|accepted|rejected|retracted),
+  rejection_reason (nullable: quote_not_found|sanity_check_failed|unsupported)
+      -- ruled 2026-10-26: pending = awaiting verify_citations; accepted = passed every check,
+      -- eligible for edges; retracted = withdrawn by a later correction (events row).
+      -- quote_verified BOOL dropped (implied by status). New filters add a reason, not a status.
 
 edges                          -- the published graph (derived from claims)
   id, from_entity_id, to_entity_id, relation, effective_date,
-  confidence (verified|reported|estimated), ownership_type
-      (pe_fund|pe_backed|conglomerate|family|employee_owned|trust|public|independent|unknown),
+  confidence (verified|reported|estimated),
+      -- ownership_type removed 2026-10-26 (ADR 0001): owners carry owner_kind; each business's
+      -- category + separation degree are computed by code from its ownership chains.
   supporting_claim_ids JSONB, published_at, retracted_at (nullable)
 
-review_items
-  id, claim_id, reason (single_source|conflict|low_confidence|community_flag),
-  assigned_to, resolution, resolved_at
+~~review_items~~               -- dropped 2026-10-26 (ADR 0002). Its reasons now live elsewhere:
+      -- single_source → edge confidence = reported; conflict → business category sources_disagree;
+      -- low_confidence → claim rejection_reason = unsupported; community_flag → not in the MVP.
 
 ingest_batches / ingest_items  -- batch submission tracking
   batch: id, name, submitted_by, counts, status
-  item: id, batch_id, input_name, input_address, resolved_entity_id, stage, result
+  item: id, batch_id, input_name, input_address, resolved_entity_id, stage,
+        result (resolved|ambiguous|failed), candidates JSONB (nullable, set only when ambiguous)
+      -- 2026-10-26: no "not found" (a miss creates an entity); failed = error after tenacity
+      -- retries (→ dead-letter). The automatic re-attempt selects result = ambiguous.
 ```
 
 Key design points:
 - **Claims are append-only; edges are derived.** Corrections retract an edge and add a new one — you never silently rewrite history, which is both your credibility story and your legal posture.
-- **`verbatim_quote` + `quote_verified`** is the anti-hallucination mechanism, stored per claim.
-- **`confidence` + `ownership_type`** on edges powers the claim cards, including the honest "unknown" and the Fiskars-isn't-PE taxonomy.
+- **`verbatim_quote` + `status`/`quote_offset`** is the anti-hallucination mechanism, stored per claim.
+- **`confidence`** on edges plus each owner's **owner kind** power the claim cards, including the honest "owner type not confirmed" and the Fiskars-isn't-PE taxonomy (ADR 0001).
 
 ---
 
@@ -139,7 +150,7 @@ Everything below is a Celery task. Sequencing uses Celery `chain()` (≈ Laravel
 3. Healthcare? Match against the pre-loaded NPPES bulk census first (free, local); NPPES API only on census miss → organization NPI, authorized official, parent org name.
 4. State SoS / OpenCorporates lookup → legal entity, registered agent, officers.
 5. Fuzzy-match against existing `entities` + `entity_aliases` (Meilisearch + rapidfuzz scoring) to avoid duplicates.
-6. Output: `entity_id` (created or matched) with aliases recorded. Ambiguous matches (score below threshold) → `review_items` instead of guessing.
+6. Output: `entity_id` (created or matched) with aliases recorded. Ambiguous matches (score below threshold, deterministic tiebreakers exhausted) → item status `ambiguous`, candidates stored, nothing linked — never a guess, never a new duplicate (ADR 0002).
 
 **This stage is where most real-world failure happens. Budget accordingly.**
 
@@ -163,7 +174,7 @@ Runs per entity once its retrieval chord completes (the `chord()` callback ≈ `
 2. Call Claude (Anthropic Python SDK) with a strict system prompt; the response is parsed straight into Pydantic `Claim` models — anything that fails validation is dropped and logged before it can reach the DB:
    - Emit claims only in the fixed predicate vocabulary.
    - **Every claim must include a verbatim quote copied exactly from the provided document.**
-   - Classify ownership_type per the taxonomy (pe_fund vs conglomerate vs family etc.). *(Experimental, Step 27b: Jev independently picks the ownership type from the same 9-value list; disagreements with Claude go to review.)*
+   - ~~Classify ownership_type~~ — removed 2026-10-26 by ADR 0001 (`docs/adr/0001-ownership-category-computed-by-code.md`): the LLM never classifies ownership categories. It may only extract a quoted self-description of an owner (e.g. "Oak Ridge is a private equity firm"), the lowest-ranked owner-kind source.
    - If the documents contain no ownership/exposure evidence, return an explicit `no_evidence_found` result — a first-class outcome, not an error.
 3. Model tiering: Sonnet-class for bulk; escalate to Opus-class when documents conflict or classification is ambiguous.
 4. Write raw response to the claim rows (`extraction_model`, `extracted_at`).
@@ -171,22 +182,25 @@ Runs per entity once its retrieval chord completes (the `chord()` callback ≈ `
 ### Stage 4 — Mechanical Citation Verification (`verify_citations`, was `VerifyCitationsJob`)
 Pure Python, no AI:
 1. For each claim, string-search `verbatim_quote` (whitespace-normalized) in the stored document text.
-2. Found → `quote_verified = true`, record offset. Not found → **auto-reject** the claim and log for prompt tuning.
+2. Found → record offset (status becomes `accepted` once all checks pass). Not found → **auto-reject** (`rejected`, reason `quote_not_found`) and log for prompt tuning.
 3. Sanity checks: cited document actually mentions the subject alias; event_date is plausible; numeric values in `value` appear in the quote for PC claims.
-4. *(Experimental, Step 27b)* **Jev claim-support check:** for claims that passed steps 1–3, Jev answers "does this verified quote support predicate P between S and O?" Low confidence routes the claim to a `review_item` instead of auto-publication. Jev can only send a claim to review; it can never verify or publish one by itself.
+4. *(Experimental, Step 27b)* **Jev claim-support check:** for claims that passed steps 1–3, Jev answers "does this verified quote support predicate P between S and O?" Low confidence sets the claim's status to `unsupported`: kept, never counted toward an edge (ADR 0002). Jev can only remove a claim from publication; it can never verify, publish or downgrade one.
 
 ### Stage 5 — Confidence Scoring & Edge Publication (`score_and_publish`, was `ScoreAndPublishJob`)
 1. Group verified claims by (subject, predicate, object).
 2. **Two independent documents agree → publish edge as `verified`.** ("Independent" = different `source_type` or different domains — a press release syndicated to five sites counts once.)
-3. One source → publish as `reported` **and** open a `review_item` (single_source).
-4. Conflicting claims → no publication; `review_item` (conflict), escalated extraction pass with both documents side-by-side to assist the human.
-5. `no_evidence_found` → entity flagged `independent (no PE evidence found)` / `unknown` — the honest state the consumer UI displays.
+3. One source → publish as `reported` (labeled as one source on the card).
+4. Conflicting claims (different controlling owners over overlapping dates) → no publication as fact; shown as "sources disagree" with links to each. *(Both updated by ADR 0002 (`docs/adr/0002-no-manual-review.md`).)*
+4b. Recompute each affected business's category and separation degree from its chains and owners' owner kinds (ADR 0001 (`docs/adr/0001-ownership-category-computed-by-code.md`)).
+5. `no_evidence_found` → business category `no_pe_evidence_found`, shown as "No PE evidence found (checked {date})" — never "independent" (ADR 0001).
 
 ### Stage 6 — Human Review (Starlette-Admin/SQLAdmin panel or small Vue app; ≈ Filament)
-Reviewers see: the claim, the quote highlighted in the source document, the conflicting evidence if any. Actions: approve (publish edge), edit-and-approve, reject, request more retrieval. Every action audited. Community submissions (from the Verified Ledger feature) enter this same queue as `source_type = submission` documents and count as one source — they can corroborate but never solo-publish a `verified` edge.
+> **Superseded 2026-10-26 by ADR 0002 (`docs/adr/0002-no-manual-review.md`): there is no manual review.** Kept for history; the open items it used to absorb are listed in the ADR.
+
+Reviewers see: the claim, the quote highlighted in the source document, the conflicting evidence if any. Actions: approve (publish edge), edit-and-approve, reject, request more retrieval. Every action audited. ~~Community submissions (from the Verified Ledger feature) enter this same queue~~ (community submissions not in the MVP, 2026-10-26) as `source_type = submission` documents and count as one source — they can corroborate but never solo-publish a `verified` edge.
 
 ### Stage 7 — Serving
-- `GET /api/entities/{id}/card` → claim card: verdict, ownership_type, sponsor, acquisition date, N sources with links + quotes, confidence.
+- `GET /api/entities/{id}/card` → claim card: business category (+ separation degree per PE firm), sponsor, acquisition date, N sources with links + quotes, confidence.
 - `GET /api/entities/{id}/graph` → recursive CTE (via SQLAlchemy `text()`) walking edges for the ownership-chain / money-flow visualization (cap depth, label each hop with confidence). FastAPI routers ≈ Laravel API controllers.
 - Retraction/correction endpoint feeds a public changelog — corrections displayed, not hidden.
 
@@ -225,7 +239,7 @@ Form 5500 deserves emphasis: it's a **bulk annual CSV download**, not a scrape �
 Alembic migrations for the schema above; one connector (press-release RSS per build_roadmap.md Step 10; originally planned as sponsor portfolio pages for ~20 known DSO/vet rollup sponsors); `extract_claims` + `verify_citations` tasks; a *minimal* review view (Starlette-Admin or Streamlit is fine at this stage). Add roughly a week to the estimate for stack ramp-up. Success = a claim card for a real clinic with verified quotes. **The citation-verification loop is the premise — prototype it first.**
 
 **Phase 2 — Healthcare wedge**
-Load the NPPES bulk census (national); add the NPPES API, state SoS for launch states, press-release RSS, and lazy Google Places resolution. Match DSO/sponsor rosters against the census for the national baseline, then run a deep batch of every dental + vet practice in one metro. Measure: % auto-verified, % unknown, % needing review — these numbers tell you real coverage and review staffing needs.
+Load the NPPES bulk census (national); add the NPPES API, state SoS for launch states, press-release RSS, and lazy Google Places resolution. Match DSO/sponsor rosters against the census for the national baseline, then run a deep batch of every dental + vet practice in one metro. Measure: % verified, % reported, % no_evidence_found, % ambiguous, % sources_disagree — these numbers tell you real coverage.
 
 **Phase 3 — Batch scale + alerts**
 CSV batch intake at thousands-of-entities scale; Celery Beat re-crawls; diff detection on portfolio pages/rosters → new-acquisition events → Acquisition Alarm notifications.
@@ -234,7 +248,7 @@ CSV batch intake at thousands-of-entities scale; Celery Beat re-crawls; diff det
 Form 5500 bulk load (pandas); camelot BDC Schedule of Investments parsing; top-100 pension CAFR ingestion; PC claim types + jargon decoder content. This is where the Python choice pays back most visibly. This lights up MyRetirementX-Ray on the same graph.
 
 **Phase 5 — Graph depth**
-Cross-link the layers (sponsor → PC lender → pension LP where public evidence exists, `estimated` edges labeled as such); expose the money-flow graph views; open community submissions into the review queue.
+Cross-link the layers (sponsor → PC lender → pension LP where public evidence exists, `estimated` edges labeled as such); expose the money-flow graph views; ~~open community submissions into the review queue~~ (not in the MVP, 2026-10-26).
 
 ---
 

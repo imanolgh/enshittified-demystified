@@ -40,8 +40,8 @@ Python is the native language of this workload: scraping, PDF/table parsing, dat
 | 2 Retrieve | One Celery task per connector; Playwright pool for JS pages; Form 5500 = pandas ETL script, not a scrape |
 | 2.5 Parse | In-process: pdfplumber text, camelot tables → normalized text + table JSON on `documents` |
 | 3 Extract | `extract_claims` task: doc set → Anthropic SDK call → **Pydantic-validated** claim objects → insert |
-| 4 Verify | Pure-Python quote matching (normalized substring) → `quote_verified` or auto-reject |
-| 5 Score/Publish | Grouping + two-source rule + edge upsert + review_items — plain SQLAlchemy logic |
+| 4 Verify | Pure-Python quote matching (normalized substring) → claim `accepted` or auto-rejected (`quote_not_found`) |
+| 5 Score/Publish | Grouping + two-source rule + edge upsert (no review queue, ADR 0002) — plain SQLAlchemy logic |
 | 6 Review | Starlette-Admin/SQLAdmin resource with custom claim-detail view (quote highlighted in doc text), or small Vue panel |
 | 7 Serve | FastAPI routers; ownership chain = recursive CTE via SQLAlchemy `text()`; OpenAPI docs free |
 
@@ -65,4 +65,4 @@ Python is the native language of this workload: scraping, PDF/table parsing, dat
 2. Healthcare wedge (NPPES, launch-state SoS, press RSS, Places).
 3. Batch scale + Beat re-crawls + acquisition-diff alerts.
 4. PC layer (this is where the path pays you back: pandas + camelot, no managed-service dependency).
-5. Cross-layer edges + graph views + community submissions.
+5. Cross-layer edges + graph views. (Community submissions: not in the MVP, 2026-10-26.)
