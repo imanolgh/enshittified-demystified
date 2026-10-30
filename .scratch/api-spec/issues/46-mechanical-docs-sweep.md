@@ -38,6 +38,11 @@ Apply the ~80 pure wording fixes the 2026-10-26 inventory found (no decision nee
 - **Skills**: `doc-digest` → retire (delete `.claude/skills/doc-digest/`, remove mentions); `connector-dev` → rewrite framing as Claude's connector-building skill (house style, fixtures, live check per CLAUDE.md definition of done); `bdc-parser` → drop "the ONE delegated component"/hand-check loop (deeper XBRL rewrite waits for "BDC discovery and Schedule of Investments parsing"); `conformance-tests` → drop "developer runs them".
 - **decisions.md** :8, :93 — drop `stack_laravel.md` refs; §1 keeps "Laravel was evaluated and rejected".
 
+## Added by "Launch states and metros" (2026-10-29)
+
+- **build_roadmap.md**: metro wording → launch state (Step 18 keeps a ~200-practice sample, drawn from the launch-state census; Step 27 "Full metro batch" → full launch-state batch; 27b, Phase 2/4 exits, :105); §8 "states 2–50 SoS" → "SoS beyond the launch states".
+- **Bare "state 1–3/4"** for coverage states anywhere in docs → "coverage state" (GLOSSARY rule).
+
 ## How to resolve
 
 AFK. Make the edits, then append `## Answer` listing what changed and anything skipped (with why). No commits.

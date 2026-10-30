@@ -95,3 +95,13 @@ _Avoid_: Separate sources, multiple sources
 **Registry**:
 The curated list of PE firms and rollups and where their pages are. It tells the crawler where to look and is never itself evidence.
 _Avoid_: Database, list of PE firms (as a source)
+
+## Coverage
+
+**Coverage state**:
+One of the four labels every business visible at launch carries, saying how much the engine knows about its ownership. Always written in full, never as a bare "state".
+_Avoid_: State (alone), status
+
+**Launch state**:
+A US state where the engine runs its per-state connectors (Secretary of State registry, veterinary license board) at launch.
+_Avoid_: Seeded state, home state

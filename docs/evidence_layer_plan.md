@@ -239,7 +239,7 @@ Form 5500 deserves emphasis: it's a **bulk annual CSV download**, not a scrape �
 Alembic migrations for the schema above; one connector (press-release RSS per build_roadmap.md Step 10; originally planned as sponsor portfolio pages for ~20 known DSO/vet rollup sponsors); `extract_claims` + `verify_citations` tasks; a *minimal* review view (Starlette-Admin or Streamlit is fine at this stage). Add roughly a week to the estimate for stack ramp-up. Success = a claim card for a real clinic with verified quotes. **The citation-verification loop is the premise — prototype it first.**
 
 **Phase 2 — Healthcare wedge**
-Load the NPPES bulk census (national); add the NPPES API, state SoS for launch states, press-release RSS, and lazy Google Places resolution. Match DSO/sponsor rosters against the census for the national baseline, then run a deep batch of every dental + vet practice in one metro. Measure: % verified, % reported, % no_evidence_found, % ambiguous, % sources_disagree — these numbers tell you real coverage.
+Load the NPPES bulk census (national); add the NPPES API, state SoS for launch states, press-release RSS, and lazy Google Places resolution. Match DSO/sponsor rosters against the census for the national baseline, then run a deep batch of every dental + vet practice in one launch state. Measure: % verified, % reported, % no_evidence_found, % ambiguous, % sources_disagree — these numbers tell you real coverage.
 
 **Phase 3 — Batch scale + alerts**
 CSV batch intake at thousands-of-entities scale; Celery Beat re-crawls; diff detection on portfolio pages/rosters → new-acquisition events → Acquisition Alarm notifications.

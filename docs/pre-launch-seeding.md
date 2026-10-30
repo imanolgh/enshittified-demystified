@@ -10,7 +10,7 @@ Every business a user can see at launch is in exactly one of four coverage state
 
 | State | Meaning | How it got there |
 |---|---|---|
-| **Verified chain** | Full ownership chain published, ≥2 independent sources per edge, claim card with receipts | Metro-depth research (A1) or roster + corroborating press/filing |
+| **Verified chain** | Full ownership chain published, ≥2 independent sources per edge, claim card with receipts | Launch-state deep research (A1) or roster + corroborating press/filing |
 | **Roster-confirmed** | PE-connected via a sponsor/DSO's own published roster (single authoritative source); shown as `reported` pending second source | National roster crawl (A0) |
 | **No PE evidence found (checked {date})** | In the census, matched against all known rosters, nothing found — the honest "likely independent" state | Census × roster join (A0) |
 | **Unknown — research on request** | Not yet in the graph; searching triggers on-demand research (A2), results in minutes and published permanently | User demand post-launch |
@@ -41,9 +41,13 @@ Launch is credible when Tier-1 categories are dense in states 1–3 and everythi
 
 For 2B categories the honest UI states are: roster-confirmed (PE layer), or unknown-with-on-demand — there is no national "likely independent" claim without a census to back it.
 
-### 2C. Metro-depth showcase (full deep research per entity)
+### 2C. Launch-state depth (full deep research per entity)
 
-2–3 launch metros where **every** dental + vet practice gets the full connector fan-out (press, SoS, EDGAR, NPPES/board records) on top of the census/roster baseline — producing dense verified chains and the screenshots/share-links that market the launch. Pick metros by: (a) documented rollup density, (b) a state SoS you've built a scraper for, (c) where you live (support and spot-checking are easier).
+The **launch states** (GLOSSARY.md) are where **every** dental + vet practice gets the full connector fan-out (press, SoS, EDGAR, NPPES/board records) on top of the census/roster baseline — producing dense verified chains and the screenshots/share-links that market the launch. The unit of deep research is the whole state, not a metro: the per-state connectors (SoS, vet board) already bound it, and metros cross state lines (ruled 2026-10-29, `.scratch/api-spec/issues/03-launch-states-and-metros.md`). A per-batch spend cap bounds each state run.
+
+- **Launch state 1: New York** (the developer's home state).
+- **Launch state 2: optional**, picked from FL, CO, TX, AZ only if cheap — free SoS bulk/API data and a downloadable vet licensee list; a downloadable vet list is the tiebreaker. Otherwise New York alone.
+- Selection rule, in order: (1) free, terms-permitted SoS bulk data or API; (2) a downloadable or scrapable vet licensee list; (3) documented rollup density (registry roster locations per state); (4) the developer's home state.
 
 ---
 
@@ -83,9 +87,9 @@ Any business type is searchable from day one — the search box is not category-
 
 **W3 — National roster crawl + census match.** Scenario A0 in full: crawl every W1 registry entry, publish roster claims, run the census join, publish the "no PE evidence found" denominator for §2A categories.
 
-**W4 — Vet license boards (launch states).** Scraper per launch state's veterinary board → vet census for those states; national backfill post-launch.
+**W4 — Vet license boards (launch states).** Scraper per launch state's veterinary board → vet census for those states; national backfill post-launch. **New York fallback:** if NYSED's board cannot be scraped, the developer files a FOIL request for the veterinarian licensee list with addresses, which becomes the NY vet census when it arrives; until then NY vets are roster-confirmed or unknown-with-on-demand (§2B honest states), with no "no PE evidence found".
 
-**W5 — Metro deep batches.** Scenario A1 across the 2–3 showcase metros; work the review queue to zero on conflicts before launch.
+**W5 — Launch-state deep batches.** Scenario A1 across every dental + vet practice in the launch states; work the review queue to zero on conflicts before launch.
 
 **W6 — PC bulk loads.** Form 5500 (B1a) + 150-BDC parse (B1b) + borrower resolution pass (the graph join).
 
@@ -99,7 +103,7 @@ Any business type is searchable from day one — the search box is not category-
 
 | Item | Estimate |
 |---|---|
-| LLM extraction (rosters + metro batches + BDC parse, batch pricing, cached prompts) | **Low hundreds of dollars, one-time**; re-runs free via sha256 dedup |
+| LLM extraction (rosters + launch-state batches + BDC parse, batch pricing, cached prompts) | **Low hundreds of dollars, one-time**; re-runs free via sha256 dedup |
 | NPPES, Form 5500, EDGAR, license-board data | $0 (free/official) |
 | Google Places | Near-$0 at seeding (lazy-only policy, decisions.md §11); scales with user searches post-launch |
 | Compute/storage (workers, Postgres, S3-compatible) | Tens of dollars/month at this scale |
@@ -112,7 +116,7 @@ Any business type is searchable from day one — the search box is not category-
 - [ ] W1 registry ≥ target counts per §2 category (dental ≥30 DSOs, vet ≥15 consolidators, etc.)
 - [ ] NPPES census loaded + monthly refresh scheduled
 - [ ] Census × roster join published; §2A categories show all three seeded states correctly
-- [ ] 2–3 metros at showcase depth; review queue drained for them
+- [ ] Every launch state at full depth; review queue drained for them
 - [ ] Form 5500 lookup returns lineups for arbitrary employer names; headline exposure number renders
 - [ ] ≥1 full cross-layer chain (clinic → DSO → sponsor ← BDC) live and traversable
 - [ ] On-demand search (A2) works for an unseeded category, honest states included

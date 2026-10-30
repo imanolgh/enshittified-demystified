@@ -15,11 +15,11 @@ All entity names in Scenario examples that reference real companies (e.g., Heart
 1. `load_nppes_census`: download the free NPPES bulk file → pandas filter to Tier-1 taxonomies → national entities for every dental/medical organization (names, addresses, authorized officials, other-name aliases). Same ETL pattern as Form 5500; no API calls, no Places, no LLM.
 2. Sponsor/DSO roster crawl (the Scenario A3 crawler, run in full): each roster location → `operates_location_of` claim citing the roster page.
 3. **The census match:** roster locations resolved against census entities. Matches publish the PE-connected layer; every unmatched census entity publishes as "no PE evidence found (checked {date})".
-4. Result: the national healthcare map lights up — PE-connected layer + honest-independent denominator — for a few dollars of extraction and zero per-lookup API cost. Deep per-entity research (A1) then adds metro-depth chains on top.
+4. Result: the national healthcare map lights up — PE-connected layer + honest-independent denominator — for a few dollars of extraction and zero per-lookup API cost. Deep per-entity research (A1) then adds launch-state-depth chains on top.
 
-## Scenario A1: Metro Depth — 2,000 Dental & Vet Practices in One Metro
+## Scenario A1: Launch-State Depth — Every Dental & Vet Practice in a Launch State
 
-**Trigger:** You select a launch metro's census slice (or upload `westchester_dental_vet.csv`) via the admin endpoint, for full connector fan-out on each entity.
+**Trigger:** You select a launch state's census slice (or upload `westchester_dental_vet.csv`) via the admin endpoint, for full connector fan-out on each entity.
 
 ### Step 1 — Intake
 `POST /admin/ingest-batches` → pandas validates the CSV → 2,000 `ingest_items` rows (status `queued`) → Celery `group()` dispatches 2,000 `resolve_entity` tasks onto the `resolve` queue. Workers process ~4–8 concurrently (rate limits, not CPU, are the bottleneck).
