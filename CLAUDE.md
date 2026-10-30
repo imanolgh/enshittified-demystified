@@ -1,6 +1,6 @@
 # CLAUDE.md — Evidence Engine
 
-Ownership-transparency platform: maps private equity ownership of local businesses and private credit exposure in retirement funds, as one graph. Full context lives in `docs/` — read `docs/README.md` for the map. The build plan is being replaced (2026-10-26): grill sessions settle every open item, then a wayfinder spec drives the build. Until that spec exists, "Step N" still resolves to `docs/build_roadmap.md`.
+Ownership-transparency platform: maps private equity ownership of local businesses and private credit exposure in retirement funds, as one graph. Full context lives in `docs/` — read `docs/README.md` for the map. The build plan is being replaced (2026-10-26): grill sessions settle every open item, then a wayfinder spec drives the build. Until that spec exists, "Step N" still resolves to `docs/build_roadmap.md`. When docs disagree: ADRs > `GLOSSARY.md` > spec > `decisions.md` > this file > other docs, and every conflict goes to the developer (`docs/README.md`).
 
 ## Stack (always true)
 - Python 3.12, FastAPI, SQLAlchemy 2.0 + Alembic, Pydantic v2, Celery + Redis (+ Beat, Flower), PostgreSQL 16, MinIO/S3 via boto3, httpx + tenacity, Playwright, pdfplumber/camelot, pandas/polars, pytest.
@@ -47,7 +47,7 @@ Structure decisions (settled 2026-08-31, don't relitigate): thin route functions
 
 ## Working rules
 - **Git commits are the developer's alone.** Never run `git commit` (or push, amend, rebase, tag) unless the developer explicitly asks for that specific commit in that moment. Staging with `git add` when asked is fine; the commit itself is theirs.
-- Every connector needs 2–3 REAL fixture files in `tests/fixtures/<connector>/` and a conformance test before it's "done". No fixtures, no done.
+- **Definition of done** for a piece of the build: (1) conformance tests pass against 2–3 REAL fixture files in `tests/fixtures/<connector>/` — no fixtures, no done; (2) Claude runs one live lookup against the real source and records it in the build ticket (URL, what came back, claims produced); (3) for BDC parsing, output is cross-checked automatically against the SEC XBRL data where it exists (ADR 0002), with no hand-checked rows; (4) the developer commits it — the commit is the acceptance gate and where the re-explain bar is checked. Numeric bars live in the spec.
 - When a source changes shape in production: update the fixture to the new reality FIRST, then the fix.
 - Scrape etiquette: per-domain Redis token bucket, identified user agent, robots.txt, prefer official APIs/bulk files.
 - Never introduce PitchBook/Preqin/CB Insights data or any paywalled secondary source. Public primary sources only.

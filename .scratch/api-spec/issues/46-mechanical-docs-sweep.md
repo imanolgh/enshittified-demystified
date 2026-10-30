@@ -29,6 +29,15 @@ Apply the ~80 pure wording fixes the 2026-10-26 inventory found (no decision nee
 - **PROGRESS.md**: :18–20, :29.
 - **Across docs**: GLOSSARY-avoided terms in active use — "sponsor" as an entity/card label (evidence_layer_plan.md:203; decisions.md:58), "DSO" for non-dental rollups, "consolidator", "platform", "Unknown" (pre-launch-seeding.md:16), "ownership type"; `no_evidence` / `no_evidence_found` / `no_evidence_for` (resolve per "ExtractedClaim and the extraction result envelope").
 
+## Added by "Docs governance and definition of done" (2026-10-29)
+
+- **docs/README.md**: already fixed (dead rows, count, roadmap role) — skip its checklist line.
+- **Archive**: create `docs/archive/`; move `architecture-study-notes.md` and `python-types-primer.md` there (skip their wording fixes above); update README rows 11–12. `build_roadmap.md` is **not** moved yet — that happens when the spec lands; still do its wording fixes only if cheap, since it becomes history.
+- **PROGRESS.md**: delete, after confirming each "Rulings" bullet is recorded elsewhere (predicates → CLAUDE.md; FastAPI-only → decisions.md §1; launch scope, pricing, first connector → check); record any that isn't in the right doc first. Skip its checklist line.
+- **evidence_layer_glossary.md**: retitle as the sources and tools reference; replace domain-term definitions that duplicate `GLOSSARY.md` with links.
+- **Skills**: `doc-digest` → retire (delete `.claude/skills/doc-digest/`, remove mentions); `connector-dev` → rewrite framing as Claude's connector-building skill (house style, fixtures, live check per CLAUDE.md definition of done); `bdc-parser` → drop "the ONE delegated component"/hand-check loop (deeper XBRL rewrite waits for "BDC discovery and Schedule of Investments parsing"); `conformance-tests` → drop "developer runs them".
+- **decisions.md** :8, :93 — drop `stack_laravel.md` refs; §1 keeps "Laravel was evaluated and rejected".
+
 ## How to resolve
 
 AFK. Make the edits, then append `## Answer` listing what changed and anything skipped (with why). No commits.
