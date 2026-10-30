@@ -17,3 +17,8 @@ Given the research findings, does the launch add a second launch state alongside
   - Rule order: SoS access, then the vet list, then rollup density, then home state. A downloadable vet list is the tiebreaker.
 - If NYSED can't be scraped, the developer files a FOIL request for the NY veterinarian list. This ticket confirms whether that's needed and what the request asks for.
 - Rollup density per state can be measured from registry roster locations once the registry crawl exists. Otherwise use the research's density evidence.
+- Research findings are in [sos-vet-boards.md](../research/sos-vet-boards.md). Questions they raise for this pick:
+  - **Florida's site terms** say "personal, non-commercial use only", which conflicts with its free-download page. That's a legal call for the developer.
+  - **data.ny.gov's terms** ban bots, but the clause sits under the commenting and uploading section, so it may not cover read-only API use.
+  - **NYSED's bulk verification files** may make FOIL unnecessary; who qualifies and the reuse terms are unconfirmed.
+  - **Arizona's vet board** wasn't reachable (HTTP 403).
