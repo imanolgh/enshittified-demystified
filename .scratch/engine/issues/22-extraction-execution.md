@@ -20,4 +20,11 @@ How does extraction run: per document or per entity, Batch API vs synchronous, w
 - **Failure handling**: ">5% malformed → batch flagged" (research_flows.md:65) — under ADR 0002 "flagged" must mean an operational alert / halt / retry; also `refusal` and `max_tokens` stop reasons.
 - **Re-extraction policy** when prompt or model changes.
 - **Cost figures disagree**: evidence_layer_plan.md:229 (cents to tens of cents per entity; "real money at 100k") vs decisions.md:89 / pre-launch-seeding.md:102 (low hundreds total; the latter still counts BDC parsing as LLM cost) vs research_flows.md:18 ("a few dollars" for national roster seeding).
+- **Cost estimate for chains and brands** (added 2026-11-04; usage figures are assumptions, not measurements):
+  - Anthropic prices checked 2026-11-04 against https://platform.claude.com/docs/en/about-claude/pricing (per million tokens, input / output; batch is 50% off and combines with caching): Opus 5.5 $4 / $20 (batch $2 / $10, cache read $0.20); Sonnet 5.5 $2 / $10 (batch $1 / $5, cache read $0.10); Haiku 5.5 $0.10 / $0.50 for prompts up to 100K tokens (batch $0.05 / $0.25; $0.50 / $2.50 above 100K).
+  - Assumed per request: ~10k input tokens (document chunk plus prompt prefix) and ~2k output (claims, quotes and thinking). Per document: Haiku ~$0.001, Sonnet ~$0.02, Opus ~$0.04 in batch; double that without batch.
+  - Assumed workload: ~1,000 brands × ~6 documents = ~6,000 requests. The brand count is the pivot proposal's unsettled figure (chains-and-brands "Product categories: vocabulary and assignment" and "Category brand lists and brand-level checked"); cost scales linearly with it. Top 30 × 10 categories would be ~300 brands, about a third of these figures.
+  - One full seeding pass in batch: Haiku ~$6, Sonnet ~$120, Opus ~$240. Re-extraction after prompt changes means budgeting 2–3 passes.
+  - Biggest swing: sending whole SEC filings instead of the relevant sections could multiply input several times over, so chunking (above) drives cost more than model choice.
+  - Consistent with decisions.md §11's "few hundred dollars" for the parked local seeding.
 - Load the `claude-api` skill when working this ticket.
