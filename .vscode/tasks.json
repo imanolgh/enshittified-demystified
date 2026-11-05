@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "claude",
+      "type": "shell",
+      "command": "claude",
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "panel": "dedicated", "focus": true }
+    }
+  ]
+}
