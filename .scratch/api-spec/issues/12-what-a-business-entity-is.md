@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 06, 09  (Research: NPPES bulk file and API; Research: Google Places terms, pricing and a free geocoder)
+Blocked by: 06, 09, 48  (Research: NPPES bulk file and API; Research: Google Places terms, pricing and a free geocoder; Research: Rollup rosters for omitted medical specialties)
 Map: [api-spec](../map.md)
 
 ## Question
@@ -17,4 +17,4 @@ What real-world thing does a `business` entity represent — a physical location
 - **Identity columns**: entities have no address, city, state, zip, lat/lng, phone, website, yet ADR 0002:14 tiebreaks on address/phone/NPI. Identifiers missing: EIN+PN (plans), CIK, CRD/SEC adviser numbers, SoS entity number, vet license/premises number. Columns on `entities` or an `entity_identifiers` table?
 - **Geocoding**: the map needs coordinates; Places is lazy-only and may be place_id-only (ADR 0003:12). Pick a free geocoder or rule coordinates out of the engine (see "Research: Google Places terms, pricing and a free geocoder").
 - **Canonical name/address precedence** across NPPES, SoS, roster, license board (Places content may not be storable).
-- **Business vertical vocabulary** (dental, vet, funeral, HVAC…): the intake CSV and "category-aware" fan-out depend on it (evidence_layer_plan.md:145,158; research_flows.md:39; decisions.md:34–36; pre-launch-seeding.md:26–40); there is no enum or column, and the word "category" collides with ADR 0001's BusinessCategory. Needs a GLOSSARY term and a mapping to NPPES taxonomies.
+- **Business vertical vocabulary** (dental, vet, funeral, HVAC…): the intake CSV and "category-aware" fan-out depend on it (evidence_layer_plan.md:145,158; research_flows.md:39; decisions.md:34–36; pre-launch-seeding.md:26–40); there is no enum or column, and the word "category" collides with ADR 0001's BusinessCategory. Needs a GLOSSARY term and a mapping to NPPES taxonomies. The mapping includes optometry (`152W*`), confirmed as Tier 1 on 2026-10-31.

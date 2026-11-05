@@ -1,7 +1,7 @@
 # Schema conventions
 
 Type: grilling
-Status: open
+Status: claimed
 Map: [api-spec](../map.md)
 
 ## Question

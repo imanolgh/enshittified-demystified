@@ -31,7 +31,7 @@
 
 **Decision:** Users can search any business type; the pipeline does not restrict category. Coverage is sequenced by evidence density.
 
-- **Tier 1 (launch):** dental, veterinary, physician/urgent care, ABA therapy (all get NPPES), funeral homes/crematoria, car washes, HVAC/plumbing/electrical, dermatology/ophthalmology — heavy PE rollup activity, state licensing records, acquisition press coverage.
+- **Tier 1 (launch):** dental, veterinary, physician/urgent care, ABA therapy (all get NPPES), funeral homes/crematoria, car washes, HVAC/plumbing/electrical, dermatology/ophthalmology/optometry — heavy PE rollup activity, state licensing records, acquisition press coverage.
 - **Tier 2:** apartments/property management, daycare chains, pet boarding, med spas, physical therapy.
 - **Tier 3:** independent bars, clubs, hair salons, single-location restaurants — low PE density; the honest output is usually "no PE evidence found," framed in the UI as *likely independent*, never as certainty.
 
@@ -84,7 +84,7 @@
 - **The census denominator** for healthcare comes from the **NPPES bulk file** — the entire NPI registry as a free monthly download, loaded with the same ETL pattern as Form 5500. Every census entity not matching a roster launches as "no PE evidence found (checked {date})" — the honest likely-independent state, nationally.
 - **Vets** (not in NPPES — it covers human healthcare) use state veterinary license boards plus vet-rollup rosters; other Tier-1 verticals (funeral, car wash, HVAC) get top-down roster coverage only, with independents filled on demand.
 - **Google Places is lazy/on-demand only** — canonicalizing user searches and enriching entities, never bulk seeding. Used naively for a national census it would be the project's largest bill, exceeding all LLM spend combined.
-- **Bottom-up deep research** (full connector fan-out per entity) is reserved for the launch states (New York, plus at most one more; pre-launch-seeding.md §2C) at launch, on-demand user searches (which permanently grow the graph and act as the crawl-prioritization signal), and review-queue follow-ups.
+- **Bottom-up deep research** (full connector fan-out per entity) is reserved for the launch states (New York, with the NYC area first in run order, plus at most one more; pre-launch-seeding.md §2C) at launch, on-demand user searches (which permanently grow the graph and act as the crawl-prioritization signal), and review-queue follow-ups.
 
 **Cost consequence:** LLM extraction runs cents per entity (batch pricing, prompt caching, sha256 dedup making re-runs free); realistic launch seeding is a few hundred dollars of LLM spend total. The binding constraints on launch quality are connector coverage and review throughput, not money.
 
