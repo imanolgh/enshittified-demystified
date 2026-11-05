@@ -27,7 +27,7 @@ Claude never makes a decision on its own. When a build hits a question the docs/
 - Ownership categories are computed by code from each owner's `OwnerKind` and the business's ownership chains; the LLM never classifies them (docs/adr/0001). Vocabulary: `GLOSSARY.md`.
 - `no_evidence_found` is a first-class, publishable outcome — never pad, never guess.
 - Idempotency: claim uniqueness = hash(subject, predicate, object, doc_sha, quote), enforced by DB unique index.
-- Predicate vocabulary (closed set): `acquired_by, owned_by, operates_location_of, lends_to, allocates_to, holds_position, renamed_from`. Adding a predicate is a schema decision → developer only.
+- Predicate vocabulary (closed set): `acquired_by, owned_by, operated_by, lends_to, allocates_to, holds_position, renamed_from`. Each claim reads subject → object; the role table in `contracts.py` fixes the allowed entity types per side. `acquired_by` and `owned_by` back the same ownership hop; `operated_by` (location → company) is the other hop kind (engine "Predicate semantics", 2026-11-05). Adding a predicate is a schema decision → developer only.
 - Google Places is lazy/on-demand only. Never bulk. Bulk identity comes from the NPPES census and rosters.
 
 ## Directory layout

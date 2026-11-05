@@ -10,10 +10,11 @@ You own this module's implementation. The developer owns acceptance: they review
 ## Requirements (fixed)
 - Input: a BDC 10-K/10-Q already retrieved to storage (PDF or filing HTML) + its `documents` row.
 - Parse the Schedule of Investments table(s) — pdfplumber for text/layout, camelot for table structure; handle multi-page tables, repeated headers, footnote markers, subtotal rows.
+- Equity rows in the Schedule (common units, warrants, preferred) emit `holds_position` (BDC fund → company), never an ownership claim, so a warrant can't become a control hop (engine "Predicate semantics", 2026-11-05). Whether a "control investments" row also yields `owned_by` is engine "BDC discovery and Schedule of Investments parsing".
 - Output per portfolio row: an `ExtractedClaim` with predicate `lends_to` (BDC fund → borrower), `value` carrying instrument type, rate (capture PIK terms when present), principal, fair value, non-accrual flag — and a `quote` reproducing the row's text verbatim from the parsed-table text stored on the document.
 - **Numeric cross-check (hard requirement): the principal amount in the quote must equal the structured value, or the claim is not emitted.** Above a per-filing failure-rate threshold (a setting), emit no claims for that filing, mark it unparseable (`no_evidence_found`), and log an operational alert (ADR 0002).
 - Unparseable table/section → emit `no_evidence_found` for that section with a parse-failure note. Never guess a row. Never interpolate.
-- Fund-level facts (total PIK %, non-accrual %) as separate claims quoting the summary text.
+- Fund-level facts (total PIK %, non-accrual %) are NOT emitted: they moved to the retirement map with fund health (engine "Predicate semantics", 2026-11-05).
 - Borrower names go out raw for `resolve_entity` — do not "clean" them beyond whitespace; suffixes like "LLC"/"Holdings" are resolution signals.
 
 ## Fixtures & acceptance loop

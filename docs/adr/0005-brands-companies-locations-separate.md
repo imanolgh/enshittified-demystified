@@ -7,14 +7,14 @@ The graph no longer has a `business` entity. What a reader calls "a business" is
 ## Rules
 
 - **Entity types:** `brand, company, location, family, investment_firm, fund, retirement_plan, insurer`. `rollup` is dropped: a rollup is a company, and "rollup" is a word the product may use about one. `chain` is not a type. A trust, an ESOP trust, a nonprofit and a government body are companies, with the matching owner kind.
-- **Brand:** exists only for a name that spans several locations or is sold as a product. A single-site independent's name is the location's name. A brand owns nothing; a company owns it.
+- **Brand:** exists only for a name that spans several locations or is sold as a product. A single-site independent's name is the location's name. A brand owns nothing; its owner is usually a company, but a source may name a fund, investment firm or family as the owner directly *(amended 2026-11-05, engine "Predicate semantics")*.
 - **Location:** one place where one company at a time serves customers, under zero or more brands. The same address is not the same location (a vision center run by an independent optometrist inside a Walmart is its own location). A new operator keeps the location; a move to a new address starts a new one.
 - **Family:** one person or a family who owns a company in their own name, named only as sources name them. It carries no personal identifiers and is never searchable as a person. "No person entities" (2026-10-26) now means no profiles of individual people. Without this node, a family-owned chain such as Chick-fil-A tops out at its company and reads "owner type not confirmed".
 
 ## Consequences
 
 - A name in a quote must resolve to the right type ("Subway" may mean the brand or the company): "Entity resolution algorithm".
-- No predicate links a location to its brand: "Predicate semantics".
+- No predicate links a location to its brand. *(Settled 2026-11-05 by "Predicate semantics": the link is identity data, `location_brands` rows written by code producers, never a claim or a hop. A location is run by its operator through `operated_by`.)*
 - Which of brand, company and location carry an ownership category: "Category precedence and storage". Whether chains v1 stores locations at all: chains-and-brands "Brand and chain model".
 
 ## Considered options

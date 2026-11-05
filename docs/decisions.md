@@ -37,7 +37,7 @@
 - **Tier 2:** apartments/property management, daycare chains, pet boarding, med spas, physical therapy.
 - **Tier 3:** independent bars, clubs, hair salons, single-location restaurants — low PE density; the honest output is usually "no PE evidence found," framed in the UI as *likely independent*, never as certainty.
 
-**Franchise rule:** ownership is modeled at two levels — **brand ownership** and **location operator** — because a franchised location (e.g., a sandwich shop) is typically owned by a local franchisee even when the brand is PE-owned. Collapsing these would be wrong in exactly the way that destroys trust. National-brand data and local-services data compose in one graph: any search returns both the brand verdict and the operator verdict.
+**Franchise rule:** ownership is modeled at two levels — **brand ownership** and **location operator** — because a franchised location (e.g., a sandwich shop) is typically owned by a local franchisee even when the brand is PE-owned. Collapsing these would be wrong in exactly the way that destroys trust. National-brand data and local-services data compose in one graph: any search returns both the brand verdict and the operator verdict. *(2026-11-05, engine "Predicate semantics": the brand verdict walks brand → owner; the store verdict walks location → `operated_by` → operator → owners; a location's brands are `location_brands` identity rows, never a hop.)*
 
 ## 5. Paid 401(k)/Pension Analysis: Yes, Informational Only, Subscription-Led
 

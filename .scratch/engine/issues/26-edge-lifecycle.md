@@ -19,3 +19,4 @@ How do edges start, end, get retracted, go stale and get re-confirmed — and ho
 - **Append-only vs "claim updates"** (CLAUDE.md:25 vs research_flows.md:162).
 - Concurrency (advisory lock per business or a single-concurrency publish queue) and incremental re-derivation (recompute touched (s,p,o) groups, emit events only on change) — defaultable.
 - **From "Claim producers and the claims door"** (2026-11-05; summary in evidence_layer_plan.md "Producers and the door"): claims carry `producer_version`. Withdrawing every claim from a buggy producer version (retraction plus events) is this ticket's.
+- **From "Predicate semantics"** (2026-11-05; role table in evidence_layer_plan.md §4 `claims`): edges: from = the claim's subject; `relation` is never `acquired_by` (it backs an `owned_by` edge). `location_brands` rows are identity data, not edges.

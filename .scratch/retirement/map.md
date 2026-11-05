@@ -22,6 +22,7 @@ None yet. Relevant engine research: [Research: Form 5500 bulk data contents](../
 ## Not yet specified
 
 - How a user without a Form 5500 plan is routed, now that CAFR pensions are out of scope.
+- **BDC fund health** (total PIK %, non-accrual %): facts about a fund, not relations, moved here from the engine on 2026-11-05 (engine "Predicate semantics"). How they are stored and shown is open.
 
 ## Out of scope
 

@@ -17,3 +17,4 @@ How is the NPPES census loaded and refreshed, and how does the census match join
 - What a match publishes (`operates_location_of` claim? via which producer — see "Claim producers…") and what an unmatched census entity shows ("no PE evidence found (checked {date})" vs not-yet-checked — see "What 'checked' means…").
 - NPPES API: when called beyond census misses.
 - **NPPES: entity, hint, or claim?** (moved here from engine "Claim producers and the claims door", 2026-11-04) build_roadmap.md:88 (census → entities + aliases); research_flows.md:34 ("a hint for retrieval, not a claim") vs :72 (NPPES other-name counted as a verifying source); connector-dev SKILL:18 (ETL → claims). Because NPPES self-verifies, an alias field alone would publish a verified link.
+- **From "Predicate semantics"** (2026-11-05; role table in evidence_layer_plan.md §4 `claims`): `operates_location_of` is renamed `operated_by` (location → company), an ownership hop.

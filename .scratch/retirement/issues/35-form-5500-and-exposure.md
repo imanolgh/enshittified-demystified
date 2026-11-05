@@ -19,3 +19,4 @@ How is Form 5500 data ingested into plans and `allocates_to` claims, how does a 
 - **Headline exposure number** (pre-launch-seeding.md:71; monetizationideas.md:35,76): never defined — what counts as exposure, computed from the 5500 lineup alone (N-PORT deferred)?
 - Which years at launch; amendments; 5500-SF; EIN+PN key; what the quote is (RawDocument: one row per document).
 - In scope by map ruling 2026-10-26; deferred by ADR 0004 (2026-11-04).
+- **From "Predicate semantics"** (2026-11-05; role table in evidence_layer_plan.md §4 `claims`): `allocates_to` is retirement plan or insurer → fund, never an ownership hop; it stays in the vocabulary but no engine producer emits it. `holds_position` (fund|retirement_plan|insurer → company|fund) will also carry CAFR fund commitments if CAFRs return.

@@ -141,6 +141,13 @@ entity_industries              -- 2026-11-05 (ticket 12)
       -- 2026-11-05 (ticket 04): a CHECK requires exactly one of ingest_item_id and
       -- source_document_id. Chains values and display: chains-and-brands "Product categories".
 
+location_brands                -- 2026-11-05 (ticket 15, "Predicate semantics")
+  id, location_id, brand_id, source_document_id, producer, producer_version
+      -- which brands a location trades under: identity data, never a claim, never an ownership
+      -- hop, no confidence. Written only by code producers (store locators, rosters), so the
+      -- source document is required. Unique (location_id, brand_id, source_document_id); a
+      -- Taco Bell/KFC combo store has two rows. Retiring an old row: "Entity lifecycle".
+
 documents                      -- immutable once written
   id, source_type (nppes|form5500|form_adv|sec_filing|irs_exempt_org|sos|license_board|cafr|
       company_site|press_release|news),   -- ADR 0003; fetch method (bulk|api) + connector go in meta
@@ -148,7 +155,16 @@ documents                      -- immutable once written
 
 claims                         -- atomic, cited assertions
   id, subject_entity_id, predicate (acquired_by|owned_by|lends_to|holds_position|
-      allocates_to|operates_location_of|renamed_from),
+      allocates_to|operated_by|renamed_from),
+      -- 2026-11-05 (ticket 15): operates_location_of renamed operated_by. Every claim reads
+      -- subject → object. Role table (contracts.py), subject → object, hop?:
+      --   owned_by, acquired_by: brand|company|investment_firm|insurer → company|fund|
+      --     investment_firm|family; ownership hop (the two back the same hop)
+      --   operated_by: location → company; ownership hop
+      --   lends_to: fund → company; holds_position: fund|retirement_plan|insurer → company|fund;
+      --   allocates_to: retirement_plan|insurer → fund; none of these three is a hop
+      --   renamed_from: "Entity lifecycle"
+      -- A resolved claim whose entity types don't fit is rejected (sanity_check_failed).
       -- ruled 2026-09-14: majority/minority stake is degree, not relationship —
       -- it lives in `value` (e.g. {"stake_pct": 65, "stake_type": "majority"}), matching
       -- how lends_to @ rate and allocates_to @ % already work. Canonical set: CLAUDE.md.
@@ -167,6 +183,8 @@ claims                         -- atomic, cited assertions
 
 edges                          -- the published graph (derived from claims)
   id, from_entity_id, to_entity_id, relation, effective_date,
+      -- from = the claim's subject. relation is never acquired_by: acquired_by and owned_by
+      -- claims publish one owned_by edge (ticket 15).
   confidence (verified|reported|estimated),
       -- ownership_type removed 2026-10-26 (ADR 0001): owners carry owner_kind; each business's
       -- category + separation degree are computed by code from its ownership chains.
@@ -250,7 +268,7 @@ Every claim, whatever produced it, quotes a stored document, enters as `pending`
 - A roster item on an HTML page: the item's text, which must appear in the page's text.
 - A store-locator JSON record: one document per record. Code writes the record's text as one `field: value` line per field, sorted, with nested fields dotted (`address.city: Atlanta`) and list items indexed (`brands.0: Dunkin'`). The quote is the lines the claim uses. `meta` records the rendering format's version and points at the full response, which is stored as the original.
 
-**Identity records.** Code producers (`etl`, `parser`, `selector`) also emit identity records: what one document states about one entity's identity (names, identifiers, addresses, phone, domain, industry code). The LLM emits only claims. Identity records replace the old "resolution hints", "structured hints" and "enrichment structs". Nothing records "where to look next"; fan-out reads identity rows and claims.
+**Identity records.** Code producers (`etl`, `parser`, `selector`) also emit identity records: what one document states about one entity's identity (names, identifiers, addresses, phone, domain, industry code, and for a location the names of its brands, which become `location_brands` rows). The LLM emits only claims. Identity records replace the old "resolution hints", "structured hints" and "enrichment structs". Nothing records "where to look next"; fan-out reads identity rows and claims.
 
 **The door** is one in-process function in `app/core`, validated against `contracts.py`. There is no HTTP route. A producer makes one call per run: one per document for code producers, one per request for the LLM. Each call is one transaction and is idempotent. A call carries the document ids, producer and version, identity records, claims and "nothing found". Each identity record has a key such as `r1` that is only valid inside the call, and a code producer's claim can name its subject or object by that key. The door:
 
@@ -282,7 +300,7 @@ Pure Python, no AI:
 4. *(Experimental, Step 27b)* **Jev claim-support check:** for claims that passed steps 1–3, Jev answers "does this verified quote support predicate P between S and O?" Low confidence sets the claim's status to `unsupported`: kept, never counted toward an edge (ADR 0002). Jev can only remove a claim from publication; it can never verify, publish or downgrade one.
 
 ### Stage 5 — Confidence Scoring & Edge Publication (`score_and_publish`, was `ScoreAndPublishJob`)
-1. Group verified claims by (subject, predicate, object).
+1. Group verified claims by (subject, predicate, object). *(2026-11-05, "Predicate semantics": `acquired_by` and `owned_by` claims for the same pair form one group, published as an `owned_by` edge; `acquired_by` supplies the start date.)*
 2. **Two independent documents agree → publish edge as `verified`.** ("Independent" = different `source_type` or different domains — a press release syndicated to five sites counts once.)
 3. One source → publish as `reported` (labeled as one source on the card).
 4. Conflicting claims (different controlling owners over overlapping dates) → no publication as fact; shown as "sources disagree" with links to each. *(Both updated by ADR 0002 (`docs/adr/0002-no-manual-review.md`).)*
@@ -307,7 +325,7 @@ Reviewers see: the claim, the quote highlighted in the source document, the conf
 |---|---|---|
 | Dominant problem | **Extraction from scattered prose** (press releases, portfolio pages, registries) | **Table parsing from structured filings** (Schedule of Investments, CAFR allocation tables, Form 5500) |
 | Key stage | Stage 2 breadth (many connectors) + Stage 3 classification | camelot/pdfplumber table extraction *before* Stage 3; LLM interprets parsed tables |
-| Claim shape | Ownership edges (`acquired_by`, `operates_location_of`) | Financial edges with values (`lends_to` @ rate, `allocates_to` @ %, `holds_position` @ amount) |
+| Claim shape | Ownership edges (`acquired_by`/`owned_by`, `operated_by`) | Financial edges with values (`lends_to` @ rate, `allocates_to` @ %, `holds_position` @ amount) |
 | Extra layer | Ownership-type taxonomy (the misattribution fix) | Jargon decoder content keyed to claim types (gates, PIK, non-accrual) — written once, attached to every relevant card |
 | Easiest wins | Sponsor/DSO rosters (national PE layer) × NPPES bulk census (national denominator) — their join is the launch map | Form 5500 bulk CSVs (no scraping!) + top-100 pension CAFRs |
 

@@ -9,7 +9,7 @@ The ordered list of owners from a local business up to a private equity fund, e.
 _Avoid_: Ownership tree, path (in user-facing text)
 
 **Hop**:
-One ownership link between two neighbours in an ownership chain.
+One link between two neighbours in an ownership chain: an owner above what it owns, or the operator above a location.
 _Avoid_: Step, level, link (when counting)
 
 **Separation degree**:
@@ -57,6 +57,10 @@ _Avoid_: Founder, individual, person (as an owner)
 **Industry**:
 What line of business an entity is in, such as dental care, restaurants or gyms. It is not the entity's ownership category.
 _Avoid_: Category, vertical, sector
+
+**Operator**:
+The company that runs a location. A franchisee is the operator of its stores. A location is company-run when its operator is in the brand owner's ownership chain, and franchised when it isn't.
+_Avoid_: Manager, franchisee (as the general term)
 
 ## Owners
 

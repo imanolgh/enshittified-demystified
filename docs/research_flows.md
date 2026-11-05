@@ -13,7 +13,7 @@ All entity names in Scenario examples that reference real companies (e.g., Heart
 **Trigger:** One-time launch seeding, then monthly refresh.
 
 1. `load_nppes_census`: download the free NPPES bulk file → pandas filter to Tier-1 taxonomies → national entities for every dental/medical organization (names, addresses, authorized officials, other-name aliases). Same ETL pattern as Form 5500; no API calls, no Places, no LLM.
-2. Sponsor/DSO roster crawl (the Scenario A3 crawler, run in full): each roster location → `operates_location_of` claim citing the roster page.
+2. Sponsor/DSO roster crawl (the Scenario A3 crawler, run in full): each roster location → `operated_by` claim citing the roster page.
 3. **The census match:** roster locations resolved against census entities. Matches publish the PE-connected layer; every unmatched census entity publishes as "no PE evidence found (checked {date})".
 4. Result: the national healthcare map lights up — PE-connected layer + honest-independent denominator — for a few dollars of extraction and zero per-lookup API cost. Deep per-entity research (A1) then adds launch-state-depth chains on top.
 
@@ -31,7 +31,7 @@ For row: *"Bright Smiles Dental, 123 Grand St, Croton-on-Hudson, NY"* (fictional
 2. **NPPES API** (free): `https://npiregistry.cms.hhs.gov/api/?organization_name=Bright+Smiles+Dental&state=NY` → returns organization NPI **1234567890**, authorized official "J. Chen DDS", and — the gold — "Other Organization Name" field listing **"Smile Partners Management LLC"** (a management-company alias).
 3. **NY SoS scrape** for both names → Bright Smiles Dental PLLC (active) + Smile Partners Management LLC, foreign LLC, registered agent = CT Corporation.
 4. **Meilisearch/rapidfuzz** match against existing entities → "Smile Partners Management" matches an existing DSO entity at 0.94 → link instead of create.
-5. Write: entity `ent_8821` with aliases (since ADR 0005, a location, run by Bright Smiles Dental PLLC as a company; local identity is in local-businesses "Local business identity and resolution"), and no link to DSO entity `ent_0455` yet: the `operates_location_of` claim must come from a stored document in Steps 3–4. *(2026-11-05: "resolution hints" are dropped; engine "Claim producers and the claims door".)* Item status → `resolved`.
+5. Write: entity `ent_8821` with aliases (since ADR 0005, a location, run by Bright Smiles Dental PLLC as a company; local identity is in local-businesses "Local business identity and resolution"), and no link to DSO entity `ent_0455` yet: the `operated_by` claim must come from a stored document in Steps 3–4. *(2026-11-05: "resolution hints" are dropped; engine "Claim producers and the claims door".)* Item status → `resolved`.
 
 **Failure branches:** Places returns 3 plausible matches and address/phone/NPI tiebreakers don't separate them → item status `ambiguous`, candidates stored, no claims linked, search shows "couldn't confirm which business this is"; retried automatically when an identity source refreshes (ADR 0002); no NPPES hit for a vet named "Pet Palace" → continue with Places + SoS only (NPPES is dental/medical, vets resolve via state veterinary license boards where scraped).
 
@@ -40,7 +40,7 @@ Category `dental` + DSO link triggers this connector set for `ent_8821` + `ent_0
 
 | Task | Call | Typical yield |
 |---|---|---|
-| `retrieve_dso_roster` | Playwright fetch of smilepartners.com/locations | Location page listing Croton office → `operates_location_of` claim |
+| `retrieve_dso_roster` | Playwright fetch of smilepartners.com/locations | Location page listing Croton office → `operated_by` claim |
 | `retrieve_portfolio_pages` | Fetch known sponsor domains whose portfolio mentions "Smile Partners" (from sponsor registry crawl index) | e.g., sponsor page: "Smile Partners — Partnered 2022" |
 | `retrieve_press` | Google News RSS `q="Smile Partners Management"` + wire archives | PR: "Sponsor X announces growth investment in Smile Partners" |
 | `retrieve_edgar_fts` | `https://efts.sec.gov/LATEST/search-index?q=%22Smile+Partners%22` | Form D from 2022 raise, if any |
@@ -53,7 +53,7 @@ Assemble the 6–12 documents (text-extracted) → one Claude call (Sonnet-class
 
 ```json
 [
- {"subject":"ent_8821","predicate":"operates_location_of","object":"ent_0455",
+ {"subject":"ent_8821","predicate":"operated_by","object":"ent_0455",
   "quote":"Croton-on-Hudson — Bright Smiles Dental","doc":"d_4410"},
  {"subject":"ent_0455","predicate":"acquired_by","object":"ent_sponsorX",
   "event_date":"2022-06-14",
@@ -69,7 +69,7 @@ Pure Python: normalize whitespace, substring-match each `quote` in its doc's sto
 
 ### Step 6 — Scoring & Publication (`score_and_publish`)
 - `acquired_by(SmilePartners → SponsorX)`: supported by press release (wire) **and** sponsor portfolio page (different domains/source_types) → **edge published, confidence `verified`**. Sponsor X's owner kind is `pe_firm`, so Bright Smiles' category is computed as `pe_owned`, separation degree 2 (ADR 0001).
-- `operates_location_of(BrightSmiles → SmilePartners)`: DSO roster **and** NPPES other-name field → **verified**.
+- `operated_by(BrightSmiles → SmilePartners)`: DSO roster **and** NPPES other-name field → **verified**.
 - Result the consumer app can now serve: *Bright Smiles → Smile Partners (DSO) → Sponsor X (PE)* — full chain, 4 receipts.
 - A different item in the batch with only one source → edge `reported`, labeled as one source (ADR 0002).
 
