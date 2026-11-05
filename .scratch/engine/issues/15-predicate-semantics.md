@@ -20,3 +20,4 @@ For each predicate: what are its subject/object roles and direction, which predi
 - **`holds_position`**: semantics never spelled out.
 - Adding a predicate is a schema decision (CLAUDE.md:30) — this ticket is where it's made if needed.
 - **From "What a business entity is"** (2026-11-05, [ADR 0005](../../../docs/adr/0005-brands-companies-locations-separate.md)): a brand owns nothing and a company owns it, and a location is run by one company at a time under zero or more brands. No predicate links a location to its brand(s). Brand → company and company → location need roles and direction here.
+- **From "Schema conventions"** (2026-11-05; conventions in evidence_layer_plan.md §4; no on-demand research per decisions.md §15): "A2 accepts restaurants" no longer applies, since searches never start research. Franchises stay first-order because chains are the launch product (ADR 0004).

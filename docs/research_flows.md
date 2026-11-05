@@ -1,6 +1,6 @@
 # Research Flows — Scenario Walkthroughs
 ### Concrete end-to-end traces of claim gathering, verification, and publication for the PE and PC paths, in the FastAPI/Celery stack
-### Covers: initial bulk seeding, on-demand lookups, and ongoing scheduled refresh
+### Covers: initial bulk seeding and ongoing scheduled refresh (on-demand lookups removed 2026-11-05, decisions.md §15)
 
 All entity names in Scenario examples that reference real companies (e.g., Heartland Dental / KKR) reflect widely reported public information and are used for realism; fictional local businesses are marked.
 
@@ -22,7 +22,7 @@ All entity names in Scenario examples that reference real companies (e.g., Heart
 **Trigger:** You select a launch state's census slice (or upload `westchester_dental_vet.csv`) via the admin endpoint, for full connector fan-out on each entity.
 
 ### Step 1 — Intake
-`POST /admin/ingest-batches` → pandas validates the CSV → 2,000 `ingest_items` rows (status `queued`) → Celery `group()` dispatches 2,000 `resolve_entity` tasks onto the `resolve` queue. Workers process ~4–8 concurrently (rate limits, not CPU, are the bottleneck).
+`POST /admin/ingest-batches` → pandas validates the CSV → 2,000 `ingest_items` rows (`result` null until resolved) → Celery `group()` dispatches 2,000 `resolve_entity` tasks onto the `resolve` queue. Workers process ~4–8 concurrently (rate limits, not CPU, are the bottleneck).
 
 ### Step 2 — Entity Resolution (`resolve_entity`)
 For row: *"Bright Smiles Dental, 123 Grand St, Croton-on-Hudson, NY"* (fictional):
@@ -81,6 +81,8 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 ---
 
 ## Scenario A2: On-Demand — User Searches a Business Not in the Graph
+
+> **Removed 2026-11-05** (decisions.md §15): a search never starts research. A search that finds nothing ready is logged for the demand dashboard (engine "Search and the demand log"). Kept below as history only.
 
 **Trigger:** `GET /api/search?q=harbor+veterinary+ossining` → no entity match above threshold.
 
@@ -179,4 +181,4 @@ Diffing is the theme: ongoing PC work is **compare-new-filing-to-old-edges**, em
 
 **No review queue (ADR 0002):** everything flows lights-out. Ambiguous resolutions (A1) publish as "couldn't confirm which business"; single-source edges publish as `reported`; conflicts show as "sources disagree"; numeric cross-check failures (B1b) are rejected, with an operational alert when a filing's failure rate crosses the threshold.
 
-**The flywheel, restated as data flow:** user searches (A2) prioritize crawling → crawling publishes edges → edges make searches instant → filings refresh (A3/B3) emit events → events drive alerts → alert subscribers fund the crawling.
+**The flywheel, restated as data flow:** searches that find nothing ready are logged → the developer seeds the most-wanted brands and categories (decisions.md §15) → crawling publishes edges → edges make searches instant → filings refresh (A3/B3) emit events → events drive alerts → alert subscribers fund the crawling.

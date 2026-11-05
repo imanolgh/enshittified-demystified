@@ -18,3 +18,4 @@ Given an entity, which connectors run (the routing matrix), how far research rec
 - **Beat jobs missing from cadence tables**: last-confirmed sweep, ambiguous retries, batch poller, events consumer, Form ADV / IRS refresh.
 - **Moved out 2026-11-04 (ADR 0004 split)**: the quarterly no-evidence refresh at census scale and the NPPES reload, census re-match and vet board refresh jobs are in local-businesses "Local fan-out and refresh cadence"; the Form 5500 date is in retirement "Form 5500 ingestion and the headline exposure number". Blockers on parked tickets (31, 33, 35) were dropped.
 - Staleness of known entities: does an A2 search re-research an entity checked N months ago?
+- **From "Schema conventions"** (2026-11-05; conventions in evidence_layer_plan.md §4; no on-demand research per decisions.md §15): a search never re-researches an entity, so the A2 staleness question is moot; refresh is scheduled or operator-seeded only.

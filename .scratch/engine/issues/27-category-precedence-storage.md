@@ -16,3 +16,4 @@ What is the full precedence among business categories, which entity types get a 
 - **Which entity types get a category**: businesses only, or rollups and brands too (an A2 search for a DSO)?
 - Several chains to the same PE firm → separation degree = minimum (default).
 - **From "What a business entity is"** (2026-11-05, [ADR 0005](../../../docs/adr/0005-brands-companies-locations-separate.md)): the candidate types are now `brand`, `company` and `location` (no `business` or `rollup`). The franchise rule needs a brand verdict and an operator verdict, so more than one type may need a category.
+- **From "Schema conventions"** (2026-11-05; conventions in evidence_layer_plan.md §4; no on-demand research per decisions.md §15): the "A2 search for a DSO" example now means a search for a seeded rollup company; searches never start research.

@@ -20,3 +20,4 @@ How are the sponsor/rollup registry, portfolio pages and DSO/rollup location ros
 - **"Exited/former portfolio" sections** → formerly PE-owned?
 - **Registry targets** beyond dental/vet (pre-launch-seeding.md:112 "dental ≥30, vet ≥15, etc.").
 - The "sponsor registry crawl index" (research_flows.md:43) is never defined (default: Postgres full-text over stored portfolio/roster text).
+- **From "Schema conventions"** (2026-11-05; conventions in evidence_layer_plan.md §4; no on-demand research per decisions.md §15): crawl state is assigned here (it had no owner); the registry and crawl-state tables, their columns and retention are this ticket's.

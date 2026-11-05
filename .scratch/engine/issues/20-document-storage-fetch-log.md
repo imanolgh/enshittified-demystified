@@ -17,3 +17,4 @@ How are documents keyed and stored, how is each fetch recorded (so "last confirm
 - **S3 layout**: only `docs/{sha256}.html` given (research_flows.md:49); bulk archives, batch files, versioning/object lock for the "legal defense" archive (evidence_layer_plan.md:44,225).
 - **Text-extraction rules must be versioned** (quotes and offsets match exact text): HTML→text (boilerplate, block separators), PDF (layout mode, page separators for page citations, ligatures, hyphenation), Playwright capture (post-render DOM, wait conditions).
 - Builds on "RawDocument shape" (raw_text written once).
+- **From "Schema conventions"** (2026-11-05; conventions in evidence_layer_plan.md §4; no on-demand research per decisions.md §15): the fetch log table, its columns and retention are this ticket's; it follows the shared conventions.

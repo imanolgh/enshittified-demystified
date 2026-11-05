@@ -82,6 +82,17 @@ The AI is a reading-comprehension engine over documents you fetched. Hallucinati
 
 ## 4. Database Schema (migrations to write first)
 
+**Conventions every table follows** (ticket 04, 2026-11-05):
+- `id bigint` identity primary key, internal only. Rows that appear in a URL (`entities`, `documents`) also carry `public_id`: 12 random Crockford base32 characters, unique, never reused.
+- Enums are text columns with a named CHECK constraint generated from the StrEnum in `app/core/contracts.py`. Every value change is a hand-written migration that drops and re-adds the constraint, and a test fails if a live CHECK and its StrEnum differ. (Alembic autogenerate detects neither CHECK expression changes nor native-enum value changes.)
+- A reference to another row is a foreign-key column or a join table, never ids inside JSONB. JSONB holds only payloads that point at no row (`documents.meta`, `claims.value`).
+- snake_case, plural table names, `<singular>_id` foreign keys, join tables named after both tables, `_at` timestamps (`timestamptz`, UTC), `_date` calendar dates, `is_`/`has_` booleans. One SQLAlchemy `naming_convention` names every constraint and index.
+- `created_at` (database default) on every table; `updated_at` on tables whose rows change.
+- No deletes and no soft-delete flags on evidence and identity tables (documents, claims, edges, events, aliases, identifiers, addresses, industries). Corrections go through status, `retracted_at` and events. Operational tables (cache, crawl state, cost log) may prune; their owning tickets set retention.
+- Money is `numeric`, never float, with its currency stated.
+- Indexes: every foreign-key column; every uniqueness rule as a unique index (claim hash, strong identifiers, public ids); `edges` on `from_entity_id`, `to_entity_id` and a partial index on non-retracted edges; a trigram index on aliases only if "Entity resolution algorithm" picks `pg_trgm`. Any other index needs a slow query behind it.
+- Tables defined in their own tickets: fetch log ("Document storage, fetch log and last-confirmed"), Anthropic batch jobs and extraction cache ("Extraction execution"), registry and crawl state ("Rosters, portfolio pages and the registry"), `api_costs` and operational alerts ("Operational identity, budgets and guardrail values"), `failed_tasks` ("Celery topology"), the search demand log ("Search and the demand log").
+
 ```
 entities
   id, canonical_name, entity_type (brand|company|location|family|investment_firm|fund|
@@ -89,7 +100,7 @@ entities
       -- 2026-10-26: what a thing is, not its role; owner_kind per ADR 0001
       -- 2026-11-05 (ADR 0005): business and rollup replaced by brand|company|location; family =
       -- one person or a family owning in their own name (no individual profiles, no identifiers)
-  jurisdiction (nullable), status, created_at
+  public_id, jurisdiction (nullable), status, created_at
       -- jurisdiction = place of formation, from a filing; company|fund|investment_firm only.
       -- canonical_name is picked by code from the entity's sourced names (ticket 12):
       -- company|fund|investment_firm|family: official filing > own site > own press_release >
@@ -119,16 +130,18 @@ entity_addresses               -- 2026-11-05 (ticket 12)
       -- follows the canonical_name ranking above.
 
 entity_industries              -- 2026-11-05 (ticket 12)
-  id, entity_id, industry (one closed list in code), origin
+  id, entity_id, industry (one closed list in code), ingest_item_id (nullable),
+      source_document_id (nullable)
       -- brand|company|location only; zero or more each. Assigned by code from where the entity
-      -- came in (brand list, intake column, NPPES taxonomy), never by the LLM, never a claim.
-      -- origin's value set is not yet fixed. Chains values and display: chains-and-brands
-      -- "Product categories".
+      -- came in (an intake row, incl. a brand-list upload; or a document such as an NPPES record
+      -- whose taxonomy code maps to an industry), never by the LLM, never a claim.
+      -- 2026-11-05 (ticket 04): a CHECK requires exactly one of ingest_item_id and
+      -- source_document_id. Chains values and display: chains-and-brands "Product categories".
 
 documents                      -- immutable once written
   id, source_type (nppes|form5500|form_adv|sec_filing|irs_exempt_org|sos|license_board|cafr|
       company_site|press_release|news),   -- ADR 0003; fetch method (bulk|api) + connector go in meta
-  url, retrieved_at, sha256, storage_path, mime_type, raw_text (nullable), meta JSONB
+  public_id, url, retrieved_at, sha256, storage_path, mime_type, raw_text (nullable), meta JSONB
 
 claims                         -- atomic, cited assertions
   id, subject_entity_id, predicate (acquired_by|owned_by|lends_to|holds_position|
@@ -150,18 +163,32 @@ edges                          -- the published graph (derived from claims)
   confidence (verified|reported|estimated),
       -- ownership_type removed 2026-10-26 (ADR 0001): owners carry owner_kind; each business's
       -- category + separation degree are computed by code from its ownership chains.
-  supporting_claim_ids JSONB, published_at, retracted_at (nullable)
+  published_at, retracted_at (nullable)
+      -- 2026-11-05 (ticket 04): supporting_claim_ids JSONB replaced by edge_claims.
+
+edge_claims                    -- which claims support which edge (ticket 04)
+  id, edge_id, claim_id        -- unique (edge_id, claim_id)
 
 ~~review_items~~               -- dropped 2026-10-26 (ADR 0002). Its reasons now live elsewhere:
       -- single_source → edge confidence = reported; conflict → business category sources_disagree;
       -- low_confidence → claim rejection_reason = unsupported; community_flag → not in the MVP.
 
-ingest_batches / ingest_items  -- batch submission tracking
-  batch: id, name, submitted_by, counts, status
-  item: id, batch_id, input_name, input_address, resolved_entity_id, stage,
-        result (resolved|ambiguous|failed), candidates JSONB (nullable, set only when ambiguous)
-      -- 2026-10-26: no "not found" (a miss creates an entity); failed = error after tenacity
-      -- retries (→ dead-letter). The automatic re-attempt selects result = ambiguous.
+ingest_batches / ingest_items  -- operator uploads only (decisions.md §15: no on-demand research)
+  batch: id, name, status (running|done|halted)
+      -- 2026-11-05 (ticket 04): halted = stopped by the spend cap or the operator; unfinished
+      -- items keep a null result. No counts column (computed on read); submitted_by dropped.
+  item: id, batch_id (required), input_name, input_entity_type (brand|company|location),
+        input_industry, input_street, input_city, input_state, input_postal_code, input_domain,
+        resolved_entity_id, result (resolved|ambiguous|failed)
+      -- every input_* except input_name, resolved_entity_id and result are nullable.
+      -- 2026-10-26: no "not found" (a miss creates an entity). The automatic re-attempt
+      -- selects result = ambiguous.
+      -- 2026-11-05 (ticket 04): stage dropped; result null = waiting or resolving. failed = an
+      -- error during resolution after tenacity retries (→ dead letter); later failures belong
+      -- to the entity's research. Raw CSV rows are not kept.
+
+ingest_item_candidates         -- 2026-11-05 (ticket 04); replaces ingest_items.candidates JSONB
+  id, ingest_item_id, entity_id, score   -- set only when result = ambiguous
 ```
 
 Key design points:
@@ -176,7 +203,7 @@ Key design points:
 Everything below is a Celery task. Sequencing uses Celery `chain()` (≈ Laravel `Bus::chain()`), fan-out uses `group()` (≈ `Bus::batch()`), and "run X after all of these finish" uses `chord()` (≈ `Bus::batch()->then(...)`). Task names below use Python snake_case; the Laravel job-class name each replaces is shown in parentheses on first mention.
 
 ### Stage 0 — Intake
-`create_ingest_batch` (was `CreateIngestBatch`) → accepts a single name or a CSV of thousands (`name, address, city, state, category`); pandas validates the CSV. Each row becomes an `ingest_item` and dispatches Stage 1 via a Celery `group()`. Queue: `intake` (monitored in Flower).
+`create_ingest_batch` (was `CreateIngestBatch`) → accepts an operator upload of one row or a CSV of thousands (`name, entity_type, industry, street, city, state, postal_code, domain`; only `name` is required; ticket 04); pandas validates the CSV. Searches never create batches (decisions.md §15). Each row becomes an `ingest_item` and dispatches Stage 1 via a Celery `group()`. Queue: `intake` (monitored in Flower).
 
 ### Stage 1 — Entity Resolution (`resolve_entity`, was `ResolveEntityJob`)
 1. Normalize input (strip punctuation, expand abbreviations).

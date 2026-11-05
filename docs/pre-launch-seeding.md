@@ -4,6 +4,8 @@
 
 *(Parked 2026-11-04 by ADR 0004: this is the local-businesses launch plan, kept on record. Its open questions live in `.scratch/local-businesses/`. A chains-and-brands seeding plan follows the category audit.)*
 
+*(2026-11-05, decisions.md §15: there is no on-demand research in either product. The "research on request" state, the on-demand rows in §3 and the A2 launch check below describe the old plan.)*
+
 ---
 
 ## 1. What "Seeded for Launch" Means
