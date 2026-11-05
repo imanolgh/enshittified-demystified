@@ -36,6 +36,28 @@ _Avoid_: Ex-PE, previously backed
 The category of a business that was checked against every known ownership source and has no chain to private equity, always shown with the date it was checked.
 _Avoid_: Independent, PE-free, not PE-owned
 
+## Entities
+
+**Brand**:
+A name a company sells under at several locations or on products, such as Dunkin' or Ray-Ban. A brand owns nothing: a company owns it, and it can pass from one company to another.
+_Avoid_: Label, marque
+
+**Company**:
+A legal entity, such as a corporation, LLC, partnership, trust, nonprofit or government body, that can own, be owned or run locations. A franchisee, a rollup and a public company are all companies.
+_Avoid_: Business (as the thing that owns), organization, firm (except investment firm)
+
+**Location**:
+One place where one company at a time serves customers under zero or more brands, such as a store, gym or dental office. A new operator keeps the same location; a move to a new address starts a new one.
+_Avoid_: Store, site, branch, outlet (as the general term)
+
+**Family**:
+One person or a family who owns a company in their own name, named only as sources name them. It is an owner, never a profile of a person.
+_Avoid_: Founder, individual, person (as an owner)
+
+**Industry**:
+What line of business an entity is in, such as dental care, restaurants or gyms. It is not the entity's ownership category.
+_Avoid_: Category, vertical, sector
+
 ## Owners
 
 **Owner kind**:

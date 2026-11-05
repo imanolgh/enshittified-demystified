@@ -84,12 +84,46 @@ The AI is a reading-comprehension engine over documents you fetched. Hallucinati
 
 ```
 entities
-  id, canonical_name, entity_type (business|brand|investment_firm|fund|rollup|retirement_plan|insurer),
-      -- 2026-10-26: what a thing is, not its role; no person entities; owner_kind per ADR 0001
-  jurisdiction, place_id (nullable), npi (nullable), status, created_at
+  id, canonical_name, entity_type (brand|company|location|family|investment_firm|fund|
+      retirement_plan|insurer),
+      -- 2026-10-26: what a thing is, not its role; owner_kind per ADR 0001
+      -- 2026-11-05 (ADR 0005): business and rollup replaced by brand|company|location; family =
+      -- one person or a family owning in their own name (no individual profiles, no identifiers)
+  jurisdiction (nullable), status, created_at
+      -- jurisdiction = place of formation, from a filing; company|fund|investment_firm only.
+      -- canonical_name is picked by code from the entity's sourced names (ticket 12):
+      -- company|fund|investment_firm|family: official filing > own site > own press_release >
+      -- news; brand|location: own site first, then the same order; the newer document wins a tie.
+      -- The input name (brand list, search, intake) shows until a document gives one.
+      -- Names from Places are never stored.
 
 entity_aliases
-  id, entity_id, alias, alias_type (dba|legal_name|former_name|domain), source_document_id
+  id, entity_id, alias, alias_type (dba|legal_name|former_name), source_document_id
+      -- 2026-11-05: domain moved to entity_identifiers
+
+entity_identifiers             -- 2026-11-05 (ticket 12); replaces entities.place_id and .npi
+  id, entity_id, scheme (cik|ticker|ein|crd|sec_file_number|private_fund_id|domain|phone|
+      place_id|npi), value, source_document_id (nullable: place_id only, ADR 0003)
+      -- strong schemes (cik, ein, crd, sec_file_number, private_fund_id, place_id, npi): one
+      -- entity per (scheme, value); a second holder is a resolution or merge signal, never a
+      -- second row. Weak schemes (ticker, domain, phone) may repeat.
+      -- sec_file_number = 801-|802-|814-; private_fund_id = 805-. phone only from stored
+      -- documents, never Places. Added later: SoS entity number, license number and plan
+      -- EIN+PN when their efforts start; trademark serial only if USPTO is adopted (ticket 64).
+
+entity_addresses               -- 2026-11-05 (ticket 12)
+  id, entity_id, kind (site|principal_office|mailing), street, city, state, postal_code,
+      country, source_document_id
+      -- site = a location's own address. Registered-agent addresses are never stored as an
+      -- entity's address. Places-formatted addresses are never stored. Which address shows
+      -- follows the canonical_name ranking above.
+
+entity_industries              -- 2026-11-05 (ticket 12)
+  id, entity_id, industry (one closed list in code), origin
+      -- brand|company|location only; zero or more each. Assigned by code from where the entity
+      -- came in (brand list, intake column, NPPES taxonomy), never by the LLM, never a claim.
+      -- origin's value set is not yet fixed. Chains values and display: chains-and-brands
+      -- "Product categories".
 
 documents                      -- immutable once written
   id, source_type (nppes|form5500|form_adv|sec_filing|irs_exempt_org|sos|license_board|cafr|

@@ -18,3 +18,4 @@ What are a brand and a chain in the product, whose ownership does a brand page r
 - **Public companies** (Chipotle, Walmart, Target, Home Depot) don't flag; how they read is in "Card wording and the how-this-works page".
 - Which entity rows exist (brand, company, location) is fixed in engine "What a business entity is"; this ticket is the product meaning.
 - Load `grilling` and `domain-modeling`.
+- **From engine "What a business entity is"** (2026-11-05, [ADR 0005](../../../docs/adr/0005-brands-companies-locations-separate.md)): there is no `chain` entity type. Brands, companies and locations are separate rows; a brand row exists only for a name that spans several locations or is sold as a product. Whether chains v1 creates location rows at all is this ticket's call.

@@ -17,7 +17,7 @@ The project documents in this folder, in reading order, with the role of each (f
 | 11 | `architecture-study-notes.md` | Study notes (learning material, to be archived). Part 2's folder proposals are rejected in favour of the CLAUDE.md layout |
 | 12 | `python-types-primer.md` | Python types primer (learning material, to be archived) |
 | — | `../GLOSSARY.md` | Canonical domain vocabulary (ownership, owners, evidence) |
-| — | `adr/` | Architecture decision records, `NNNN-slug.md`. 0001 ownership categories computed by code; 0002 no manual review; 0003 one source type per publisher; 0004 chains and brands first, local parked |
+| — | `adr/` | Architecture decision records, `NNNN-slug.md`. 0001 ownership categories computed by code; 0002 no manual review; 0003 one source type per publisher; 0004 chains and brands first, local parked; 0005 brands, companies and locations are separate entities |
 | — | `agents/` | How agent skills use this repo (issue tracker, domain docs) |
 | 13 | (this file) | Index |
 

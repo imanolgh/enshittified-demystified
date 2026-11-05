@@ -21,3 +21,4 @@ From "What a business entity is":
 From "Entity resolution algorithm":
 - **Census and NPPES API in the lookup order**: the doc contradictions are listed in engine "Entity resolution algorithm" (Lookup order bullet); this ticket places the census and the NPPES API once that ticket fixes the general order.
 - **Ambiguous retry trigger**: after each NPPES/SoS/board refresh (ADR 0002:14) — confirm.
+- **From engine "What a business entity is"** (2026-11-05, [ADR 0005](../../../docs/adr/0005-brands-companies-locations-separate.md)): `npi` is an `entity_identifiers` scheme; whether it sits on the company (the PLLC) or the location is this ticket's call. SoS entity number and license number join the scheme list when local unparks. A local practice is a location run by a company; a single-site independent has no brand row.

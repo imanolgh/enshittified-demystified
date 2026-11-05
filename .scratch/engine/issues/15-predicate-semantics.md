@@ -19,3 +19,4 @@ For each predicate: what are its subject/object roles and direction, which predi
 - **Employer ↔ plan**: moved out 2026-11-04 (adr 0004 split) to retirement "Form 5500 ingestion and the headline exposure number" (deferred).
 - **`holds_position`**: semantics never spelled out.
 - Adding a predicate is a schema decision (CLAUDE.md:30) — this ticket is where it's made if needed.
+- **From "What a business entity is"** (2026-11-05, [ADR 0005](../../../docs/adr/0005-brands-companies-locations-separate.md)): a brand owns nothing and a company owns it, and a location is run by one company at a time under zero or more brands. No predicate links a location to its brand(s). Brand → company and company → location need roles and direction here.

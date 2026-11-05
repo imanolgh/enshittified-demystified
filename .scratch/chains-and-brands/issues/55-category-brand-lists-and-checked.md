@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 54, engine/28  (Product categories: vocabulary and assignment; What "checked" means and coverage states)
+Blocked by: 54, 64, engine/28  (Product categories: vocabulary and assignment; USPTO trademark data: adopt as a source?; What "checked" means and coverage states)
 Map: [chains-and-brands](../map.md)
 
 ## Question

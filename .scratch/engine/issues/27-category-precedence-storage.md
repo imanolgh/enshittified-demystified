@@ -15,3 +15,4 @@ What is the full precedence among business categories, which entity types get a 
 - **Storage**: ADR 0001:13 implies a stored (business, PE firm) row with separation degree; columns undefined. Is the category itself stored (with checked_at and the deciding chain) or computed on read? Recompute bookkeeping after an owner-kind change (async fan-out above N businesses). Where does formerly-PE history live? (evidence_layer_plan.md:194; build_roadmap.md:61,73)
 - **Which entity types get a category**: businesses only, or rollups and brands too (an A2 search for a DSO)?
 - Several chains to the same PE firm → separation degree = minimum (default).
+- **From "What a business entity is"** (2026-11-05, [ADR 0005](../../../docs/adr/0005-brands-companies-locations-separate.md)): the candidate types are now `brand`, `company` and `location` (no `business` or `rollup`). The franchise rule needs a brand verdict and an operator verdict, so more than one type may need a category.

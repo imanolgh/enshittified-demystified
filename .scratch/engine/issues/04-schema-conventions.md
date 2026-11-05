@@ -17,3 +17,4 @@ Which cross-cutting schema conventions does every table follow, and what are the
 - **Implied tables never listed**: registry, crawl state, Anthropic batch jobs, extraction cache, API cost log, operational alerts, dead letters, fetch log — confirm which exist (several are decided in their own tickets; this ticket owns naming/conventions).
 - **Indexes**: trigram/GIN on aliases (if Meilisearch dropped), edges on (from) and (to), partial index on active edges.
 - **Timestamps, soft-delete policy** (none — append-only), naming conventions.
+- **From "What a business entity is"** (2026-11-05, [ADR 0005](../../../docs/adr/0005-brands-companies-locations-separate.md)): three new tables need names and conventions: `entity_identifiers`, `entity_addresses`, `entity_industries` (evidence_layer_plan.md §4). The value set for `entity_industries.origin` (brand list, intake column, NPPES taxonomy) is not fixed yet.
