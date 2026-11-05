@@ -20,10 +20,12 @@ Label: wayfinder:map · Tracker: local markdown (`docs/agents/issue-tracker.md`)
 
 - Pivot, website first, money model, retirement deferred, ticket layout: [ADR 0004](../../docs/adr/0004-chains-and-brands-first.md) and decisions.md §14 (ruled 2026-11-04, before this map existed).
 - Category audit: pilot three categories (restaurants, gyms, eyewear) first, then the developer decides on the rest (ruled 2026-11-04).
+- [Research: Category audit pilot (restaurants, gyms, eyewear)](issues/52-research-category-audit-pilot.md): of each top 30, PE-owned or PE minority stake: restaurants 30% (40% if public companies with a PE-fund 5%+ holder count), gyms 30% (33%), eyewear 13% by brands or 21% by sales; owner not found for 2, 7 and 12 brands. 21 of 90 brands borrow from BDCs (Q2 2026). Brand-direct affiliate programs exist only in eyewear, and none is on a PE-owned brand. Leads corrected: Jersey Mike's IPO'd (JMKE, still Blackstone-controlled), Pizza Hut to LongRange closed. Cost ≈ 25–32 min and ~260–280k tokens per category; ~3.1–3.4M tokens for 12 more. Five counting questions for the developer in findings §9.
+- [Research: USPTO trademark data as an official source](issues/56-research-uspto-trademark-data.md): USPTO holds one "last recorded owner" per mark, updated only by six recorded document types and without validity checks; changes sit in a separate Assignment database (one record per document; security interests recorded but owner unchanged). In 8 spot checks the registered owner never named the PE sponsor: sponsor-owned brands sat in "IP Holder" or franchisor subsidiaries, and stock acquisitions left no record; Jersey Mike's owner field disagrees with a 2019 assignment. Bulk files and APIs need a USPTO.gov sign-in or keys (ID.me for the bulk API). Adoption, self-verification and source-type count are open for the developer.
 
 ## Not yet specified
 
-- **Full category audit**: the remaining ~12 candidate categories, if the pilot's method and cost hold up (the developer decides after the pilot).
+- **Full category audit**: the remaining ~12 candidate categories. The pilot is done; the developer decides whether to run the rest, and how shares are counted (findings §9).
 - **Seeding plan** for chains and brands: sources, order and runbook. ADR 0004 says it follows the category audit; it replaces nothing in `pre-launch-seeding.md`, which stays as the parked local plan.
 - **BDC lenders on brand pages**: how a PE-owned chain's page shows which public funds lend to it, once engine "BDC discovery and Schedule of Investments parsing" closes (first follow-up, ADR 0004).
 

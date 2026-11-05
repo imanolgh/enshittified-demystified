@@ -1,7 +1,7 @@
 # Research: USPTO trademark data as an official source
 
 Type: research
-Status: open
+Status: resolved
 Map: [chains-and-brands](../map.md)
 
 ## Question
@@ -24,4 +24,20 @@ Can USPTO trademark bulk data tell us who owns a brand today, and when ownership
 
 ## How to resolve
 
-AFK. A subagent invokes the `research` skill and writes findings, every claim cited to its primary source, to `.scratch/chains-and-brands/research/uspto-trademarks.md`. No branches, commits or pushes. Then append `
+AFK. A subagent invokes the `research` skill and writes findings, every claim cited to its primary source, to `.scratch/chains-and-brands/research/uspto-trademarks.md`. No branches, commits or pushes. Then append `## Answer` here: a short summary + link.
+
+## Answer
+
+Researched 2026-11-04. Findings, each claim cited: [research/uspto-trademarks.md](../research/uspto-trademarks.md).
+
+- **Current owner per mark: yes, but only as "last recorded owner".** USPTO's Trademark database (shown in TSDR as "Current Owner(s) Information") holds one owner per mark. It auto-updates only for six kinds of recorded documents, even when the chain of title is broken. Recording is "ministerial", not a validity check (TMEP §§503.01(c), 504; 37 CFR §3.54).
+- **Changes are logged separately.** The Assignment database has one record per recorded document (reel/frame): free-text conveyance, parties, dates, and serial/registration numbers, but no mark text. Security interests and licenses are recorded for notice only. Mergers, name changes and entity conversions update the owner.
+- **Bulk products.** Daily XML for applications, assignments and TTAB, plus yearly research CSVs that run about 2 years behind. All are on the Open Data Portal, marked public domain.
+- **Access needs registration.** The ODP needs a USPTO.gov sign-in (since 2026-06-18), and its API needs an ID.me-linked key. The TSDR single-mark API needs its own key (60 requests per minute). Nothing was signed up for and no bulk file was downloaded.
+- **Spot checks (8 brands).**
+  - The registered owner never named the PE sponsor; for sponsor-owned brands it was a brand-level IP holder or franchisor entity.
+  - Stock acquisitions left no USPTO record.
+  - The public companies matched the filer or a named subsidiary.
+  - In 1 of 8 (Jersey Mike's), the TSDR owner disagrees with an assignment recorded in 2019.
+  - Every mark had recorded lender security interests.
+- **Open for the developer** (facts only, no pick): whether to adopt USPTO as a source type; whether it self-verifies; one source type or two (the two databases are not independent); what a mark-level claim attaches to; whether security interests feed any relationship; and the citable unit.
