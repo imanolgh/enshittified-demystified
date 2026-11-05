@@ -35,7 +35,7 @@ Resolved 2026-10-29 (grilling with the developer).
    - Until then, NY vets get only the §2B coverage states: confirmed from a rollup roster, or unknown with on-demand research. There is no "No PE evidence found" for them.
 6. **Vocabulary.** `GLOSSARY.md` gains **Coverage state** and **Launch state**. Docs always write "coverage state" in full, never a bare "state 1–3".
 
-7. **NYC-area priority (added 2026-10-31).** New York's deep research runs the NYC area first, and the NYC area leads launch marketing. This is priority only and doesn't reverse point 2: the whole state stays in scope, Albany, Buffalo, Rochester and the rest included. The NYC area is a list of NY counties, with no NJ, CT or PA coverage. The county list is set in "Operational identity, budgets and guardrail values".
+7. **NYC-area priority (added 2026-10-31).** New York's deep research runs the NYC area first, and the NYC area leads launch marketing. This is priority only and doesn't reverse point 2: the whole state stays in scope, Albany, Buffalo, Rochester and the rest included. The NYC area is a list of NY counties, with no NJ, CT or PA coverage. The county list is set in "Launch-state run budget and the NYC-area counties" (moved from "Operational identity, budgets and guardrail values" on 2026-11-04).
 
 **Recorded in:**
 - `GLOSSARY.md`: the new Coverage section.

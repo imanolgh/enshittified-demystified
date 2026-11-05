@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 11, 12, 47  (Research: SoS and vet license boards in the launch states; What a business entity is; Pick the second launch state)
+Blocked by: 11, engine/12, 47, 49  (Research: SoS and vet license boards in the launch states; What a business entity is; Pick the second launch state; Local business identity and resolution)
 Map: [local-businesses](../map.md)
 
 ## Question

@@ -4,6 +4,8 @@ Written 2026-11-02 at the end of a Windows Claude Code session, for the next ses
 
 **Update 2026-11-04: ruled.** The four decisions in section 6 and the section 2 layout were all accepted as recommended. They are recorded in `docs/adr/0004-chains-and-brands-first.md` and `docs/decisions.md` §14, with the numbering rule in `docs/agents/issue-tracker.md`. Everything else below is still a recommendation.
 
+**Update 2026-11-04 (later): folders set up.** Tickets now live in `.scratch/engine/`, `.scratch/chains-and-brands/` (active), `.scratch/local-businesses/` (parked) and `.scratch/retirement/` (parked; ticket 35). Local-only bullets in engine tickets were split into new local tickets 49–51. Chains-and-brands tickets 52–62 and engine ticket 63 were charted from §2 and §5. The category audit runs as a three-category pilot (ticket 52). Section 2 and section 7 step 2 are done; the paths in section 2 refer to the old `api-spec` folder, which no longer exists. Competitor facts (§4) are saved to project memory.
+
 **Original status: proposal only. The developer has not ruled on anything below.** They said they will "probably choose chains and brands for now" but want the local work kept mapped out. No project docs were changed. Treat every recommendation here as a recommendation, per the role contract in `CLAUDE.md`.
 
 **Do not commit or push anything** until the ticket-folder question in section 2 is settled. This file is itself uncommitted.

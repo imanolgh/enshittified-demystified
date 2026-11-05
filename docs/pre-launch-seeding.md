@@ -50,7 +50,7 @@ The **launch states** (GLOSSARY.md) are where **every** dental + vet practice ge
 - **Launch state 1: New York** (the developer's home state).
 - **Launch state 2: optional**, picked from FL, CO, TX, AZ only if cheap — free SoS bulk/API data and a downloadable vet licensee list; a downloadable vet list is the tiebreaker. Otherwise New York alone.
 - Selection rule, in order: (1) free, terms-permitted SoS bulk data or API; (2) a downloadable or scrapable vet licensee list; (3) documented rollup density (registry roster locations per state); (4) the developer's home state.
-- **New York run order:** the NYC area goes first, so it's covered if the spend cap limits a batch, and it leads launch marketing. This is priority only: the whole state stays in scope, and the NYC area is a list of NY counties with no coverage in NJ, CT or PA (ruled 2026-10-31). The county list is set in "Operational identity, budgets and guardrail values".
+- **New York run order:** the NYC area goes first, so it's covered if the spend cap limits a batch, and it leads launch marketing. This is priority only: the whole state stays in scope, and the NYC area is a list of NY counties with no coverage in NJ, CT or PA (ruled 2026-10-31). The county list is set in "Launch-state run budget and the NYC-area counties" (`.scratch/local-businesses/`).
 
 ---
 

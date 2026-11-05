@@ -17,3 +17,4 @@ What do the public output models contain — the business card, the per-claim re
 - **Graph endpoint** (build_roadmap.md:121; evidence_layer_plan.md:204): depth cap value; both directions (clinic→DSO→PE firm←lends_to←BDC); relation filters; ended/history edges; node cap for hubs with thousands of locations.
 - **Document receipts**: re-serve archived copies (copyright risk for news) or only URL + quote + retrieved_at + sha? pre-launch-seeding.md:119 requires cards to resolve to stored documents.
 - `ConfigDict(from_attributes=True)` for ORM-built outputs.
+- **Chains and brands** (added 2026-11-04, ADR 0004): output shapes for a brand, a chain, a category page and the public deal feed. Their wording is in chains-and-brands "Card wording and the how-this-works page", the pages in "Website pages and shareable cards".

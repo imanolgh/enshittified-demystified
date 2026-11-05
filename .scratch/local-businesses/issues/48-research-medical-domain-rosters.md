@@ -43,4 +43,4 @@ For the medical and care specialties not in Tier 1 (decisions.md §4), which hav
 
 ## How to resolve
 
-AFK. A subagent writes findings, every claim cited to its primary source, to `.scratch/local-businesses/research/medical-domain-rosters.md`, ending with a table of each candidate's rollups, public rosters and census codes. No branches, commits or pushes. Then append `## Answer` here: a short summary + link to the findings file. The developer's decision on what to add goes to "What a business entity is", which fixes the vocabulary and taxonomy mapping.
+AFK. A subagent writes findings, every claim cited to its primary source, to `.scratch/local-businesses/research/medical-domain-rosters.md`, ending with a table of each candidate's rollups, public rosters and census codes. No branches, commits or pushes. Then append `## Answer` here: a short summary + link to the findings file. The developer's decision on what to add goes to "Local business identity and resolution", which fixes the taxonomy mapping (moved from "What a business entity is" on 2026-11-04).

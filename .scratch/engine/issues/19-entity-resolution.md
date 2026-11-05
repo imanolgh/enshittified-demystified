@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 12, 06, 09  (What a business entity is; Research: NPPES bulk file and API; Research: Google Places terms, pricing and a free geocoder)
+Blocked by: 12, 09  (What a business entity is; Research: Google Places terms, pricing and a free geocoder)
 Map: [engine](../map.md)
 
 ## Question
@@ -18,5 +18,5 @@ What is the resolution algorithm end to end: lookup order, when Google Places is
 - **Normalization** (suffixes LLC/PLLC/DDS/DMD, Dental↔Dentistry, &↔and, Unicode folding), **scorer** (which rapidfuzz scorer, field weights, blocking keys at census scale), **tiebreaker order** (address standardizer, phone normalization).
 - **Fuzzy engine**: Meilisearch (evidence_layer_plan.md:39,152; stack_fastapi.md:26,39) vs pg_trgm + rapidfuzz (build_roadmap.md:75,167). Not in compose or pyproject. Phase 5's Meilisearch item was ruled into this ticket.
 - **Can a user disambiguate in A2?** B2 lets a user pick a plan (research_flows.md:146); for businesses ADR 0002:14 says "couldn't confirm".
-- **Ambiguous retry trigger**: after each NPPES/SoS/board refresh (ADR 0002:14) — confirm.
+- **Moved out 2026-11-04 (ADR 0004 split)**: where the NPPES census and NPPES API sit in the lookup order, and the ambiguous-retry trigger after each NPPES/SoS/board refresh (ADR 0002:14), are in local-businesses "Local business identity and resolution". The lookup-order doc contradictions above stay here.
 - Jev role 4 (entity-match confidence) is out of scope (Jev ruled out 2026-10-26).
