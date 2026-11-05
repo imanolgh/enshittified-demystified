@@ -1,6 +1,6 @@
 # CLAUDE.md — Evidence Engine
 
-Ownership-transparency platform: maps private equity ownership of local businesses and private credit exposure in retirement funds, as one graph. Full context lives in `docs/` — read `docs/README.md` for the map. The build plan is being replaced (2026-10-26): grill sessions settle every open item, then a wayfinder spec drives the build. Until that spec exists, "Step N" still resolves to `docs/build_roadmap.md`. When docs disagree: ADRs > `GLOSSARY.md` > spec > `decisions.md` > this file > other docs, and every conflict goes to the developer (`docs/README.md`).
+Ownership-transparency platform: maps private equity ownership and private credit exposure as one graph. The active product is national chains and brands; local businesses are parked and the retirement side is deferred (docs/adr/0004). Full context lives in `docs/` — read `docs/README.md` for the map. The build plan is being replaced (2026-10-26): grill sessions settle every open item, then a wayfinder spec drives the build. Until that spec exists, "Step N" still resolves to `docs/build_roadmap.md`. When docs disagree: ADRs > `GLOSSARY.md` > spec > `decisions.md` > this file > other docs, and every conflict goes to the developer (`docs/README.md`).
 
 ## Stack (always true)
 - Python 3.12, FastAPI, SQLAlchemy 2.0 + Alembic, Pydantic v2, Celery + Redis (+ Beat, Flower), PostgreSQL 16, MinIO/S3 via boto3, httpx + tenacity, Playwright, pdfplumber/camelot, pandas/polars, pytest.

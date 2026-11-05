@@ -29,6 +29,8 @@
 
 ## 4. Business Categories: Category-Agnostic Pipeline, Tiered Rollout
 
+*(Parked 2026-11-04 by ADR 0004: the tiers below are the parked local-businesses plan. The franchise rule still holds for chains.)*
+
 **Decision:** Users can search any business type; the pipeline does not restrict category. Coverage is sequenced by evidence density.
 
 - **Tier 1 (launch):** dental, veterinary, physician/urgent care, ABA therapy (all get NPPES), funeral homes/crematoria, car washes, HVAC/plumbing/electrical, dermatology/ophthalmology/optometry — heavy PE rollup activity, state licensing records, acquisition press coverage.
@@ -38,6 +40,8 @@
 **Franchise rule:** ownership is modeled at two levels — **brand ownership** and **location operator** — because a franchised location (e.g., a sandwich shop) is typically owned by a local franchisee even when the brand is PE-owned. Collapsing these would be wrong in exactly the way that destroys trust. National-brand data and local-services data compose in one graph: any search returns both the brand verdict and the operator verdict.
 
 ## 5. Paid 401(k)/Pension Analysis: Yes, Informational Only, Subscription-Led
+
+*(Deferred 2026-11-04 by ADR 0004: not in the first product, except BDC loan data, which is the first follow-up. The regulatory line still holds.)*
 
 **Decision:** Offer personalized retirement-plan analysis. Public pensions are a lookup against pre-analyzed CAFRs; 401(k)s are resolved via the employer's Form 5500 (or user-entered tickers), with look-through into mutual funds via N-PORT filings. Collective investment trusts (CITs) are reported honestly as opaque.
 
@@ -78,6 +82,8 @@
 
 ## 11. Seeding Strategy: Top-Down National, Bottom-Up Launch-State Depth
 
+*(Parked 2026-11-04 by ADR 0004: this is the local-businesses seeding plan. A chains-and-brands seeding plan follows the category audit.)*
+
 **Decision:** Launch pre-seeded — an empty map kills trust. But national coverage is built **top-down**, not by researching businesses one at a time:
 
 - **The PE-connected layer** comes from ~300–500 sponsor/DSO/rollup websites, which publish their own location rosters — a few hundred crawled sites enumerate tens of thousands of PE-connected locations nationally, with the roster page as the citation.
@@ -101,3 +107,13 @@ Reading order for the document set: `painpoints.md` → `marketgaps.md` → `evi
 **What is dropped:** the learning goal of §1 and build_roadmap.md ("FastAPI expertise earned by building every piece by hand"), the learning ledger, and the "assistant, not author" contract. The quality bar stays: the developer must be able to re-explain any module the next morning.
 
 **What does not change:** every architecture invariant (§8, CLAUDE.md), the public-sources rule (§3), and the guardrails (§10). The overhaul changes who types, not what the system guarantees.
+
+## 14. Chains and Brands First; Local Parked (2026-11-04)
+
+**Decision:** recorded in `docs/adr/0004-chains-and-brands-first.md`. The active product is national chains and brands, and version 1 is a website. Local businesses are parked on record. The retirement lookup is deferred, BDC loan data is the first follow-up, and Form ADV ingestion stays.
+
+**Money model:** free, unmetered search; paid alerts when a followed brand changes hands; affiliate links on product categories, with a visible disclosure and ranked by a published rule, never by commission. The pivot proposal suggested about $5/mo or $49/yr for alerts. `monetizationideas.md` stays canonical for prices and still critiques $5/mo alerts for local follows (§1 row 1), so the alert price is open until that doc is updated.
+
+**Ticket layout:** `.scratch/engine/` (shared), `.scratch/chains-and-brands/` (active) and `.scratch/local-businesses/` (parked), each with its own spec. Ticket numbers stay unique across folders.
+
+**Context:** the full proposal and evidence are in `.scratch/pivot-handoff-2026-11-02.md`: competitors, the USDA barcode test, chain examples, the money estimate and the Worse on Purpose review. Its other recommendations (positioning, category audit, healthcare chains, a source-link submission path, a competitor-data rule) are not decided.
