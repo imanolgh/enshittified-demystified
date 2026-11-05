@@ -11,9 +11,9 @@ The project documents in this folder, in reading order, with the role of each (f
 | 5 | `research_flows.md` | The system in motion — scenarios A0–A3 (PE) and B1–B3 (PC), cross-cutting mechanics |
 | 6 | `stack_fastapi.md` | Chosen stack blueprint |
 | 7 | `decisions.md` | Decision log — §11 seeding strategy, §5 regulatory line, §7 evidence-is-free, §13 authorship, etc. |
-| 8 | `build_roadmap.md` | Build-order reference until `.scratch/api-spec/spec.md` exists: "Step N" references resolve here, and where it differs from `evidence_layer_plan.md` on build order, the roadmap wins. When the spec lands, the spec owns build order and this file moves to `docs/archive/` |
+| 8 | `build_roadmap.md` | Build-order reference until the specs exist (`.scratch/engine/spec.md` and the active product's `.scratch/chains-and-brands/spec.md`): "Step N" references resolve here, and where it differs from `evidence_layer_plan.md` on build order, the roadmap wins. When the spec lands, the spec owns build order and this file moves to `docs/archive/` |
 | 9 | `monetizationideas.md` | Pricing model and free/paid line — canonical for pricing |
-| 10 | `pre-launch-seeding.md` | Launch data plan — coverage states, category tiers, workstreams W1–W8, readiness checklist. Launch = roadmap engine **plus** these workstreams |
+| 10 | `pre-launch-seeding.md` | The parked local-businesses launch data plan (ADR 0004) — coverage states, category tiers, workstreams W1–W8, readiness checklist. A chains-and-brands seeding plan follows the category audit |
 | 11 | `architecture-study-notes.md` | Study notes (learning material, to be archived). Part 2's folder proposals are rejected in favour of the CLAUDE.md layout |
 | 12 | `python-types-primer.md` | Python types primer (learning material, to be archived) |
 | — | `../GLOSSARY.md` | Canonical domain vocabulary (ownership, owners, evidence) |
@@ -27,7 +27,7 @@ Precedence, highest first:
 
 1. **ADRs** (`adr/`)
 2. **`GLOSSARY.md`** — on what a term means
-3. **`.scratch/api-spec/spec.md`**, once it exists — on what is built, how, and in what order
+3. **The specs** (`.scratch/engine/spec.md` and each product's `spec.md`, ADR 0004), once they exist — on what is built, how, and in what order
 4. **`decisions.md`**
 5. **`CLAUDE.md`** — a summary of the invariants, never their source
 6. Every other document in `docs/`

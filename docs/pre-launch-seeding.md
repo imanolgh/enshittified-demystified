@@ -2,6 +2,8 @@
 ### What must be loaded, matched, and verified before the app launches — plus the definitive category list
 ### Companion to: decisions.md §11 (seeding strategy), research_flows.md (scenarios A0/A1/B1), build_roadmap.md (who builds what, when)
 
+*(Parked 2026-11-04 by ADR 0004: this is the local-businesses launch plan, kept on record. Its open questions live in `.scratch/local-businesses/`. A chains-and-brands seeding plan follows the category audit.)*
+
 ---
 
 ## 1. What "Seeded for Launch" Means
@@ -43,7 +45,7 @@ For 2B categories the honest UI states are: roster-confirmed (PE layer), or unkn
 
 ### 2C. Launch-state depth (full deep research per entity)
 
-The **launch states** (GLOSSARY.md) are where **every** dental + vet practice gets the full connector fan-out (press, SoS, EDGAR, NPPES/board records) on top of the census/roster baseline — producing dense verified chains and the screenshots/share-links that market the launch. The unit of deep research is the whole state, not a metro: the per-state connectors (SoS, vet board) already bound it, and metros cross state lines (ruled 2026-10-29, `.scratch/api-spec/issues/03-launch-states-and-metros.md`). A per-batch spend cap bounds each state run.
+The **launch states** (GLOSSARY.md) are where **every** dental + vet practice gets the full connector fan-out (press, SoS, EDGAR, NPPES/board records) on top of the census/roster baseline — producing dense verified chains and the screenshots/share-links that market the launch. The unit of deep research is the whole state, not a metro: the per-state connectors (SoS, vet board) already bound it, and metros cross state lines (ruled 2026-10-29, `.scratch/local-businesses/issues/03-launch-states-and-metros.md`). A per-batch spend cap bounds each state run.
 
 - **Launch state 1: New York** (the developer's home state).
 - **Launch state 2: optional**, picked from FL, CO, TX, AZ only if cheap — free SoS bulk/API data and a downloadable vet licensee list; a downloadable vet list is the tiebreaker. Otherwise New York alone.

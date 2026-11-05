@@ -10,7 +10,7 @@ The first product maps private equity ownership of **national chains and brands*
 - **Money model:** search is free and never metered (`monetizationideas.md`: never meter evidence). Paid alerts tell a user when a followed brand changes hands. Product categories may carry affiliate links with a visible disclosure, ranked by a published rule and never by commission. Prices live in `monetizationideas.md`.
 - **Retirement side deferred:** the employer → plan lookup and Form 5500 exposure number (ticket 35) are deferred. BDC loan data (ticket 36) is the first follow-up, so a PE-owned chain's page can show which public funds lend to it or its parent. Form ADV ingestion (ticket 34) stays, because that is how a PE firm is identified (ADR 0001).
 - **Local parked:** its tickets and its launch plan stay on file and are not rewritten for chains. Unparking it is a developer decision.
-- **Ticket layout:** shared engine questions live in `.scratch/engine/`. Product questions live in `.scratch/chains-and-brands/` (active) and `.scratch/local-businesses/` (parked). Each has its own spec: `engine/spec.md` plus one spec per product. Ticket numbers stay unique across all three folders (`docs/agents/issue-tracker.md`).
+- **Ticket layout:** shared engine questions live in `.scratch/engine/`. Product questions live in `.scratch/chains-and-brands/` (active) and `.scratch/local-businesses/` (parked), and the deferred retirement lookup in `.scratch/retirement/` (parked; added 2026-11-04). Each has its own spec: `engine/spec.md` plus one spec per product. Ticket numbers stay unique across all three folders (`docs/agents/issue-tracker.md`).
 
 ## Consequences
 

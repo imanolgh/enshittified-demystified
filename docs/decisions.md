@@ -114,6 +114,6 @@ Reading order for the document set: `painpoints.md` → `marketgaps.md` → `evi
 
 **Money model:** free, unmetered search; paid alerts when a followed brand changes hands; affiliate links on product categories, with a visible disclosure and ranked by a published rule, never by commission. The pivot proposal suggested about $5/mo or $49/yr for alerts. `monetizationideas.md` stays canonical for prices and still critiques $5/mo alerts for local follows (§1 row 1), so the alert price is open until that doc is updated.
 
-**Ticket layout:** `.scratch/engine/` (shared), `.scratch/chains-and-brands/` (active) and `.scratch/local-businesses/` (parked), each with its own spec. Ticket numbers stay unique across folders.
+**Ticket layout:** `.scratch/engine/` (shared), `.scratch/chains-and-brands/` (active), `.scratch/local-businesses/` (parked) and `.scratch/retirement/` (parked), each with its own spec. Engine tickets hold no parked work: local-only and retirement-only bullets were split into their own maps' tickets, and engine tickets don't wait on parked tickets (ruled 2026-11-04). Ticket numbers stay unique across folders.
 
 **Context:** the full proposal and evidence are in `.scratch/pivot-handoff-2026-11-02.md`: competitors, the USDA barcode test, chain examples, the money estimate and the Worse on Purpose review. Its other recommendations (positioning, category audit, healthcare chains, a source-link submission path, a competitor-data rule) are not decided.
