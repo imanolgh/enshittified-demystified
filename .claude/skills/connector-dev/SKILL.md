@@ -12,10 +12,10 @@ The developer writes every connector by hand. Your contributions are bounded: sc
 ## The house style (established in Phase 1–2; hold all connectors to it)
 - One module per source in `app/source_connectors/`; a single public entrypoint the Celery task calls.
 - All HTTP through the shared httpx client factory with: tenacity retry/backoff on 429/5xx, per-domain Redis token bucket, identified user agent, explicit timeouts.
-- Output is ONLY `RawDocument` instances (plus optional resolution-enrichment structs) from `app/core/contracts.py` — never raw dicts, never direct DB writes; storage goes through `store_document` (sha256 dedup).
+- Output is ONLY `RawDocument` instances from `app/core/contracts.py` — never raw dicts, never direct DB writes; storage goes through `store_document` (sha256 dedup). Code producers (`etl`, `parser`, `selector`) then send identity records and claims through the one in-process door; each declares a `producer_version` and bumps it when its output changes (engine "Claim producers and the claims door", 2026-11-05).
 - Scrapers: static-first (httpx + selectolax); Playwright only when the page demands it; every crawl records sha256 for the diff loop.
 - Paid APIs: per-call cost logging, hard budget guard from settings.
-- Bulk ETLs (NPPES census, Form 5500): pandas/polars → cleaned → claims with file/row provenance, `source_type` marked self-verifying per CLAUDE.md invariants.
+- Bulk ETLs (Form ADV now; NPPES census and Form 5500 when unparked): check the file header first and read columns by name; pandas/polars → cleaned → identity records and claims through the door, one document per row. Each claim quotes the whole data line and passes `verify_citations` like any other; the `source_type` self-verifies per CLAUDE.md invariants.
 
 ## What you may produce
 1. **Scaffold**: module skeleton with typed function signatures, docstrings describing each step, TODO markers — bodies empty or `raise NotImplementedError`.

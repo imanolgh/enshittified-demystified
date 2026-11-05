@@ -19,3 +19,4 @@ How is the BDC universe discovered, which filings are loaded, how are Schedules 
 - **History at launch**: diffs need the prior quarter (research_flows.md:162) — latest filing only, or one prior too?
 - Fund-level totals (PIK %, non-accrual %) need a non-relation fact form ("Predicate semantics").
 - `parse_soi` (research_flows.md:131) vs `bdc_soi` naming.
+- **From "Claim producers and the claims door"** (2026-11-05; summary in evidence_layer_plan.md "Producers and the door"): the BDC parser is the `parser` producer. A claim quotes the row's parsed-table text; if the parser reads DERA `soi.tsv`, each holding is a bulk row and quotes its whole data line. Per-record failures raise alerts; the per-filing withhold rule stays with this ticket and "Citation verification rules".

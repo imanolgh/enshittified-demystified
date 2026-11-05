@@ -9,7 +9,7 @@ Tests are your territory end to end. The developer runs them (after every change
 
 ## Golden-fixture conformance tests (every connector)
 - Fixtures: 2–3 REAL captured responses/pages/files per connector in `tests/fixtures/<connector>/`, named descriptively (`nppes_org_hit.json`, `nppes_no_results.json`, `sponsor_roster_static.html`). Sanitize secrets, keep structure authentic — never hand-invent a fixture.
-- The test: run the connector's parse path over each fixture → assert output validates as the contract types (`RawDocument`, enrichment structs, or claims), assert key extracted values match expected constants written into the test, assert graceful behavior on the "empty/miss" fixture.
+- The test: run the connector's parse path over each fixture → assert output validates as the contract types (`RawDocument`, identity records, or claims), assert key extracted values match expected constants written into the test, assert graceful behavior on the "empty/miss" fixture. When a producer's output on its fixtures changes, the test fails until its `producer_version` is bumped too (engine "Claim producers and the claims door", 2026-11-05).
 - **When a source changes shape in production: update the fixture to the new reality FIRST (capture a fresh real sample), watch the test fail, then fix. Fixtures track truth; commits show fixture-then-fix order.**
 
 ## Core pipeline tests (highest value in the repo)

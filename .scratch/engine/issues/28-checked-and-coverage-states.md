@@ -20,3 +20,4 @@ What has to have happened for a business to show "No PE evidence found (checked 
 - **Brand level** (added 2026-11-04): what "checked" means for a brand and a category is the product side, in chains-and-brands "Category brand lists and brand-level checked".
 - Launch gate replacing W8 (pre-launch-seeding.md:94) has no number — owned by "Testing and acceptance bars".
 - **From "Schema conventions"** (2026-11-05; conventions in evidence_layer_plan.md §4; no on-demand research per decisions.md §15): the "A2 in flight" state and the "Unknown, research on request" coverage state (pre-launch-seeding.md:18) are gone. An entity that is in the data but not yet checked still needs a state: searches for it are logged as demand ("Search and the demand log").
+- **From "Claim producers and the claims door"** (2026-11-05; summary in evidence_layer_plan.md "Producers and the door"): "nothing found" arrives through the door call; where it is stored is this ticket's.

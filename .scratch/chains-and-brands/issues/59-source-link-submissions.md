@@ -14,3 +14,4 @@ Can a user submit a URL as evidence, which then goes through normal retrieval, e
 - Pivot proposal (handoff §5), **not decided**. It relaxes the ruling that community submissions are not in the MVP (decisions.md:79; stack_fastapi.md:68; build_roadmap.md:173).
 - ADR 0002 (no manual review) still holds: a submission could only trigger retrieval of a public document, never assert a fact itself.
 - Open: which domains are allowed (public primary sources only, CLAUDE.md), whether a submitted URL counts toward source independence, abuse and cost limits (each one costs extraction money), and what the submitter sees.
+- **From "Claim producers and the claims door"** (2026-11-05; summary in evidence_layer_plan.md "Producers and the door"): there is no HTTP door for claims. A submission is a URL to fetch; the fetched page becomes a stored document and goes through a producer like any other.

@@ -17,3 +17,4 @@ What exactly does the LLM return — the `ExtractedClaim` model and the result e
 - Field inventory from the guide: subject, predicate, object (names, min_length 1), verbatim_quote (required, meaningful min_length), event_date (optional), value (typed per "Claim value schemas…"), doc_sha. `ownership_type` removed (ADR 0001).
 - `no_evidence` / `no_evidence_found` / `no_evidence_for` naming drift (build_roadmap.md:117; research_flows.md:61).
 - Pydantic conventions: StrEnum, frozen, `extra="forbid"`, tz-aware datetimes.
+- **From "Claim producers and the claims door"** (2026-11-05; summary in evidence_layer_plan.md "Producers and the door"): the task sets `producer`, `producer_version` and `extraction_model`; the model's output never does (settles that leftover). The LLM emits only claims, never identity records. "Nothing found" rides in the door call, one per LLM request (a request can cover several documents); its shape is this ticket's.

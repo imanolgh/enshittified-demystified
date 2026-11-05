@@ -109,12 +109,15 @@ entities
       -- Names from Places are never stored.
 
 entity_aliases
-  id, entity_id, alias, alias_type (dba|legal_name|former_name), source_document_id
+  id, entity_id, alias, alias_type (dba|legal_name|former_name), source_document_id,
+      producer, producer_version
       -- 2026-11-05: domain moved to entity_identifiers
+      -- producer and producer_version: see claims (ticket 17); the same on every identity table
 
 entity_identifiers             -- 2026-11-05 (ticket 12); replaces entities.place_id and .npi
   id, entity_id, scheme (cik|ticker|ein|crd|sec_file_number|private_fund_id|domain|phone|
-      place_id|npi), value, source_document_id (nullable: place_id only, ADR 0003)
+      place_id|npi), value, source_document_id (nullable: place_id only, ADR 0003),
+      producer, producer_version (both null when source_document_id is null)
       -- strong schemes (cik, ein, crd, sec_file_number, private_fund_id, place_id, npi): one
       -- entity per (scheme, value); a second holder is a resolution or merge signal, never a
       -- second row. Weak schemes (ticker, domain, phone) may repeat.
@@ -124,14 +127,14 @@ entity_identifiers             -- 2026-11-05 (ticket 12); replaces entities.plac
 
 entity_addresses               -- 2026-11-05 (ticket 12)
   id, entity_id, kind (site|principal_office|mailing), street, city, state, postal_code,
-      country, source_document_id
+      country, source_document_id, producer, producer_version
       -- site = a location's own address. Registered-agent addresses are never stored as an
       -- entity's address. Places-formatted addresses are never stored. Which address shows
       -- follows the canonical_name ranking above.
 
 entity_industries              -- 2026-11-05 (ticket 12)
   id, entity_id, industry (one closed list in code), ingest_item_id (nullable),
-      source_document_id (nullable)
+      source_document_id (nullable), producer, producer_version (both null for an intake row)
       -- brand|company|location only; zero or more each. Assigned by code from where the entity
       -- came in (an intake row, incl. a brand-list upload; or a document such as an NPPES record
       -- whose taxonomy code maps to an industry), never by the LLM, never a claim.
@@ -151,7 +154,11 @@ claims                         -- atomic, cited assertions
       -- how lends_to @ rate and allocates_to @ % already work. Canonical set: CLAUDE.md.
   object_entity_id, event_date (nullable), value JSONB (amounts, %, rates),
   document_id, verbatim_quote TEXT, quote_offset,
-  extraction_model, extracted_at,
+  producer (llm|parser|etl|selector), producer_version, extraction_model (nullable), extracted_at,
+      -- 2026-11-05 (ticket 17): producer_version = the prompt version (llm), a module constant
+      -- (parser, etl) or the selector config revision; the producer declares it and golden-fixture
+      -- tests force a bump when output changes. extraction_model is null except for llm. The task
+      -- sets all three, never the model's output.
   status (pending|accepted|rejected|retracted),
   rejection_reason (nullable: quote_not_found|sanity_check_failed|unsupported)
       -- ruled 2026-10-26: pending = awaiting verify_citations; accepted = passed every check,
@@ -226,6 +233,33 @@ Each connector task:
 
 Celery Beat (≈ Laravel Scheduler): recurring crawls of sponsor portfolio pages, DSO rosters, and news RSS to catch *new* acquisitions — this feeds the Acquisition Alarm feature.
 
+### Producers and the door (2026-11-05, engine "Claim producers and the claims door")
+
+Four producers turn stored documents into output. Each one records itself in `producer`:
+
+- `llm` is the default. It reads any page or filing text, sponsor portfolio pages included (Stage 3).
+- `parser` reads BDC Schedules of Investments.
+- `etl` reads bulk official files: Form ADV now, Form 5500 and NPPES when their efforts unpark.
+- `selector` reads long lists where every record has the same fields, such as store locators and location rosters, through a per-site registry config. Store-locator JSON endpoints are allowed when robots.txt permits them and they feed the brand's public locator page.
+
+Every claim, whatever produced it, quotes a stored document, enters as `pending` and passes `verify_citations`. Confidence comes from the source type, never from the producer. What counts as the quote:
+
+- Page or filing text: an exact span of the document's text.
+- A bulk row (header line + data line): the whole data line, exactly as in the file.
+- A BDC holding: the row's parsed-table text. If the parser reads the SEC BDC dataset, each holding is a bulk row.
+- A roster item on an HTML page: the item's text, which must appear in the page's text.
+- A store-locator JSON record: one document per record. Code writes the record's text as one `field: value` line per field, sorted, with nested fields dotted (`address.city: Atlanta`) and list items indexed (`brands.0: Dunkin'`). The quote is the lines the claim uses. `meta` records the rendering format's version and points at the full response, which is stored as the original.
+
+**Identity records.** Code producers (`etl`, `parser`, `selector`) also emit identity records: what one document states about one entity's identity (names, identifiers, addresses, phone, domain, industry code). The LLM emits only claims. Identity records replace the old "resolution hints", "structured hints" and "enrichment structs". Nothing records "where to look next"; fan-out reads identity rows and claims.
+
+**The door** is one in-process function in `app/core`, validated against `contracts.py`. There is no HTTP route. A producer makes one call per run: one per document for code producers, one per request for the LLM. Each call is one transaction and is idempotent. A call carries the document ids, producer and version, identity records, claims and "nothing found". Each identity record has a key such as `r1` that is only valid inside the call, and a code producer's claim can name its subject or object by that key. The door:
+
+1. checks every identity value, as found, against the cited document's text (the quote normalization), and does not write a record with a missing value;
+2. resolves each identity record to an entity and writes the sourced alias, identifier, address and industry rows, normalized for storage;
+3. writes claims as `pending`. Their quotes are checked in Stage 4, after names are resolved.
+
+**Code producer failures.** Every `etl` run first compares the file header with the expected columns and reads columns by name. Every `selector` run first checks that items still come back with the expected fields and roughly the usual count. A failed shape check stops the run before it writes anything and raises an alert. A per-record failure (a rejected claim or an unwritten identity record) raises an alert naming the producer, version and document, and the run keeps going. When per-record failures in one run pass the spec's threshold, the rest of the run stops. Rows already written can be found by `producer_version`.
+
 ### Stage 3 — LLM Extraction (`extract_claims`, was `ExtractClaimsJob`)
 Runs per entity once its retrieval chord completes (the `chord()` callback ≈ `Bus::batch()->then(...)`).
 
@@ -238,7 +272,7 @@ Runs per entity once its retrieval chord completes (the `chord()` callback ≈ `
    - ~~Classify ownership_type~~ — removed 2026-10-26 by ADR 0001 (`docs/adr/0001-ownership-category-computed-by-code.md`): the LLM never classifies ownership categories. It may only extract a quoted self-description of an owner (e.g. "Oak Ridge is a private equity firm"), the lowest-ranked owner-kind source.
    - If the documents contain no ownership/exposure evidence, return an explicit `no_evidence_found` result — a first-class outcome, not an error.
 3. Model tiering: Sonnet-class for bulk; escalate to Opus-class when documents conflict or classification is ambiguous.
-4. Write raw response to the claim rows (`extraction_model`, `extracted_at`).
+4. Write raw response to the claim rows (`extraction_model`, `extracted_at`). *(2026-11-05: claims go through the door above; the task sets `producer = llm`, `producer_version` and `extraction_model`, never the model's output.)*
 
 ### Stage 4 — Mechanical Citation Verification (`verify_citations`, was `VerifyCitationsJob`)
 Pure Python, no AI:
