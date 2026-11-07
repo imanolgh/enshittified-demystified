@@ -16,3 +16,4 @@ What is the `events` table (columns, event-type vocabulary, idempotency, consume
 - Payload, correlation id, idempotency key (retries must not double-emit), consumer cursors, card-cache invalidation (research_flows.md:178).
 - **Changelog**: retractions only or all events? Global or per entity? Which fields are public?
 - Alerts to users are out of scope (map ruling 2026-10-26); operational alerts to the developer are in — events may feed them.
+- **From "Entity lifecycle"** (2026-11-06; notes in evidence_layer_plan.md §4 `entities`): event kinds this adds: entity merged, entity unmerged, entity type changed, and producer version withdrawn (identity rows retracted). Whether any of them appear in the public changelog is this ticket's.

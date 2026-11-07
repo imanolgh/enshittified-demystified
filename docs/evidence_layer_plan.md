@@ -100,7 +100,18 @@ entities
       -- 2026-10-26: what a thing is, not its role; owner_kind per ADR 0001
       -- 2026-11-05 (ADR 0005): business and rollup replaced by brand|company|location; family =
       -- one person or a family owning in their own name (no individual profiles, no identifiers)
-  public_id, jurisdiction (nullable), status, created_at
+  public_id, jurisdiction (nullable), status (active|merged|closed), merged_into_id (nullable),
+  created_at
+      -- 2026-11-06 (ticket 13): status set only by code. closed = stopped existing (a moved
+      -- location leaves a closed one); nothing sets it at launch, the store-map follow-up sets it
+      -- from locator diffs. A merge adds a pointer and rewrites nothing: the duplicate gets
+      -- status = merged + merged_into_id, keeps its claims and identity rows, and reads follow the
+      -- pointer to the end. The older entity (lower id) survives; the duplicate's public_id
+      -- redirects (301). Merges come only from code: an identity record whose strong identifiers
+      -- belong to two same-type entities, a verified renamed_from, or "Entity resolution
+      -- algorithm" rules; undone when the triggering identifier row or claim is retracted.
+      -- Type changes: only company -> investment_firm|fund, when a Form ADV record matches.
+      -- Merges, unmerges and type changes each write an events row.
       -- jurisdiction = place of formation, from a filing; company|fund|investment_firm only.
       -- canonical_name is picked by code from the entity's sourced names (ticket 12):
       -- company|fund|investment_firm|family: official filing > own site > own press_release >
@@ -110,14 +121,20 @@ entities
 
 entity_aliases
   id, entity_id, alias, alias_type (dba|legal_name|former_name), source_document_id,
-      producer, producer_version
+      producer, producer_version, retracted_at (nullable)
+      -- 2026-11-06 (ticket 13), all five identity tables (aliases, identifiers, addresses,
+      -- industries, location_brands): never deleted; a newer document's value is current and
+      -- old rows stay as history. retracted_at is set only when a whole producer +
+      -- producer_version is withdrawn (one operator command after a code fix, then a re-run),
+      -- with an events row; a retracted identifier undoes a merge it triggered.
       -- 2026-11-05: domain moved to entity_identifiers
       -- producer and producer_version: see claims (ticket 17); the same on every identity table
 
 entity_identifiers             -- 2026-11-05 (ticket 12); replaces entities.place_id and .npi
   id, entity_id, scheme (cik|ticker|ein|crd|sec_file_number|private_fund_id|domain|phone|
       place_id|npi), value, source_document_id (nullable: place_id only, ADR 0003),
-      producer, producer_version (both null when source_document_id is null)
+      producer, producer_version (both null when source_document_id is null), retracted_at
+      -- (2026-11-06: the strong-scheme unique index skips rows with retracted_at set.)
       -- strong schemes (cik, ein, crd, sec_file_number, private_fund_id, place_id, npi): one
       -- entity per (scheme, value); a second holder is a resolution or merge signal, never a
       -- second row. Weak schemes (ticker, domain, phone) may repeat.
@@ -127,14 +144,15 @@ entity_identifiers             -- 2026-11-05 (ticket 12); replaces entities.plac
 
 entity_addresses               -- 2026-11-05 (ticket 12)
   id, entity_id, kind (site|principal_office|mailing), street, city, state, postal_code,
-      country, source_document_id, producer, producer_version
+      country, source_document_id, producer, producer_version, retracted_at
       -- site = a location's own address. Registered-agent addresses are never stored as an
       -- entity's address. Places-formatted addresses are never stored. Which address shows
       -- follows the canonical_name ranking above.
 
 entity_industries              -- 2026-11-05 (ticket 12)
   id, entity_id, industry (one closed list in code), ingest_item_id (nullable),
-      source_document_id (nullable), producer, producer_version (both null for an intake row)
+      source_document_id (nullable), producer, producer_version (both null for an intake row),
+      retracted_at
       -- brand|company|location only; zero or more each. Assigned by code from where the entity
       -- came in (an intake row, incl. a brand-list upload; or a document such as an NPPES record
       -- whose taxonomy code maps to an industry), never by the LLM, never a claim.
@@ -142,7 +160,7 @@ entity_industries              -- 2026-11-05 (ticket 12)
       -- source_document_id. Chains values and display: chains-and-brands "Product categories".
 
 location_brands                -- 2026-11-05 (ticket 15, "Predicate semantics")
-  id, location_id, brand_id, source_document_id, producer, producer_version
+  id, location_id, brand_id, source_document_id, producer, producer_version, retracted_at
       -- which brands a location trades under: identity data, never a claim, never an ownership
       -- hop, no confidence. Written only by code producers (store locators, rosters), so the
       -- source document is required. Unique (location_id, brand_id, source_document_id); a
@@ -163,7 +181,10 @@ claims                         -- atomic, cited assertions
       --   operated_by: location → company; ownership hop
       --   lends_to: fund → company; holds_position: fund|retirement_plan|insurer → company|fund;
       --   allocates_to: retirement_plan|insurer → fund; none of these three is a hop
-      --   renamed_from: "Entity lifecycle"
+      --   renamed_from: any entity → no object (2026-11-06, ticket 13); value.former_name is the
+      --     old name, which must appear in the quote; an accepted claim makes code write a
+      --     former_name alias; a same-type entity under the old name merges only once the rename
+      --     is verified; never a hop. object_entity_id is nullable for renamed_from only.
       -- A resolved claim whose entity types don't fit is rejected (sanity_check_failed).
       -- ruled 2026-09-14: majority/minority stake is degree, not relationship —
       -- it lives in `value` (e.g. {"stake_pct": 65, "stake_type": "majority"}), matching
