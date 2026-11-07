@@ -62,7 +62,7 @@ Assemble the 6–12 documents (text-extracted) → one Claude call (Sonnet-class
 ]
 ```
 
-Malformed items fail Pydantic → logged, dropped, batch flagged if failure rate >5%.
+Malformed items fail Pydantic → logged, dropped, batch flagged if failure rate >5%. *(2026-11-06, engine "ExtractedClaim and the extraction result envelope": the response is only a list of claims, so the `no_evidence_for` item above is dropped; no `lends_to` claim citing a document already means no lending evidence in it. The alert threshold is "Operational identity and guardrails"'s; a response that didn't finish fails as a request and gives no document `no_evidence_found`.)*
 
 ### Step 5 — Mechanical Verification (`verify_citations`)
 Pure Python: normalize whitespace, substring-match each `quote` in its doc's stored text. Match → offset recorded, claim `accepted` once all checks pass. No match → claim `rejected` (reason `quote_not_found`) + logged for prompt tuning. Sanity checks: subject alias appears in doc; event_date within doc's plausible range.

@@ -47,6 +47,10 @@ Apply the ~80 pure wording fixes the 2026-10-26 inventory found (no decision nee
 
 - Field-name drift to fix across docs and skills: `quote` / `verbatim_quote` → `verbatim_quote`; `doc` / `doc_sha` → `document_id`; `subject`/`object` on extracted claims → `subject_name`/`object_name` (names as written); `quote_offset` → `quote_start`/`quote_end`. Edges keep `relation`. Sources: research_flows.md, build_roadmap.md, the bdc-parser and conformance-tests skills.
 
+## Added by "ExtractedClaim and the extraction result envelope" (2026-11-06)
+
+- `no_evidence` and `no_evidence_for` → `no_evidence_found` everywhere they remain (build_roadmap.md, research_flows.md, the bdc-parser and conformance-tests skills); `no_evidence_found` is a per-document outcome code derives, never a flag the LLM sets.
+
 ## How to resolve
 
 AFK. Make the edits, then append `## Answer` listing what changed and anything skipped (with why). No commits.

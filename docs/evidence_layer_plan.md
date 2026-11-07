@@ -199,6 +199,9 @@ claims                         -- atomic, cited assertions
       -- it lives in `value` (e.g. {"stake_pct": 65, "stake_type": "majority"}), matching
       -- how lends_to @ rate and allocates_to @ % already work. Canonical set: CLAUDE.md.
   object_name (nullable), object_entity_id (nullable), event_date (nullable),
+  event_date_precision (nullable: year|month|day),
+      -- 2026-11-06 (ticket 21): event_date is the first day of the period the document gives
+      -- ("2019" → 2019-01-01 with precision year), so a year is never read as January 1.
   value JSONB (amounts, %, rates),
   document_id, verbatim_quote TEXT, quote_start, quote_end, claim_hash,
       -- 2026-11-06 (ticket 18): quote_start/quote_end are character offsets into the document's
@@ -306,7 +309,7 @@ Every claim, whatever produced it, quotes a stored document, enters as `pending`
 
 **Identity records.** Code producers (`etl`, `parser`, `selector`) also emit identity records: what one document states about one entity's identity (names, identifiers, addresses, phone, domain, industry code, and for a location the names of its brands, which become `location_brands` rows). The LLM emits only claims. Identity records replace the old "resolution hints", "structured hints" and "enrichment structs". Nothing records "where to look next"; fan-out reads identity rows and claims.
 
-**The door** is one in-process function in `app/core`, validated against `contracts.py`. There is no HTTP route. A producer makes one call per run: one per document for code producers, one per request for the LLM. Each call is one transaction and is idempotent. A call carries the document ids, producer and version, identity records, claims and "nothing found". Each identity record has a key such as `r1` that is only valid inside the call, and a code producer's claim can name its subject or object by that key. The door:
+**The door** is one in-process function in `app/core`, validated against `contracts.py`. There is no HTTP route. A producer makes one call per run: one per document for code producers, one per request for the LLM. Each call is one transaction and is idempotent. A call carries the ids of the documents the request read, producer and version, identity records and claims; code gives each read document that no claim cites the outcome `no_evidence_found` (ticket 21). Each identity record has a key such as `r1` that is only valid inside the call, and a code producer's claim can name its subject or object by that key. The door:
 
 1. checks every identity value, as found, against the cited document's text (the quote normalization), and does not write a record with a missing value;
 2. resolves each identity record to an entity and writes the sourced alias, identifier, address and industry rows, normalized for storage;
@@ -324,7 +327,7 @@ Runs per entity once its retrieval chord completes (the `chord()` callback ≈ `
    - Emit claims only in the fixed predicate vocabulary.
    - **Every claim must include a verbatim quote copied exactly from the provided document.**
    - ~~Classify ownership_type~~ — removed 2026-10-26 by ADR 0001 (`docs/adr/0001-ownership-category-computed-by-code.md`): the LLM never classifies ownership categories. It may only extract a quoted self-description of an owner (e.g. "Oak Ridge is a private equity firm"), the lowest-ranked owner-kind source.
-   - If the documents contain no ownership/exposure evidence, return an explicit `no_evidence_found` result — a first-class outcome, not an error.
+   - ~~If the documents contain no ownership/exposure evidence, return an explicit `no_evidence_found` result~~ *(2026-11-06, engine "ExtractedClaim and the extraction result envelope": the response is only `claims: list[ExtractedClaim]`, possibly empty. Code gives each document in the request that no claim cites the outcome `no_evidence_found`, and only from a response that finished and parsed. A bad item is dropped and logged; a response that stopped at the token limit or doesn't parse fails as a request and is retried, giving no document an outcome; a document cited only by dropped items gets no outcome.)*
 3. Model tiering: Sonnet-class for bulk; escalate to Opus-class when documents conflict or classification is ambiguous.
 4. Write raw response to the claim rows (`extraction_model`, `extracted_at`). *(2026-11-05: claims go through the door above; the task sets `producer = llm`, `producer_version` and `extraction_model`, never the model's output.)*
 
@@ -341,7 +344,7 @@ Pure Python, no AI:
 3. One source → publish as `reported` (labeled as one source on the card).
 4. Conflicting claims (different controlling owners over overlapping dates) → no publication as fact; shown as "sources disagree" with links to each. *(Both updated by ADR 0002 (`docs/adr/0002-no-manual-review.md`).)*
 4b. Recompute each affected business's category and separation degree from its chains and owners' owner kinds (ADR 0001 (`docs/adr/0001-ownership-category-computed-by-code.md`)).
-5. `no_evidence_found` → business category `no_pe_evidence_found`, shown as "No PE evidence found (checked {date})" — never "independent" (ADR 0001).
+5. `no_evidence_found` → business category `no_pe_evidence_found` *(2026-11-06: computed from the per-document outcomes by "Checked and coverage states")*, shown as "No PE evidence found (checked {date})" — never "independent" (ADR 0001).
 
 ### Stage 6 — Human Review (Starlette-Admin/SQLAdmin panel or small Vue app; ≈ Filament)
 > **Superseded 2026-10-26 by ADR 0002 (`docs/adr/0002-no-manual-review.md`): there is no manual review.** Kept for history; the open items it used to absorb are listed in the ADR.
