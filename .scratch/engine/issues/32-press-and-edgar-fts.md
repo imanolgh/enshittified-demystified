@@ -18,3 +18,4 @@ How do the press-release/news connector and the EDGAR full-text search connector
 - EDGAR FTS: endpoint/params/form types/pagination; which files of a hit to store; EX-99 stored as `press_release` (ADR 0003:10); SEC user agent + ~10 req/s (from "Research: EDGAR access…").
 - GDELT is in the Beat table (research_flows.md:110) but deferred — drop.
 - Query construction and caps: which aliases, quoting, location terms, max hits per connector, max documents per entity.
+- **From "Owner kind: storage, evidence and the PE-firm test"** (2026-11-07; ADR 0001 amended; table in evidence_layer_plan.md §4 `owner_kind_evidence`): rank 2 owner-kind evidence includes a press release the owner issued, so the press connector must record a release's issuer in a form code can match to an entity.

@@ -65,7 +65,7 @@ _Avoid_: Manager, franchisee (as the general term)
 ## Owners
 
 **Owner kind**:
-What sort of owner an entity is: PE firm, other investment fund (venture capital, hedge, or real estate only), conglomerate, family, employee-owned, trust, public company, nonprofit, or government. It is a fact about the owner, not about any single hop.
+What sort of owner an entity is: PE firm, other investment fund (venture capital, hedge, credit, or real estate), conglomerate, family, employee-owned, trust, public company, nonprofit, government, or cooperative. It is a fact about the owner, not about any single hop.
 _Avoid_: Ownership type, owner category
 
 **Certified Independent**:

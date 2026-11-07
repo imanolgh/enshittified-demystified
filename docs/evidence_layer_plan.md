@@ -101,6 +101,11 @@ entities
       -- 2026-11-05 (ADR 0005): business and rollup replaced by brand|company|location; family =
       -- one person or a family owning in their own name (no individual profiles, no identifiers)
   public_id, jurisdiction (nullable), status (active|merged|closed), merged_into_id (nullable),
+  owner_kind (nullable), owner_kind_confidence (nullable: verified|reported),
+      -- 2026-11-07 (ticket 14): both computed by code from owner_kind_evidence (higher rank wins;
+      -- a same-rank contradiction leaves owner_kind null = "owner type not confirmed"); only
+      -- companies, investment firms, funds, families and insurers carry one, never brands or
+      -- locations. Rank 1 → verified; ranks 2-3 → reported (ADR 0001).
   created_at
       -- 2026-11-06 (ticket 13): status set only by code. closed = stopped existing (a moved
       -- location leaves a closed one); nothing sets it at launch, the store-map follow-up sets it
@@ -256,6 +261,20 @@ edge_claims                    -- which claims support which edge (ticket 04)
       -- single_source → edge confidence = reported; conflict → business category sources_disagree;
       -- low_confidence → claim rejection_reason = unsupported; community_flag → not in the MVP.
 
+owner_kind_evidence            -- 2026-11-07 (ticket 14, ADR 0001 amended)
+  id, entity_id, kind (nullable), rank (1|2|3), phrase (nullable: the describing phrase as
+      written), match_state (nullable: mapped|unclear|unknown), document_id, verbatim_quote,
+      quote_start, quote_end, producer, producer_version, status (pending|accepted|rejected|
+      retracted), rejection_reason (nullable), retracted_at (nullable)
+      -- Rank 1 rows come from code producers (Form ADV Any PE Funds = Y, a ticker from an SEC
+      -- filing, the IRS exempt-org file, an 814- number); their phrase and match_state are null.
+      -- Ranks 2-3 come from the LLM's owner_descriptions: rank 2 when the document is on one of
+      -- the owner's own domain identifiers or is a press release it issued, else rank 3. Their
+      -- kind is code's current answer from the term table (terms matched inside the phrase,
+      -- case-insensitive, longest term wins; a negation or two kinds → no kind), recomputed when
+      -- the table changes; phrase and quote never change. Rows enter through the door and quotes
+      -- pass verify_citations. Within one source, the newer document wins.
+
 ingest_batches / ingest_items  -- operator uploads only (decisions.md §15: no on-demand research)
   batch: id, name, status (running|done|halted)
       -- 2026-11-05 (ticket 04): halted = stopped by the spend cap or the operator; unfinished
@@ -345,7 +364,7 @@ Runs per entity once its retrieval chord completes (the `chord()` callback ≈ `
 2. Call Claude (Anthropic Python SDK) with a strict system prompt; the response is parsed straight into Pydantic `Claim` models — anything that fails validation is dropped and logged before it can reach the DB:
    - Emit claims only in the fixed predicate vocabulary.
    - **Every claim must include a verbatim quote copied exactly from the provided document.**
-   - ~~Classify ownership_type~~ — removed 2026-10-26 by ADR 0001 (`docs/adr/0001-ownership-category-computed-by-code.md`): the LLM never classifies ownership categories. It may only extract a quoted self-description of an owner (e.g. "Oak Ridge is a private equity firm"), the lowest-ranked owner-kind source.
+   - ~~Classify ownership_type~~ — removed 2026-10-26 by ADR 0001 (`docs/adr/0001-ownership-category-computed-by-code.md`): the LLM never classifies ownership categories. It may only extract a quoted self-description of an owner (e.g. "Oak Ridge is a private equity firm"), the lowest-ranked owner-kind source. *(2026-11-07, engine "Owner kind": the response gains `owner_descriptions`, each with the owner's name as written, the describing phrase as written, the document label and the quote; a term table in code maps the phrase to a kind, never the model.)*
    - ~~If the documents contain no ownership/exposure evidence, return an explicit `no_evidence_found` result~~ *(2026-11-06, engine "ExtractedClaim and the extraction result envelope": the response is only `claims: list[ExtractedClaim]`, possibly empty. Code gives each document in the request that no claim cites the outcome `no_evidence_found`, and only from a response that finished and parsed. A bad item is dropped and logged; a response that stopped at the token limit or doesn't parse fails as a request and is retried, giving no document an outcome; a document cited only by dropped items gets no outcome.)*
 3. Model tiering: Sonnet-class for bulk; escalate to Opus-class when documents conflict or classification is ambiguous.
 4. Write raw response to the claim rows (`extraction_model`, `extracted_at`). *(2026-11-05: claims go through the door above; the task sets `producer = llm`, `producer_version` and `extraction_model`, never the model's output.)*

@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 14, 25  (Owner kind: storage, evidence and the fund–firm link; Conflict, succession and co-investors)
+Blocked by: 14, 25, 65  (Owner kind: storage, evidence and the PE-firm test; Conflict, succession and co-investors; Funds and their investment firm)
 Map: [engine](../map.md)
 
 ## Question
@@ -20,3 +20,5 @@ What is the full precedence among business categories, which entity types get a 
 - **From "Predicate semantics"** (2026-11-05; role table in evidence_layer_plan.md §4 `claims`): a store has two verdicts: the brand verdict walks brand → owner; the store verdict walks location → `operated_by` → operator → owners. Hops are `owned_by` and `operated_by`; `lends_to`, `holds_position` and `allocates_to` never are. A brand's chain may skip the operating company, so separation degree can be one lower than reality.
 - **From chains-and-brands "Brand and chain model"** (2026-11-06): at launch only brands are looked up, so categories are needed for brands. Store-map pins reuse the brand's verdict, so per-store categories aren't needed until operators arrive. The glossary's category entries still say "business"; rewording them to the entities that carry a category is this ticket's.
 - **From "Claim value schemas"** (2026-11-06; schemas in evidence_layer_plan.md §4 `claims`): ownership claims may carry `stake_basis` (`voting|economic`) beside `stake_pct`; how the basis feeds ADR 0001's "under 50%" rule (Jersey Mike's: Blackstone ~76.5% voting) is this ticket's. Only `acquired_by` claims with `deal_status = completed` back a hop.
+- **Moved from "Owner kind"** (2026-11-06 split): It also raised whether a public company that a PE fund controls (Jersey Mike's) and a public company with a PE-fund 5%+ holder count as PE-owned and PE minority stake (§9). Public companies today read "Public company (NYSE: CMG)"; whether a PE-controlled public company reads PE-owned, and whether a PE fund's 5%+ stake in a public company makes it PE minority stake, are this ticket's.
+- **From "Owner kind: storage, evidence and the PE-firm test"** (2026-11-07; ADR 0001 amended; table in evidence_layer_plan.md §4 `owner_kind_evidence`): new category `cooperative_owned` (owner kind `cooperative`). `entities.owner_kind_confidence` (`verified` for rank 1, `reported` for ranks 2–3) is the "deciding owner kind is verified" input to category confidence. Trian, 3G, BDT and JAB read `pe_firm` (their own Form ADV), so whether their minority stakes in public companies (Wendy's, Burger King, Popeyes) change those companies' categories is this ticket's.

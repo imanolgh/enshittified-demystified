@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 07, 14  (Research: Form ADV and IRS exempt-org bulk data; Owner kind: storage, evidence and the fund–firm link)
+Blocked by: 07, 14, 65  (Research: Form ADV and IRS exempt-org bulk data; Owner kind: storage, evidence and the PE-firm test; Funds and their investment firm)
 Map: [engine](../map.md)
 
 ## Question
@@ -17,3 +17,4 @@ How are Form ADV and IRS exempt-org data ingested to set owner kinds (and fund�
 - Matching ADV advisers/funds and EO-BMF orgs to existing entities (resolution path).
 - **From "Claim producers and the claims door"** (2026-11-05; summary in evidence_layer_plan.md "Producers and the door"): Form ADV is an `etl` producer. Each run checks the file header and reads columns by name before writing anything; one document per row; each claim quotes the whole data line; it emits identity records for advisers (and funds, from the archive); `producer_version` is a module constant.
 - **From "Entity lifecycle"** (2026-11-06; notes in evidence_layer_plan.md §4 `entities`): a Form ADV identity record that matches an entity typed `company` changes it to `investment_firm` (adviser) or `fund` (private fund) by code, with an events row.
+- **From "Owner kind: storage, evidence and the PE-firm test"** (2026-11-07; ADR 0001 amended; table in evidence_layer_plan.md §4 `owner_kind_evidence`): the Form ADV ETL emits rank-1 `owner_kind_evidence` rows for advisers with `Any PE Funds = Y` (quote = the whole data line); `N` emits nothing. The IRS exempt-org file emits rank-1 `nonprofit` rows matched by EIN. Rows ride in the same door call as the identity records.
