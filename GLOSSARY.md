@@ -5,7 +5,7 @@ How the project describes who owns a local business and how private equity sits 
 ## Language
 
 **Ownership chain**:
-The ordered list of owners from a local business up to a private equity fund, e.g. Dentist → Smile Partners → Fund X. A business can have more than one chain.
+The ordered list of owners from a brand (or, later, a location) up through each owner above it, ending at the first private equity owner or at the top owner, e.g. Dunkin' → Inspire Brands → Roark Capital, or for a location, Bright Smiles Dental → Smile Partners → Fund X. A brand can have more than one chain.
 _Avoid_: Ownership tree, path (in user-facing text)
 
 **Hop**:
@@ -13,7 +13,7 @@ One link between two neighbours in an ownership chain: an owner above what it ow
 _Avoid_: Step, level, link (when counting)
 
 **Separation degree**:
-The number of hops from a local business to one specific private equity fund. A fund that owns the business directly is at separation degree 1.
+The number of hops from a brand (or, later, a location) to one specific private equity fund. A fund that owns the brand directly is at separation degree 1.
 _Avoid_: Distance, depth
 
 **PE-owned**:
@@ -39,8 +39,8 @@ _Avoid_: Independent, PE-free, not PE-owned
 ## Entities
 
 **Brand**:
-A name a company sells under at several locations or on products, such as Dunkin' or Ray-Ban. A brand owns nothing: a company owns it, and it can pass from one company to another.
-_Avoid_: Label, marque
+A name a company sells under at several locations or on products, such as Dunkin' or Ray-Ban. A brand owns nothing. Its owner is usually a company, but a source may name a fund, investment firm or family directly, and a brand can pass from one owner to another.
+_Avoid_: Label, marque, chain (as its own kind of thing)
 
 **Company**:
 A legal entity, such as a corporation, LLC, partnership, trust, nonprofit or government body, that can own, be owned or run locations. A franchisee, a rollup and a public company are all companies.

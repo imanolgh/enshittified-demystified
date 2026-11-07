@@ -23,6 +23,8 @@ Label: wayfinder:map · Tracker: local markdown (`docs/agents/issue-tracker.md`)
 
 ## Not yet specified
 
+- **Franchisee operators for chain stores** (parked here 2026-11-06 by chains-and-brands "Brand and chain model"): the operator of each chain store, so a store can show its own verdict beside the brand's. Likely source: Item 20 of each brand's Franchise Disclosure Document (filed with state regulators), which often names individual people (privacy, "no profiles of individual people"); then ownership research per franchisee company.
+
 - **Seeding runbooks** — the code entrypoints (CLI) and order for registry → NPPES → roster crawl → census match → vet boards → launch-state batches, and the re-extraction backfill; specifiable once the connector tickets close.
 
 ## Out of scope

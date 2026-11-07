@@ -19,3 +19,4 @@ What do the public output models contain — the business card, the per-claim re
 - `ConfigDict(from_attributes=True)` for ORM-built outputs.
 - **Chains and brands** (added 2026-11-04, ADR 0004): output shapes for a brand, a chain, a category page and the public deal feed. Their wording is in chains-and-brands "Card wording and the how-this-works page", the pages in "Website pages and shareable cards".
 - **From "Predicate semantics"** (2026-11-05; role table in evidence_layer_plan.md §4 `claims`): the graph has two hop kinds (`owned_by`, `operated_by`) plus non-hop money edges; a store shows both the brand verdict and the store verdict, and code can say whether the store is company-run or franchised (glossary "Operator").
+- **From chains-and-brands "Brand and chain model"** (2026-11-06): one verdict per card at launch, the brand's. The store map (follow-up) shows the brand's verdict on each pin, labeled as the brand's; a second, operator verdict waits for operators.
