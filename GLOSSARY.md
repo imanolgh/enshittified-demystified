@@ -13,11 +13,11 @@ One link between two neighbours in an ownership chain: an owner above what it ow
 _Avoid_: Step, level, link (when counting)
 
 **Separation degree**:
-The number of hops from a brand (or, later, a location) to one specific private equity fund. A fund that owns the brand directly is at separation degree 1.
+The number of hops from a brand (or, later, a location) to one specific private equity owner, where a fund and the investment firm that manages it count as one owner. A fund or firm that owns the brand directly is at separation degree 1.
 _Avoid_: Distance, depth
 
 **PE-owned**:
-The category of a business that has at least one ownership chain to a private equity fund with no minority hop, whether the fund owns it directly or through intermediate companies.
+The category of a business that has at least one ownership chain to a private equity fund or firm with no minority hop, whether it owns the business directly or through intermediate companies.
 _Avoid_: PE-backed, PE-affiliated
 
 **PE minority stake**:
@@ -65,7 +65,7 @@ _Avoid_: Manager, franchisee (as the general term)
 ## Owners
 
 **Owner kind**:
-What sort of owner an entity is: PE firm, other investment fund (venture capital, hedge, credit, or real estate), conglomerate, family, employee-owned, trust, public company, nonprofit, government, or cooperative. It is a fact about the owner, not about any single hop.
+What sort of owner an entity is: private equity, venture capital, real estate, other investment fund (hedge, credit and other pooled funds), conglomerate, family, employee-owned, trust, public company, nonprofit, government, or cooperative. It is a fact about the owner, not about any single hop. A fund and the firm that manages it can have different kinds, as when a private equity firm runs a real estate fund.
 _Avoid_: Ownership type, owner category
 
 **Certified Independent**:
@@ -77,11 +77,11 @@ What the product shows when an owner's owner kind cannot be established from any
 _Avoid_: Unknown owner, unclassified
 
 **Investment firm**:
-A company that manages funds. Its owner kind says whether it is a PE firm.
+A company that manages funds, as the public knows it, such as KKR or L Catterton, even when it is registered as several advisers. Its owner kind says whether it is a PE firm. A public company that owns an investment firm, such as Blackstone Inc. or The Goldman Sachs Group, is a separate company above it.
 _Avoid_: Sponsor, GP, asset manager (as entity labels)
 
 **Fund**:
-A pool of money run by an investment firm that owns or lends to companies. Whether it owns or lends is a relationship, not part of what it is.
+A pool of money that one investment firm manages at a time, and that owns or lends to companies. Most of its money comes from outside investors, so the firm manages the fund without owning it or what it owns. Whether it owns or lends is a relationship, not part of what it is.
 _Avoid_: Lender, vehicle
 
 **Rollup**:

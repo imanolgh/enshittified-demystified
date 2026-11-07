@@ -68,7 +68,7 @@ Malformed items fail Pydantic → logged, dropped, batch flagged if failure rate
 Pure Python: normalize whitespace, substring-match each `quote` in its doc's stored text. Match → offset recorded, claim `accepted` once all checks pass. No match → claim `rejected` (reason `quote_not_found`) + logged for prompt tuning. Sanity checks: subject alias appears in doc; event_date within doc's plausible range.
 
 ### Step 6 — Scoring & Publication (`score_and_publish`)
-- `acquired_by(SmilePartners → SponsorX)`: supported by press release (wire) **and** sponsor portfolio page (different domains/source_types) → **edge published, confidence `verified`**. Sponsor X's owner kind is `pe_firm`, so Bright Smiles' category is computed as `pe_owned`, separation degree 2 (ADR 0001).
+- `acquired_by(SmilePartners → SponsorX)`: supported by press release (wire) **and** sponsor portfolio page (different domains/source_types) → **edge published, confidence `verified`**. Sponsor X's owner kind is `private_equity`, so Bright Smiles' category is computed as `pe_owned`, separation degree 2 (ADR 0001).
 - `operated_by(BrightSmiles → SmilePartners)`: DSO roster **and** NPPES other-name field → **verified**.
 - Result the consumer app can now serve: *Bright Smiles → Smile Partners (DSO) → Sponsor X (PE)* — full chain, 4 receipts.
 - A different item in the batch with only one source → edge `reported`, labeled as one source (ADR 0002).

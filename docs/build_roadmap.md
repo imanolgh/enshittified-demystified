@@ -56,7 +56,7 @@ Write this contract into `CLAUDE.md` on Day 0 so every session starts with the s
 
 The foundation week-and-a-half. Slowest, most educational, entirely yours. Each step names the FastAPI/Python concept it teaches.
 
-**Step 1 — Contracts (Day 1).** Hand-write `app/core/contracts.py`: `RawDocument`, `ExtractedClaim` (with the predicate `str, Enum`: `acquired_by, owned_by, operated_by, lends_to, allocates_to, holds_position, renamed_from`), `ResolvedEntity`, `ClaimCardOut`, `EdgeOut`. *Teaches: Pydantic v2 models, enums, validators.* This file is the constitution — every connector emits these types or its output doesn't exist.
+**Step 1 — Contracts (Day 1).** Hand-write `app/core/contracts.py`: `RawDocument`, `ExtractedClaim` (with the predicate `str, Enum`: `acquired_by, owned_by, operated_by, lends_to, allocates_to, holds_position, renamed_from, managed_by`), `ResolvedEntity`, `ClaimCardOut`, `EdgeOut`. *Teaches: Pydantic v2 models, enums, validators.* This file is the constitution — every connector emits these types or its output doesn't exist.
 
 **Step 2 — Database schema (Days 1–2).** Design on paper first (you already have evidence_layer_plan.md §4). Hand-write the SQLAlchemy models: `entities`, `entity_aliases`, `documents`, `claims` (unique index on hash(subject, predicate, object, doc_sha, quote) — idempotency as a constraint, not a convention), `edges`, `ingest_batches/items`, `events` (append-only). Claude Code may generate repetitive column boilerplate *from your written design*; you review every line. Learn the Alembic loop: edit model → `revision --autogenerate` → **read the generated migration** → `upgrade head`. *Teaches: SQLAlchemy 2.0 declarative, relationships, Alembic.*
 

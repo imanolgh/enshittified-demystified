@@ -106,6 +106,12 @@ entities
       -- a same-rank contradiction leaves owner_kind null = "owner type not confirmed"); only
       -- companies, investment firms, funds, families and insurers carry one, never brands or
       -- locations. Rank 1 → verified; ranks 2-3 → reported (ADR 0001).
+      -- 2026-11-07 (ticket 65, "Funds and their investment firm"): a fund with no kind evidence of
+      -- its own takes the owner_kind of the firm that manages it (current managed_by edge),
+      -- computed by code with no evidence row; verified only if that edge and the firm's kind
+      -- are both verified. Kind never flows up (fund → firm, or firm → listed parent). One
+      -- investment_firm = the firm as the public names it, holding each adviser registration's
+      -- crd; a listed parent (Blackstone Inc.) is a separate company above it by owned_by.
   created_at
       -- 2026-11-06 (ticket 13): status set only by code. closed = stopped existing (a moved
       -- location leaves a closed one); nothing sets it at launch, the store-map follow-up sets it
@@ -142,7 +148,8 @@ entity_identifiers             -- 2026-11-05 (ticket 12); replaces entities.plac
       -- (2026-11-06: the strong-scheme unique index skips rows with retracted_at set.)
       -- strong schemes (cik, ein, crd, sec_file_number, private_fund_id, place_id, npi): one
       -- entity per (scheme, value); a second holder is a resolution or merge signal, never a
-      -- second row. Weak schemes (ticker, domain, phone) may repeat.
+      -- second row. Weak schemes (ticker, domain, phone) may repeat. An entity may hold several
+      -- values of one scheme: an investment firm holds one crd per adviser registration (ticket 65).
       -- sec_file_number = 801-|802-|814-; private_fund_id = 805-. phone only from stored
       -- documents, never Places. Added later: SoS entity number, license number and plan
       -- EIN+PN when their efforts start; trademark serial only if USPTO is adopted (ticket 64).
@@ -178,7 +185,7 @@ documents                      -- immutable once written
 
 claims                         -- atomic, cited assertions
   id, subject_name, subject_entity_id (nullable), predicate (acquired_by|owned_by|lends_to|
-      holds_position|allocates_to|operated_by|renamed_from),
+      holds_position|allocates_to|operated_by|renamed_from|managed_by),
       -- 2026-11-06 (ticket 18): subject_name/object_name = the name as written in the document
       -- (the LLM never returns ids; a keyed code-producer claim takes its identity record's main
       -- name). Claim content (names, quote, value, document) never changes. The entity ids are
@@ -195,11 +202,18 @@ claims                         -- atomic, cited assertions
       --   operated_by: location → company; ownership hop
       --   lends_to: fund → company; holds_position: fund|retirement_plan|insurer → company|fund;
       --   allocates_to: retirement_plan|insurer → fund; none of these three is a hop
+      --   managed_by: fund → investment_firm (2026-11-07, ticket 65); never a hop; one manager at
+      --     a time (a newer claim naming a different firm ends the older edge). Producers: the
+      --     Form ADV ETL (archive fund rows; each in-graph firm's current IAPD PDF fund list), the
+      --     LLM ("managed by", "advised by", "its affiliate, <fund>"), BDC 10-Ks.
       --   renamed_from: any entity → no object (2026-11-06, ticket 13); value.former_name is the
       --     old name, which must appear in the quote; an accepted claim makes code write a
       --     former_name alias; a same-type entity under the old name merges only once the rename
       --     is verified; never a hop. object_entity_id is nullable for renamed_from only.
-      -- A resolved claim whose entity types don't fit is rejected (sanity_check_failed).
+      -- 2026-11-07 (ticket 65): the role-table check runs when edges are built, not when a claim
+      -- is accepted. A claim whose quote passes is accepted; its edge forms only once the current
+      -- entity types fit (a company later typed fund by a Form ADV record), as a null id never
+      -- counts. A type mismatch no longer rejects with sanity_check_failed.
       -- ruled 2026-09-14: majority/minority stake is degree, not relationship —
       -- it lives in `value` (e.g. {"stake_pct": 65, "stake_type": "majority"}), matching
       -- how lends_to @ rate and allocates_to @ % already work. Canonical set: CLAUDE.md.
@@ -217,7 +231,7 @@ claims                         -- atomic, cited assertions
       --   BDC rows: event_date = the Schedule's period end. Amounts in full units with currency
       --     (required when an amount is present) and scale (1|1000|1000000, the table's "(in
       --     thousands)" factor); rates are percent numbers (5.25 = 5.25%).
-      --   renamed_from: former_name (required). operated_by: none. allocates_to: defined when
+      --   renamed_from: former_name (required). operated_by: none. managed_by: none. allocates_to: defined when
       --     the retirement map unparks.
       -- Values over time are new claims, never edits: each filing gives a new claim; the edge
       -- shows the newest accepted claim by as-of date (event_date, else the document's date);
@@ -247,7 +261,8 @@ claims                         -- atomic, cited assertions
 edges                          -- the published graph (derived from claims)
   id, from_entity_id, to_entity_id, relation, effective_date,
       -- from = the claim's subject. relation is never acquired_by: acquired_by and owned_by
-      -- claims publish one owned_by edge (ticket 15).
+      -- claims publish one owned_by edge (ticket 15). managed_by edges (fund → firm) are never
+      -- hops; a fund and its firm, or two funds of one firm, count as one PE owner (ticket 65).
   confidence (verified|reported|estimated),
       -- ownership_type removed 2026-10-26 (ADR 0001): owners carry owner_kind; each business's
       -- category + separation degree are computed by code from its ownership chains.
@@ -268,6 +283,14 @@ owner_kind_evidence            -- 2026-11-07 (ticket 14, ADR 0001 amended)
       retracted), rejection_reason (nullable), retracted_at (nullable)
       -- Rank 1 rows come from code producers (Form ADV Any PE Funds = Y, a ticker from an SEC
       -- filing, the IRS exempt-org file, an 814- number); their phrase and match_state are null.
+      -- 2026-11-07 (ticket 65): kinds private_equity (renamed from pe_firm), venture_capital and
+      -- real_estate. More rank-1 rows: a fund's Form ADV archive Fund Type (Private Equity →
+      -- private_equity, Real Estate → real_estate, Venture Capital → venture_capital, hedge,
+      -- securitized asset, liquidity → other_investment_fund, Other Private Fund → no row); a
+      -- firm's monthly counts by fund type (any PE fund → private_equity; all real estate or all
+      -- VC → that kind; any other mix → other_investment_fund); Y on any of a firm's registrations
+      -- counts. Starting terms moved: venture capital firm/fund → venture_capital; real estate
+      -- investment firm, real estate fund → real_estate.
       -- Ranks 2-3 come from the LLM's owner_descriptions: rank 2 when the document is on one of
       -- the owner's own domain identifiers or is a press release it issued, else rank 3. Their
       -- kind is code's current answer from the term table (terms matched inside the phrase,
