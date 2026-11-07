@@ -130,7 +130,7 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 ### B1b — BDC loan books (the parsing workhorse)
 1. `discover_bdcs`: EDGAR company search, SIC/filer type → list of ~150 BDC CIK numbers → entities.
 2. Per BDC: `retrieve_edgar_filing(cik, "10-K")` via `https://data.sec.gov/submissions/CIK{cik}.json` → latest 10-K/10-Q → S3.
-3. `parse_soi`: pdfplumber/camelot extract the **Schedule of Investments** tables (often 30–80 pages) → normalized rows: borrower name, instrument, rate (spot PIK terms), principal, fair value, non-accrual flag.
+3. `parse_soi`: pdfplumber/camelot extract the **Schedule of Investments** tables (often 30–80 pages) → normalized rows: borrower name, instrument, rate (spot PIK terms), principal, fair value *(2026-11-06: the full field list is in evidence_layer_plan.md §4, engine "Claim value schemas")*, non-accrual flag.
 4. `bdc_soi` (the delegated parser, Step 21 — no LLM) emits `lends_to` claims directly — one per borrower — each quoting its table row text; plus fund-level facts (total PIK %, non-accrual %). The LLM runs only over the filing's narrative text (MD&A commentary), as for any other `sec_filing` document. *(Ruled 2026-10-26: parser only, no LLM fallback for unparseable tables; revisit with the per-filing failure-rate data after Step 21.)*
 5. Verification quirk: quotes match against the *parsed table text* stored on the document row; a numeric cross-check asserts the quoted principal equals the structured value. A failing row's claim is rejected; above a per-filing failure-rate threshold the filing is withheld as unparseable and an operational alert fires (ADR 0002).
 6. Borrower names → `resolve_entity` (no Places — these aren't storefronts; EDGAR/SoS/fuzzy only). This is where PC meets PE: **"Borrower: Smile Partners Management LLC" resolves to `ent_0455`** — and the cross-layer edge `lends_to(BDC_Fund → SmilePartners)` joins the graphs.
@@ -147,7 +147,7 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 
 1. Employer name → fuzzy match against the Form 5500 sponsor index (already loaded, B1a) → plan entity → lineup. Ambiguous (multiple plans) → ask the user to pick (plan names shown). No 5500 (gov worker) → route to pension flow instead.
 2. For each lineup holding:
-   - **Mutual fund** → resolve ticker → check cached **N-PORT** holdings (`retrieve_nport` on cache miss: EDGAR, structured XML — parse without LLM) → scan holdings for entities carrying `type=fund(PC)` or interval-fund/BDC flags in the graph → indirect exposure claims.
+   - **Mutual fund** → resolve ticker → check cached **N-PORT** holdings (`retrieve_nport` on cache miss: EDGAR, structured XML — parse without LLM) → scan holdings for entities carrying `type=fund(PC)` or interval-fund/BDC flags in the graph → indirect exposure claims. *(2026-11-06: no such flags exist; a BDC is a `fund` recognized by its `814-` file number, and interval funds are parked with the retirement map.)*
    - **Known PC/interval fund in the lineup directly** → direct exposure, graph lookup only.
    - **CIT (collective investment trust)** → limited disclosure: report states "opaque vehicle; public filings do not disclose holdings" + link the fact sheet if retrievable. Honest-unknown, surfaced as such.
 3. Assemble the report **from published edges and claims only** — the analysis step does no new asserting, only composing: exposure table, each line citing its filing (5500 row / N-PORT / 10-K), jargon-decoder blocks (gates, PIK) attached by claim type, and the compliance framing (informational, no recommendations).
@@ -161,7 +161,7 @@ Marginal cost per analysis ≈ a few resolution calls + cache misses; the expens
 
 | Task | Cadence | Behavior |
 |---|---|---|
-| EDGAR submissions poll per tracked CIK (BDCs, interval funds) | daily | New 10-Q/10-K detected → B1b chain for that filing → **diff vs. prior quarter**: new borrowers (new `lends_to` edges), departed loans (edge end-dated), non-accrual/PIK deltas (claim updates + alert events) |
+| EDGAR submissions poll per tracked CIK (BDCs, interval funds) | daily | New 10-Q/10-K detected → B1b chain for that filing → **diff vs. prior quarter**: new borrowers (new `lends_to` edges), departed loans (edge end-dated), non-accrual/PIK deltas (*new claims, never edits: 2026-11-06*; claim updates + alert events) |
 | N-PORT refresh for funds appearing in user-monitored lineups | monthly cycle | Re-parse, diff holdings, alert on new PC exposure |
 | Form 5500 annual bulk reload | yearly (staggered release) | Reload, diff lineups per plan → "your plan added Fund X" alerts |
 | CAFR season sweep | annually per system's fiscal calendar | Re-parse, allocation trend claims (this year vs. last) |

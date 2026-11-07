@@ -198,6 +198,25 @@ claims                         -- atomic, cited assertions
       -- ruled 2026-09-14: majority/minority stake is degree, not relationship —
       -- it lives in `value` (e.g. {"stake_pct": 65, "stake_type": "majority"}), matching
       -- how lends_to @ rate and allocates_to @ % already work. Canonical set: CLAUDE.md.
+      -- 2026-11-06 (ticket 16): value schemas, one Pydantic model per predicate (extra="forbid"),
+      -- used by ExtractedClaim and code producers; every field optional unless noted:
+      --   owned_by, acquired_by: stake_pct (0-100), stake_type (majority|minority, only when the
+      --     document uses the word), stake_basis (voting|economic). acquired_by adds deal_status
+      --     (announced|completed); only completed backs an ownership hop; event_date is the
+      --     announcement or closing date to match. owned_by's event_date is the as-of date the
+      --     quote states; null means the document's date confirms the hop.
+      --   lends_to: instrument (as written), reference_rate, spread_pct, interest_rate_pct,
+      --     pik_rate_pct, floor_pct, principal, cost, fair_value, currency, scale, non_accrual,
+      --     maturity_date, affiliation (non_affiliate|affiliate|control).
+      --   holds_position: instrument, units, cost, fair_value, currency, scale, affiliation.
+      --   BDC rows: event_date = the Schedule's period end. Amounts in full units with currency
+      --     (required when an amount is present) and scale (1|1000|1000000, the table's "(in
+      --     thousands)" factor); rates are percent numbers (5.25 = 5.25%).
+      --   renamed_from: former_name (required). operated_by: none. allocates_to: defined when
+      --     the retirement map unparks.
+      -- Values over time are new claims, never edits: each filing gives a new claim; the edge
+      -- shows the newest accepted claim by as-of date (event_date, else the document's date);
+      -- same as-of date -> the later-filed document wins. A BDC is a fund with an 814- number.
   object_name (nullable), object_entity_id (nullable), event_date (nullable),
   event_date_precision (nullable: year|month|day),
       -- 2026-11-06 (ticket 21): event_date is the first day of the period the document gives
@@ -339,7 +358,7 @@ Pure Python, no AI:
 4. *(Experimental, Step 27b)* **Jev claim-support check:** for claims that passed steps 1–3, Jev answers "does this verified quote support predicate P between S and O?" Low confidence sets the claim's status to `unsupported`: kept, never counted toward an edge (ADR 0002). Jev can only remove a claim from publication; it can never verify, publish or downgrade one.
 
 ### Stage 5 — Confidence Scoring & Edge Publication (`score_and_publish`, was `ScoreAndPublishJob`)
-1. Group verified claims by (subject, predicate, object). *(2026-11-05, "Predicate semantics": `acquired_by` and `owned_by` claims for the same pair form one group, published as an `owned_by` edge; `acquired_by` supplies the start date.)*
+1. Group verified claims by (subject, predicate, object). *(2026-11-06, "Claim value schemas": an edge's value comes from its newest accepted claim by as-of date; older claims are its history.)* *(2026-11-05, "Predicate semantics": `acquired_by` and `owned_by` claims for the same pair form one group, published as an `owned_by` edge; `acquired_by` supplies the start date.)*
 2. **Two independent documents agree → publish edge as `verified`.** ("Independent" = different `source_type` or different domains — a press release syndicated to five sites counts once.)
 3. One source → publish as `reported` (labeled as one source on the card).
 4. Conflicting claims (different controlling owners over overlapping dates) → no publication as fact; shown as "sources disagree" with links to each. *(Both updated by ADR 0002 (`docs/adr/0002-no-manual-review.md`).)*
