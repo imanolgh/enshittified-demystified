@@ -172,8 +172,17 @@ documents                      -- immutable once written
   public_id, url, retrieved_at, sha256, storage_path, mime_type, raw_text (nullable), meta JSONB
 
 claims                         -- atomic, cited assertions
-  id, subject_entity_id, predicate (acquired_by|owned_by|lends_to|holds_position|
-      allocates_to|operated_by|renamed_from),
+  id, subject_name, subject_entity_id (nullable), predicate (acquired_by|owned_by|lends_to|
+      holds_position|allocates_to|operated_by|renamed_from),
+      -- 2026-11-06 (ticket 18): subject_name/object_name = the name as written in the document
+      -- (the LLM never returns ids; a keyed code-producer claim takes its identity record's main
+      -- name). Claim content (names, quote, value, document) never changes. The entity ids are
+      -- the resolver's current answer: the door fills them in the same call; null when a name
+      -- is ambiguous (retried automatically when identity data changes, ADR 0002) or, for
+      -- renamed_from, the object. Code may change an id when the resolver's rules improve, with
+      -- an events row and an edge recompute. A null id never counts toward an edge. An unmatched
+      -- name creates a company, or a family when the LLM marks the side as a person or family;
+      -- claims never create brands, locations, investment firms, funds, insurers or plans.
       -- 2026-11-05 (ticket 15): operates_location_of renamed operated_by. Every claim reads
       -- subject → object. Role table (contracts.py), subject → object, hop?:
       --   owned_by, acquired_by: brand|company|investment_firm|insurer → company|fund|
@@ -189,8 +198,14 @@ claims                         -- atomic, cited assertions
       -- ruled 2026-09-14: majority/minority stake is degree, not relationship —
       -- it lives in `value` (e.g. {"stake_pct": 65, "stake_type": "majority"}), matching
       -- how lends_to @ rate and allocates_to @ % already work. Canonical set: CLAUDE.md.
-  object_entity_id, event_date (nullable), value JSONB (amounts, %, rates),
-  document_id, verbatim_quote TEXT, quote_offset,
+  object_name (nullable), object_entity_id (nullable), event_date (nullable),
+  value JSONB (amounts, %, rates),
+  document_id, verbatim_quote TEXT, quote_start, quote_end, claim_hash,
+      -- 2026-11-06 (ticket 18): quote_start/quote_end are character offsets into the document's
+      -- stored raw_text (mapping from normalized text: "Citation verification rules"); page comes
+      -- from page markers in the stored text. claim_hash = sha256 of [subject_name, predicate,
+      -- object_name or "", document_id, verbatim_quote], whitespace collapsed; no entity ids,
+      -- producer or value. Unique index on claim_hash where status <> 'retracted'.
   producer (llm|parser|etl|selector), producer_version, extraction_model (nullable), extracted_at,
       -- 2026-11-05 (ticket 17): producer_version = the prompt version (llm), a module constant
       -- (parser, etl) or the selector config revision; the producer declares it and golden-fixture
@@ -295,7 +310,7 @@ Every claim, whatever produced it, quotes a stored document, enters as `pending`
 
 1. checks every identity value, as found, against the cited document's text (the quote normalization), and does not write a record with a missing value;
 2. resolves each identity record to an entity and writes the sourced alias, identifier, address and industry rows, normalized for storage;
-3. writes claims as `pending`. Their quotes are checked in Stage 4, after names are resolved.
+3. writes claims as `pending`, with each name as written resolved to an entity id in the same call (null when ambiguous; ticket 18). Their quotes are checked in Stage 4, after names are resolved.
 
 **Code producer failures.** Every `etl` run first compares the file header with the expected columns and reads columns by name. Every `selector` run first checks that items still come back with the expected fields and roughly the usual count. A failed shape check stops the run before it writes anything and raises an alert. A per-record failure (a rejected claim or an unwritten identity record) raises an alert naming the producer, version and document, and the run keeps going. When per-record failures in one run pass the spec's threshold, the rest of the run stops. Rows already written can be found by `producer_version`.
 

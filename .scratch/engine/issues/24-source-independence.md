@@ -15,3 +15,4 @@ What precisely makes two sources independent, and how is a syndicated or same-pu
 - ADR 0003:5,11 says source_type names *who published*, but company_site / press_release / news are genres, not publishers.
 - Detection options: text similarity, shared-quote check, wire attribution, same issuer.
 - python-types-primer.md:55,107 shows the rule as distinct source_type only (omits domain).
+- **From "Claim identity"** (2026-11-06; notes in evidence_layer_plan.md §4 `claims`): claims from the same document share a hash when their names, predicate and quote match, so one document is one source; claims from different documents count separately, subject to this ticket's independence rule.

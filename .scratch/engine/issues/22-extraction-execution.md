@@ -29,3 +29,4 @@ How does extraction run: per document or per entity, Batch API vs synchronous, w
   - Consistent with decisions.md §11's "few hundred dollars" for the parked local seeding.
 - Load the `claude-api` skill when working this ticket.
 - **From "Schema conventions"** (2026-11-05; conventions in evidence_layer_plan.md §4; no on-demand research per decisions.md §15): "A2 must be synchronous" no longer applies, so nothing forces a synchronous extraction path; whether every extraction runs through the Batch API is this ticket's call. The batch-jobs and extraction-cache tables, their columns and retention are this ticket's.
+- **From "Claim identity"** (2026-11-06; notes in evidence_layer_plan.md §4 `claims`): the LLM returns names as written, never ids, so a request needs no candidate list. The prompt may say which brand the documents were fetched for. Whether claims point at their extraction request (a column) is this ticket's, with the batch tables.

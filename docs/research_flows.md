@@ -49,7 +49,7 @@ Category `dental` + DSO link triggers this connector set for `ent_8821` + `ent_0
 Each document → S3 (`docs/{sha256}.html`), `documents` row (url, retrieved_at, sha256, source_type). Dedup by sha256. The chord's callback fires `extract_claims` when all retrievals settle.
 
 ### Step 4 — Extraction (`extract_claims`)
-Assemble the 6–12 documents (text-extracted) → one Claude call (Sonnet-class) with the claim JSON schema. Pydantic-validated output, e.g.:
+Assemble the 6–12 documents (text-extracted) → one Claude call (Sonnet-class) with the claim JSON schema. Pydantic-validated output, e.g.: *(2026-11-06, engine "Claim identity": the LLM now returns each side as the name as written, such as "Bright Smiles Dental", never an `ent_` id; the door resolves names to ids.)*
 
 ```json
 [

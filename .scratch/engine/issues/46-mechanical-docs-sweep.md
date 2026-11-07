@@ -43,6 +43,10 @@ Apply the ~80 pure wording fixes the 2026-10-26 inventory found (no decision nee
 - **build_roadmap.md**: metro wording → launch state (Step 18 keeps a ~200-practice sample, drawn from the launch-state census; Step 27 "Full metro batch" → full launch-state batch; 27b, Phase 2/4 exits, :105); §8 "states 2–50 SoS" → "SoS beyond the launch states".
 - **Bare "state 1–3/4"** for coverage states anywhere in docs → "coverage state" (GLOSSARY rule).
 
+## Added by "Claim identity" (2026-11-06)
+
+- Field-name drift to fix across docs and skills: `quote` / `verbatim_quote` → `verbatim_quote`; `doc` / `doc_sha` → `document_id`; `subject`/`object` on extracted claims → `subject_name`/`object_name` (names as written); `quote_offset` → `quote_start`/`quote_end`. Edges keep `relation`. Sources: research_flows.md, build_roadmap.md, the bdc-parser and conformance-tests skills.
+
 ## How to resolve
 
 AFK. Make the edits, then append `## Answer` listing what changed and anything skipped (with why). No commits.
