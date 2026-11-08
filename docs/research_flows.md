@@ -14,7 +14,7 @@ All entity names in Scenario examples that reference real companies (e.g., Heart
 
 1. `load_nppes_census`: download the free NPPES bulk file → pandas filter to Tier-1 taxonomies → national entities for every dental/medical organization (names, addresses, authorized officials, other-name aliases). Same ETL pattern as Form 5500; no API calls, no Places, no LLM.
 2. Sponsor/DSO roster crawl (the Scenario A3 crawler, run in full): each roster location → `operated_by` claim citing the roster page.
-3. **The census match:** roster locations resolved against census entities. Matches publish the PE-connected layer; every unmatched census entity publishes as "no PE evidence found (checked {date})".
+3. **The census match:** roster locations resolved against census entities. Matches publish the PE-connected layer; every unmatched census entity publishes as "no PE evidence found (checked {date})". *(2026-11-07, engine "What 'checked' means and coverage states": "checked" now means every source the product requires for the entity has finished a run, not the roster join alone; before that the entity reads "not yet checked". ADR 0001.)*
 4. Result: the national healthcare map lights up — PE-connected layer + honest-independent denominator — for a few dollars of extraction and zero per-lookup API cost. Deep per-entity research (A1) then adds launch-state-depth chains on top.
 
 ## Scenario A1: Launch-State Depth — Every Dental & Vet Practice in a Launch State
@@ -76,7 +76,7 @@ Pure Python: normalize whitespace, substring-match each `quote` in its doc's sto
 ### Step 7 — Batch Outcome Report
 Batch dashboard after ~a day of wall-clock (rate-limit bound):
 `resolved 94% · verified chain 31% · reported 9% · no_evidence_found 52% · ambiguous 8%`.
-The 52% "no evidence" entities publish as **"No PE evidence found (checked {date})"** — the honest state, and in Tier-1 verticals a meaningful "likely independent" signal.
+The 52% "no evidence" entities publish as **"No PE evidence found (checked {date})"** — the honest state. *(2026-11-07: the earlier "likely independent" framing is removed; "independent" is reserved for the Certified Independent badge, ADR 0001.)*
 
 ---
 

@@ -12,6 +12,8 @@
 
 Every business a user can see at launch is in exactly one of four coverage states, and the UI is honest about which:
 
+*(2026-11-07, engine "What 'checked' means and coverage states": this table belongs to the parked local plan (ADR 0004). The engine has no coverage states, only categories, confidence and checks; mapping these states onto categories is in the local-businesses map's "Not yet specified". "Likely independent" below is retired: ADR 0001 reserves "independent" for the Certified Independent badge.)*
+
 | State | Meaning | How it got there |
 |---|---|---|
 | **Verified chain** | Full ownership chain published, ≥2 independent sources per edge, claim card with receipts | Launch-state deep research (A1) or roster + corroborating press/filing |

@@ -35,7 +35,7 @@
 
 - **Tier 1 (launch):** dental, veterinary, physician/urgent care, ABA therapy (all get NPPES), funeral homes/crematoria, car washes, HVAC/plumbing/electrical, dermatology/ophthalmology/optometry — heavy PE rollup activity, state licensing records, acquisition press coverage.
 - **Tier 2:** apartments/property management, daycare chains, pet boarding, med spas, physical therapy.
-- **Tier 3:** independent bars, clubs, hair salons, single-location restaurants — low PE density; the honest output is usually "no PE evidence found," framed in the UI as *likely independent*, never as certainty.
+- **Tier 3:** independent bars, clubs, hair salons, single-location restaurants — low PE density; the honest output is usually "no PE evidence found," framed in the UI as *likely independent*, never as certainty. *(2026-11-07, engine "What 'checked' means and coverage states": not "likely independent"; ADR 0001 reserves "independent" for the Certified Independent badge. This section describes the parked local plan, ADR 0004.)*
 
 **Franchise rule:** ownership is modeled at two levels — **brand ownership** and **location operator** — because a franchised location (e.g., a sandwich shop) is typically owned by a local franchisee even when the brand is PE-owned. Collapsing these would be wrong in exactly the way that destroys trust. National-brand data and local-services data compose in one graph: any search returns both the brand verdict and the operator verdict. *(2026-11-05, engine "Predicate semantics": the brand verdict walks brand → owner; the store verdict walks location → `operated_by` → operator → owners; a location's brands are `location_brands` identity rows, never a hop.)* *(2026-11-06, chains-and-brands "Brand and chain model": launch has brand pages only, and the store map that follows shows each store with the brand's verdict labeled as the brand's. Every brand page carries the same franchise note. The operator verdict comes when operators do; they stay parked with local businesses.)*
 
@@ -78,7 +78,7 @@
 - Corrections are public retractions with a changelog — never silent edits.
 - ~~Community submissions count as one source~~ — community submissions are not in the MVP (ruled 2026-10-26).
 - Scrape etiquette: rate limits, identified user agent, robots.txt, official APIs/bulk data preferred (EDGAR, NPPES, Form 5500, CourtListener are all free and official).
-- Confidence is labeled honestly (`verified` / `reported` / `estimated` / `unknown`); the honest unknown state is load-bearing for credibility.
+- Confidence is labeled honestly (`verified` / `reported` / `estimated` / `unknown`); the honest unknown state is load-bearing for credibility. *(2026-11-07, engine "What 'checked' means and coverage states": edge confidence is `verified|reported|sources_disagree`; `estimated` was dropped and `unknown` is not a confidence value. The honest unknowns are the categories "owner type not confirmed" and "not yet checked", and "No PE evidence found (checked {date})".)*
 
 ## 11. Seeding Strategy: Top-Down National, Bottom-Up Launch-State Depth
 

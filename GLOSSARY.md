@@ -41,7 +41,7 @@ History shown for a brand, company or location whose chain to a private equity f
 _Avoid_: Ex-PE, previously backed
 
 **No PE evidence found**:
-The category of a brand, company or location that was checked against every known ownership source and has no chain to private equity, always shown with the date it was checked.
+The category of a brand, company or location that was checked against every source the product requires for it and has no chain to private equity, always shown with the date it was checked.
 _Avoid_: Independent, PE-free, not PE-owned
 
 ## Entities
@@ -113,6 +113,14 @@ _Avoid_: Unverified, alleged, single-source (in user-facing text)
 **Sources disagree**:
 The state of a fact whose sources contradict each other, such as two owners each said to hold a majority at the same time. It is not published as a fact; the reader sees that the sources disagree, with links to each. A brand's category reads sources disagree only when the readings would give it different categories.
 _Avoid_: Disputed, conflict (in user-facing text)
+
+**Checked**:
+Said of a brand, company or location once every source the product requires for it has been searched or read, whether or not anything turned up. Its checked date is the date of the oldest of those searches, so the date never claims more than the stalest part of the check.
+_Avoid_: Verified, researched, scanned
+
+**Not yet checked**:
+What a brand, company or location shows before its check is complete, unless private equity has already been found. Any owner found so far is still shown.
+_Avoid_: Unknown, pending, unresearched
 
 **Last confirmed**:
 The most recent date any source still showed a fact. A hop not confirmed for a long stretch is shown with this date and stops counting as current ownership.

@@ -21,3 +21,4 @@ How does public search work over the seeded data set, what does a search show wh
 - Required before launch (build_roadmap.md §8).
 - **Dropped with on-demand research** (2026-11-05): delivery by polling `GET /api/entities/pending/{ticket}` or SSE, ticket statuses and TTL, A2 dedup, the per-search research budget, the "Unknown, research on request" coverage state.
 - The demand dashboard itself is "API conventions, internal auth and operator surface".
+- **From "What 'checked' means and coverage states"** (2026-11-07; ADR 0001 amended; tables `document_reads` and `source_runs` in evidence_layer_plan.md §4): a search can land on a brand that is in the data but "not yet checked"; it shows that state and is logged as demand.

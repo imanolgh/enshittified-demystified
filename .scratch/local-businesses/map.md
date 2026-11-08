@@ -25,6 +25,8 @@ Label: wayfinder:map · Tracker: local markdown (`docs/agents/issue-tracker.md`)
 
 - **Franchisee operators for chain stores** (parked here 2026-11-06 by chains-and-brands "Brand and chain model"): the operator of each chain store, so a store can show its own verdict beside the brand's. Likely source: Item 20 of each brand's Franchise Disclosure Document (filed with state regulators), which often names individual people (privacy, "no profiles of individual people"); then ownership research per franchisee company.
 
+- **Coverage states** (moved here 2026-11-07 by engine "What 'checked' means and coverage states"): the four states in `pre-launch-seeding.md` §1 (Verified chain, Roster-confirmed, No PE evidence found, Unknown) map onto the engine's categories, confidence and checks only for the local plan; the engine has none of its own. The mapping is open, including "couldn't confirm which business" (ADR 0002) and one official filing self-verifying.
+
 - **Seeding runbooks** — the code entrypoints (CLI) and order for registry → NPPES → roster crawl → census match → vet boards → launch-state batches, and the re-extraction backfill; specifiable once the connector tickets close.
 
 ## Out of scope

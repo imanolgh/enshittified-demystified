@@ -21,7 +21,7 @@ That competitor also defines the whitespace. It covers national consumer brands 
 
 **Key features:**
 - Zip/name search with ownership chain visualization
-- "Verified independent" flag
+- Certified Independent badge (a later feature granted only by automated checks against official records; ADR 0001 reserves the word "independent" for it)
 - ER staffing-firm detection — productizing the job-listing forensics users already do manually for TeamHealth/Envision
 - Second-opinion prompts ("PE-owned practices are documented upselling — get an independent second opinion before accepting a $4,000 treatment plan")
 

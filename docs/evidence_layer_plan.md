@@ -292,7 +292,9 @@ edges                          -- the published graph (derived from claims)
       -- from = the claim's subject. relation is never acquired_by: acquired_by and owned_by
       -- claims publish one owned_by edge (ticket 15). managed_by edges (fund → firm) are never
       -- hops; a fund and its firm, or two funds of one firm, count as one PE owner (ticket 65).
-  confidence (verified|reported|estimated|sources_disagree),
+  confidence (verified|reported|sources_disagree),
+      -- 2026-11-07 (ticket 28): estimated dropped (no rule produced it; the retirement map may
+      -- add it back when it unparks). unknown is not a confidence value.
       -- 2026-11-07 (ticket 25): sources_disagree marks a contested edge, never shown as fact; the
       -- card lists each side with links. A brand's category is sources_disagree only when the
       -- contested readings give different categories. A fund with disputed managers inherits a
@@ -331,6 +333,29 @@ owner_kind_evidence            -- 2026-11-07 (ticket 14, ADR 0001 amended)
       -- case-insensitive, longest term wins; a negation or two kinds → no kind), recomputed when
       -- the table changes; phrase and quote never change. Rows enter through the door and quotes
       -- pass verify_citations. Within one source, the newer document wins.
+
+document_reads                 -- 2026-11-07 (ticket 28, "What 'checked' means and coverage states")
+  id, document_id, producer, producer_version, outcome (cited|no_evidence_found|unreadable|
+      claims_rejected), read_at, retracted_at (nullable)
+      -- one row per document per producer version, written in the producer's door call. cited =
+      -- at least one accepted claim; no_evidence_found = read in a finished response, no claim
+      -- cites it (ticket 21); unreadable = unparseable filing or failed response; claims_rejected
+      -- = claims were made but all failed verify_citations. A new producer version leaves earlier
+      -- rows standing; withdrawing a version sets retracted_at on its rows ("Edge lifecycle").
+
+source_runs                    -- 2026-11-07 (ticket 28)
+  id, entity_id, source, started_at, finished_at (nullable), outcome (completed|failed|blocked)
+      -- one row per entity per required source run (the required list per entity type is the
+      -- product's: chains "Category brand lists and brand-level checked"). completed only when
+      -- every document the run found has a non-retracted read of cited or no_evidence_found;
+      -- failed = errors after retries; blocked = robots.txt or site terms. Shared sources
+      -- (registry sponsor pages, press feeds, Form ADV, BDC Schedules) count through their latest
+      -- complete pass that finished after the entity was added; an incomplete pass leaves the
+      -- previous one in force; a failing item leaves a pass's list only by a code change. An
+      -- entity is checked when every required source has a completed run, judged against the
+      -- list in force when it ran; the checked date is the oldest of those runs. Until then only
+      -- pe_owned and pe_minority_stake can show; everything else reads not_yet_checked (ADR 0001).
+      -- How the checked date reaches stored categories: "Category storage and recompute".
 
 ingest_batches / ingest_items  -- operator uploads only (decisions.md §15: no on-demand research)
   batch: id, name, status (running|done|halted)
@@ -495,7 +520,7 @@ CSV batch intake at thousands-of-entities scale; Celery Beat re-crawls; diff det
 Form 5500 bulk load (pandas); camelot BDC Schedule of Investments parsing; top-100 pension CAFR ingestion; PC claim types + jargon decoder content. This is where the Python choice pays back most visibly. This lights up MyRetirementX-Ray on the same graph.
 
 **Phase 5 — Graph depth**
-Cross-link the layers (sponsor → PC lender → pension LP where public evidence exists, `estimated` edges labeled as such); expose the money-flow graph views; ~~open community submissions into the review queue~~ (not in the MVP, 2026-10-26).
+Cross-link the layers (sponsor → PC lender → pension LP where public evidence exists, `estimated` edges labeled as such; *2026-11-07: `estimated` was dropped from edge confidence (engine "What 'checked' means and coverage states"); the retirement map may add it back*); expose the money-flow graph views; ~~open community submissions into the review queue~~ (not in the MVP, 2026-10-26).
 
 ---
 
