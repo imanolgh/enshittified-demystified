@@ -305,7 +305,8 @@ claims                         -- atomic, cited assertions
       -- seller ends hops to the firm and all its funds), (2) a completed acquisition stating a
       -- stake that can't be true beside the owner's stated stake, or (3) 18 months without
       -- confirmation; every other overlap is co-ownership. A fund's stake for these rules is the
-      -- sum of its firm's funds' stated stakes. Within one document a current claim beats a
+      -- sum of its firm's funds' stated stakes (except within one 13D or 13G joint filing, where the
+      -- joint-filer rule applies: ticket 70). Within one document a current claim beats a
       -- former claim for the pair; a quote that names the seller and says it keeps a stake gives
       -- only the current claim (the hash ignores value). Undated claims take the document's own
       -- date, else the fetch date, and never restart a hop a dated claim ended. Dates compare at
@@ -538,6 +539,13 @@ Celery Beat (≈ Laravel Scheduler): recurring crawls of sponsor portfolio pages
 - A matched release is fetched and stored from the issuer's own site (found through its domain identifiers, newsroom or sitemap, by matching title and date), an SEC exhibit or an adviser's page, never from a wire site. A wire-only release can't be a source. A stored issuer copy with no date of its own takes the feed item's date as `published_on`.
 - A page on a wire domain (prnewswire.com, prweb.com, newswire.ca, globenewswire.com, businesswire.com, accessnewswire.com, accesswire.com, einpresswire.com) is `press_release`; elsewhere a page on the issuer's own domain or carrying a wire tag ("/PRNewswire/", "(GLOBE NEWSWIRE)", "(BUSINESS WIRE)") is `press_release`, otherwise `news`. The issuer sets `speaker_entity_id`; a news article's speaker is its outlet.
 - Bot rules: CLAUDE.md scrape etiquette. EDGAR full-text search and ownership filings: their own ticket.
+
+### EDGAR full-text search and ownership filings (2026-11-08, engine "EDGAR full-text search and ownership filings")
+
+- Full-text search (`efts.sec.gov/LATEST/search-index`, undocumented; all electronic filings since 2001) runs per brand: one exact-phrase query per brand and company name, over 8-K with EX-99, S-1, S-4, 424B prospectuses, 10-K with Exhibit 21, 10-Q, DEF 14A, DEFM14A, SC TO and 425. Form D, 13D/13G (own reader) and BDC filings (the BDC parser) are left out. First run: newest first since 2001, up to 100 hits per name; refreshes fetch only filings since the last run. The SEC's 10 requests a second is shared across EDGAR connectors.
+- Each hit's file is its own document: `meta` holds accession, form, filer CIK and filing date; `published_on` is the filing date. An EX-99 press release is `press_release` spoken by its issuer (ADR 0003); everything else is `sec_filing` and self-verifies. Every hit is read whole by the LLM, however long (developer's ruling; spend: "Operational identity, budgets and guardrail values").
+- 13D and 13G: for each public company in the graph, its filings and amendments. Structured filings (since December 2024) are read by a `parser` producer: each reporting person is a child document rendered as sorted `field: value` lines, giving `owned_by` claims (holder name and CIK, percent of class, event date); the rule box (`designateRulePursuantThisScheduleFiled`) goes into document `meta`. Older text filings: code reads the cover-page checkbox; a box it can't read never makes the company PE minority stake; a 13D has no box and always counts.
+- Joint filers: within one 13D or 13G, the owner's stake is the larger of the largest single aggregate amount and the sum of the reporting persons' sole voting power, with the percent from the same share count (a fund, its general partner, the firm and its listed parent usually report the same shares, so a plain sum double-counts). A newer filing replaces an older one by event date; an amendment reporting 5% or less ends the hop; 0% is an exit; percent of class counts as voting unless a proxy or prospectus gives voting power.
 
 ### Producers and the door (2026-11-05, engine "Claim producers and the claims door")
 
