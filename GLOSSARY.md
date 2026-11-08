@@ -1,6 +1,6 @@
 # Ownership
 
-How the project describes who owns a local business and how private equity sits above it.
+How the project describes who owns a brand and how private equity sits above it.
 
 ## Language
 
@@ -17,11 +17,11 @@ The number of hops from a brand (or, later, a location) to one specific private 
 _Avoid_: Distance, depth
 
 **PE-owned**:
-The category of a business that has at least one ownership chain to a private equity fund or firm with no minority hop, whether it owns the business directly or through intermediate companies.
+The category of a brand, company or location that has at least one ownership chain to a private equity fund or firm with no minority hop, whether the fund or firm owns it directly or through intermediate companies. A public company counts when a private equity owner holds more than half of its votes.
 _Avoid_: PE-backed, PE-affiliated
 
 **PE minority stake**:
-The category of a business whose every ownership chain to private equity contains at least one minority hop.
+The category of a brand, company or location whose every ownership chain to private equity contains at least one minority hop. A fund manager's ordinary passive holding in a public company is not one.
 _Avoid_: Partial PE, PE-invested
 
 **Minority hop**:
@@ -37,11 +37,11 @@ An announced acquisition that has not completed, such as Nestlé's agreed sale o
 _Avoid_: Proposed acquisition, rumored deal
 
 **Formerly PE-owned**:
-History shown for a business whose chain to a private equity fund has ended, with the years it lasted. It is history, not a current category.
+History shown for a brand, company or location whose chain to a private equity fund or firm has ended, with the years it lasted. It is history, not a current category.
 _Avoid_: Ex-PE, previously backed
 
 **No PE evidence found**:
-The category of a business that was checked against every known ownership source and has no chain to private equity, always shown with the date it was checked.
+The category of a brand, company or location that was checked against every known ownership source and has no chain to private equity, always shown with the date it was checked.
 _Avoid_: Independent, PE-free, not PE-owned
 
 ## Entities
@@ -77,7 +77,7 @@ What sort of owner an entity is: private equity, venture capital, real estate, o
 _Avoid_: Ownership type, owner category
 
 **Certified Independent**:
-A future badge a business earns when automated checks of official records show no PE ownership. The only way the product will call a business independent.
+A future badge a brand, company or location earns when automated checks of official records show no PE ownership. The only way the product will call anything independent.
 _Avoid_: Verified independent, independent (unqualified)
 
 **Owner type not confirmed**:

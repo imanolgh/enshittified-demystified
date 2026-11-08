@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 26, 27  (Edge lifecycle: ending, retraction and staleness; Category precedence and storage)
+Blocked by: 26, 27, 68  (Edge lifecycle: ending, retraction and staleness; Category precedence and public companies; Category storage and recompute)
 Map: [engine](../map.md)
 
 ## Question

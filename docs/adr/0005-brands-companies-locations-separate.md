@@ -15,7 +15,7 @@ The graph no longer has a `business` entity. What a reader calls "a business" is
 
 - A name in a quote must resolve to the right type ("Subway" may mean the brand or the company): "Entity resolution algorithm".
 - No predicate links a location to its brand. *(Settled 2026-11-05 by "Predicate semantics": the link is identity data, `location_brands` rows written by code producers, never a claim or a hop. A location is run by its operator through `operated_by`.)*
-- Which of brand, company and location carry an ownership category: "Category precedence and storage". Whether chains v1 stores locations at all: chains-and-brands "Brand and chain model".
+- Which of brand, company and location carry an ownership category: "Category precedence and storage". *(Answered 2026-11-07, engine "Category precedence and public companies": all three; launch computes brands only.)* Whether chains v1 stores locations at all: chains-and-brands "Brand and chain model".
 
 ## Considered options
 

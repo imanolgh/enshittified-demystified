@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 27  (Category precedence and storage)
+Blocked by: 27  (Category precedence and public companies)
 Map: [engine](../map.md)
 
 ## Question
@@ -22,3 +22,4 @@ What has to have happened for a business to show "No PE evidence found (checked 
 - **From "Schema conventions"** (2026-11-05; conventions in evidence_layer_plan.md §4; no on-demand research per decisions.md §15): the "A2 in flight" state and the "Unknown, research on request" coverage state (pre-launch-seeding.md:18) are gone. An entity that is in the data but not yet checked still needs a state: searches for it are logged as demand ("Search and the demand log").
 - **From "Claim producers and the claims door"** (2026-11-05; summary in evidence_layer_plan.md "Producers and the door"): "nothing found" arrives through the door call; where it is stored is this ticket's.
 - **From "ExtractedClaim and the extraction result envelope"** (2026-11-06): `no_evidence_found` is a per-document outcome derived by code: a document the producer read, in a response that finished, that no claim cites. Unreadable documents (unparseable filings, failed responses) never get it, and a document cited only by dropped items gets no outcome. Where the outcome is stored, how it turns into "checked", and what a document whose claims were all rejected counts as are this ticket's.
+- **From "Category precedence and public companies"** (2026-11-07; ADR 0001 amended): `no_pe_evidence_found` is the floor of the precedence, for a brand where no owner was found. A brand, company or location can carry a category, but launch computes brands only, so companies and locations have no category state at launch. What must have happened for the floor to show is this ticket's.

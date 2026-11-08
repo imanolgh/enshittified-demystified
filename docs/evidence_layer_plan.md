@@ -257,6 +257,14 @@ claims                         -- atomic, cited assertions
       -- edge. Conflicts: stated stakes that can't all be true at once (or, for one-at-a-time
       -- predicates, two companies with the same date), plus loops; lends_to and holds_position
       -- never conflict.
+      -- 2026-11-07 (ticket 27, "Category precedence and public companies"; ADR 0001 amended):
+      -- above a public company, a minority ownership hop counts toward PE only when one of its
+      -- claims comes from a 13D, or from a 13G not filed under Rule 13d-1(b). The 13G producer
+      -- copies the rule box from the filing's structured field designateRulePursuantThisSchedule-
+      -- Filed (and the reporting-person type) into document meta. Proxy-table claims confirm a
+      -- holder but never create such a hop. A 13D or 13G amendment reporting 5% or less ends the
+      -- holder's hop. Control uses the stated voting stake first (unstated basis = voting).
+      -- Category precedence, co-owners, unconfirmed owners and confidence: ADR 0001.
   object_name (nullable), object_entity_id (nullable), event_date (nullable),
   event_date_precision (nullable: year|month|day),
       -- 2026-11-06 (ticket 21): event_date is the first day of the period the document gives

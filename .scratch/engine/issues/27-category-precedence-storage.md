@@ -1,13 +1,14 @@
-# Category precedence and storage
+# Category precedence and public companies
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: 14, 25, 65  (Owner kind: storage, evidence and the PE-firm test; Conflict, succession and co-investors; Funds and their investment firm)
 Map: [engine](../map.md)
+Formerly "Category precedence and storage"; storage moved to [Category storage and recompute](68-category-storage-and-recompute.md) on 2026-11-07.
 
 ## Question
 
-What is the full precedence among business categories, which entity types get a category, and are categories (and separation degrees) stored or computed on read?
+What is the full precedence among business categories, how do public companies and their PE holders read, and which entity types get a category? *(Storage moved to "Category storage and recompute", 2026-11-07.)*
 
 ## Context
 
@@ -25,3 +26,42 @@ What is the full precedence among business categories, which entity types get a 
 - **From chains "Research: Full category audit"** (2026-11-07): read literally, Form ADV `Any PE Funds = Y` also flags index and asset managers (BlackRock reports 125 PE funds; J.P. Morgan, FMR, State Street and T. Rowe Price also report Y), so a strict count would put nearly every public company in PE minority stake. The audit left them out, as the pilot did. Whether and how the engine excludes them (here, or by amending the PE-firm test from "Owner kind") is open for the developer.
 - **From "Funds and their investment firm"** (2026-11-07; ADR 0001 amended; notes in evidence_layer_plan.md §4): `pe_firm` is renamed `private_equity`; new kinds `real_estate` and `venture_capital` with categories `real_estate_fund_owned` and `venture_capital_owned`, whose precedence is this ticket's. The stored (brand, PE owner) row is keyed to the firm when the fund has a `managed_by` edge, else to the fund. A listed parent stays a separate `public_company` above the firm, so a 13G filed by "BlackRock, Inc." under its CIK lands on a public company, not on a BlackRock adviser; that mostly settles the index-manager issue above, which this ticket still owns. This ticket is no longer blocked by "Funds and their investment firm".
 - **From "Conflict, succession and co-investors"** (2026-11-07; ADR 0001 and ADR 0002 amended; notes in evidence_layer_plan.md §4 `claims` and `edges`): overlapping owners are co-owners unless their stated stakes can't all be true, so a brand can have several control chains (a family plus a conglomerate; a PE firm plus founders); the precedence among them is this ticket's. A brand's category is `sources_disagree` only when its contested edges lead to different categories; otherwise the category stands and only the owner line says sources disagree. For control and minority, a firm's stake is the sum of its funds' stated stakes, and the newest stake by as-of date decides (a 13G drop below 50% moves a brand from PE-owned to PE minority stake). This ticket is no longer blocked.
+
+## Comments
+
+### Round 1 (2026-11-07)
+
+Facts read: chains audit pilot: Jersey Mike's listed 2026-07-31 as a "controlled company", Blackstone funds about 76.5% of voting power (424B4); Chewy, BC Partners 88.4% of voting power; Restaurant Brands (Burger King, Popeyes), 3G about 22% of voting interest; Wendy's, Trian 7.9% (Peltz and May group about 16% of voting power); Life Time, Leonard Green 11.2% and TPG 8.0%; all four firms report `Any PE Funds = Y`. Strictly read, restaurants go from 9 to 12 of 30 and gyms from 9 to 10. EDGAR check: T. Rowe Price Associates' 13G of 2026-11-06 for Pacific Biosciences of California (10.8%) has the structured field `designateRulePursuantThisScheduleFiled` = `Rule 13d-1(b)`, reporting-person type `IA`, and certifies the shares "were acquired and are held in the ordinary course of business and were not acquired and are not held for the purpose of or with the effect of changing or influencing the control of the issuer".
+
+- **Split** (Q0): storage (stored or computed, the stored row per brand and PE owner, recompute fan-out, formerly-PE history) moved to new ticket "Category storage and recompute", which waits on this ticket, "Edge lifecycle" and "Checked and coverage states"; "Claim card and graph output shapes" and "Events and the public changelog" now also wait on it. This ticket renamed "Category precedence and public companies".
+- **Which entities carry a category** (Q1): brand, company or location; funds, firms, families and plans carry only an owner kind. Launch computes and shows brands only; companies and locations start when a product needs them (store map with operators, local businesses). Glossary category entries change from "business" to "brand, company or location".
+- **Precedence among co-owners** (Q2): PE control first, then PE minority (unchanged). Among controlling co-owners the larger stated stake decides; with no stated stakes, a fixed order: investment funds (venture capital, real estate, other), public company, conglomerate, employee-owned, trust, family, cooperative, nonprofit, government. The card lists every co-owner. `no_pe_evidence_found` stays the floor (when it may show: "Checked and coverage states").
+- **Unconfirmed owners and disputes** (Q3): confirmed PE always shows (a verified PE control chain gives PE-owned; a confirmed PE minority chain gives PE minority stake even beside an unconfirmed controller, which the card shows). Otherwise a controlling owner of unconfirmed kind gives "owner type not confirmed", even beside a known family owner. A minority hop to an unconfirmed owner never changes the category. "Sources disagree" follows "Conflict, succession and co-investors" (only when readings differ).
+- **PE-controlled public companies** (Q4): a public company with a PE holder above 50% of voting power reads PE-owned (Jersey Mike's, Chewy), with its ticker shown beside the category.
+- **PE minority holders in public companies** (Q5, option a, revised after the developer asked why these aren't simply PE minority stakes): the misfire is fund managers (T. Rowe Price reports PE funds and holds 10.8% of Pacific Biosciences through ordinary passive holdings). Rule: a PE firm's stated stake in a public company counts as PE minority stake when it comes from a 13D, or from a 13G not filed under Rule 13d-1(b); a 13d-1(b) filing never counts; proxy tables confirm a holder but never create the stake on their own. Turned down: a 10% threshold (T. Rowe's 10.8% shows the misfire) and control only (hides 3G, Trian, Leonard Green and TPG). Which connector reads 13Ds and 13Gs: "Press and EDGAR full-text connectors". Settles the index-manager issue above together with "Funds and their investment firm".
+- **Voting or economic** (Q6): a stated voting stake decides control; an economic stake decides only when no voting stake is stated; a stake with no stated basis counts as voting.
+
+### Round 2 (2026-11-07)
+
+- **Several chains to one PE owner** (Q7): one row per PE owner, with the shortest path as its separation degree (a fund owning the brand directly and also owning its parent company gives degree 1); separate PE owners get separate rows (Smile Doctors: THL and Linden, each with its own degree).
+- **Category confidence** (Q8): a category is verified when at least one chain that gives it has every hop verified and its deciding owner kind verified; otherwise reported. Other co-owners' confidence doesn't lower it; the card shows each chain's label (Walgreens: verified chain to Sycamore, reported chain to the Pessina family, PE-owned verified). A public company's PE minority stake comes from a 13D or 13G, official filings, so it is verified.
+- **Falling below 5%** (Q9): for a public company, a 13D or 13G amendment reporting 5% or less ends the holder's hop as of that filing, since no later filing will confirm a smaller stake.
+
+## Answer
+
+Resolved 2026-11-07 in a grilling session (two rounds, recorded under Comments). Split before round 1: storage went to "Category storage and recompute"; this ticket was renamed from "Category precedence and storage".
+
+- **Which entities:** a brand, company or location carries a category; funds, firms, families and plans carry only an owner kind. Launch computes and shows brands only.
+- **Precedence** (ADR 0001 amended): PE control, then PE minority. Among controlling co-owners the larger stated stake decides; with none stated, the order is investment funds (venture capital, real estate, other), public company, conglomerate, employee-owned, trust, family, cooperative, nonprofit, government. Confirmed PE always shows; otherwise a controlling owner of unconfirmed kind gives "owner type not confirmed"; a minority hop to an unconfirmed owner changes nothing. "Sources disagree" only when readings differ. `no_pe_evidence_found` is the floor.
+- **Public companies:** a PE holder above 50% of voting power gives PE-owned (Jersey Mike's, Chewy), ticker shown. A PE firm's stake counts as PE minority stake only from a 13D or a 13G not filed under Rule 13d-1(b) (the passive institutional box; T. Rowe Price's 10.8% of Pacific Biosciences is one); proxy tables only confirm a holder. An amendment reporting 5% or less ends the holder's hop. This settles the index-manager issue from the audit. Restaurant Brands (3G), Wendy's (Trian) and Life Time (Leonard Green, TPG) read PE minority stake if their filings aren't 13d-1(b).
+- **Stakes:** a stated voting stake decides control; economic only when no voting stake is stated; an unstated basis counts as voting.
+- **Degree and confidence:** one row per PE owner with the shortest path; a category is verified when one chain that gives it is fully verified.
+- Docs: ADR 0001 amended; ADR 0005's open line answered; glossary category entries; evidence_layer_plan.md §4; conformance-tests skill. No new ADR.
+
+Handed on:
+- "Category storage and recompute": everything about storing and recomputing categories and rows.
+- "Press and EDGAR full-text connectors": 13D and 13G ingestion, the rule box, 5%-or-less amendments.
+- "Checked and coverage states": the floor; companies and locations not computed at launch.
+- "Claim card and graph output shapes": co-owners, tickers, PE holder lines, an unconfirmed controller.
+- chains "Product categories": the strict counts become the rule.
+- chains "Card wording and the how-this-works page": wording for public-company PE minority stakes and unconfirmed controllers.

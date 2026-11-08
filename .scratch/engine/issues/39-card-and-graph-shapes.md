@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 26, 27  (Edge lifecycle: ending, retraction and staleness; Category precedence and storage)
+Blocked by: 26, 27, 68  (Edge lifecycle: ending, retraction and staleness; Category precedence and public companies; Category storage and recompute)
 Map: [engine](../map.md)
 
 ## Question
@@ -23,3 +23,4 @@ What do the public output models contain — the business card, the per-claim re
 - **From "Entity lifecycle"** (2026-11-06; notes in evidence_layer_plan.md §4 `entities`): a merged entity's card and graph redirect to the survivor's; a `closed` entity (store-map follow-up) still shows its history.
 - **From "Funds and their investment firm"** (2026-11-07; ADR 0001 amended; notes in evidence_layer_plan.md §4): the card names the firm that manages a PE fund through its `managed_by` edge without adding a hop, and one (brand, PE owner) row covers a fund and its firm (Jersey Mike's two Blackstone funds give one Blackstone row). Whether and how the card shows a firm's listed parent ("part of Blackstone Inc. (NYSE: BX)") is this ticket's.
 - **From "Conflict, succession and co-investors"** (2026-11-07; ADR 0001 and ADR 0002 amended; notes in evidence_layer_plan.md §4 `claims` and `edges`): a card may list several co-owners (THL and Linden at Smile Doctors), an owner line marked sources disagree with each side's links (edge confidence `sources_disagree`) while the category stands, and pending deals (announced, not completed; ended by `terminated` or 18 months). The shapes for these are this ticket's.
+- **From "Category precedence and public companies"** (2026-11-07; ADR 0001 amended): a card may show every co-owner with its own chain label, the ticker beside a PE-owned public company (Jersey Mike's, Chewy), PE holders of a public company with their stake ("3G Capital, a PE firm, holds 22% of voting power"), and an unconfirmed controlling owner beside a PE minority stake. The shapes are this ticket's.
