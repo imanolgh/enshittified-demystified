@@ -28,6 +28,14 @@ _Avoid_: Partial PE, PE-invested
 A hop where a cited document states a stake under 50% or calls it a minority investment. A hop with no stated stake counts as control.
 _Avoid_: Partial stake
 
+**Co-owner**:
+One of two or more owners whose hops to the same brand or company overlap, such as THL and Linden at Smile Doctors. An owner who joins does not replace the others unless a source says one of them sold or exited. Co-owners are not sources disagreeing.
+_Avoid_: Partner, joint owner (in user-facing text)
+
+**Pending deal**:
+An announced acquisition that has not completed, such as Nestlé's agreed sale of Nature's Bounty to Yellow Wood Partners. It is not a hop and does not change a category until it completes; a deal that is called off is no longer pending.
+_Avoid_: Proposed acquisition, rumored deal
+
 **Formerly PE-owned**:
 History shown for a business whose chain to a private equity fund has ended, with the years it lasted. It is history, not a current category.
 _Avoid_: Ex-PE, previously backed
@@ -103,7 +111,7 @@ Backed by exactly one non-official source, and labeled that way to the reader.
 _Avoid_: Unverified, alleged, single-source (in user-facing text)
 
 **Sources disagree**:
-The state of a fact whose sources contradict each other. It is not published as a fact; the reader sees that the sources disagree, with links to each.
+The state of a fact whose sources contradict each other, such as two owners each said to hold a majority at the same time. It is not published as a fact; the reader sees that the sources disagree, with links to each. A brand's category reads sources disagree only when the readings would give it different categories.
 _Avoid_: Disputed, conflict (in user-facing text)
 
 **Last confirmed**:

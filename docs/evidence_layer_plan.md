@@ -221,9 +221,13 @@ claims                         -- atomic, cited assertions
       -- used by ExtractedClaim and code producers; every field optional unless noted:
       --   owned_by, acquired_by: stake_pct (0-100), stake_type (majority|minority, only when the
       --     document uses the word), stake_basis (voting|economic). acquired_by adds deal_status
-      --     (announced|completed); only completed backs an ownership hop; event_date is the
+      --     (announced|completed|terminated); only completed backs an ownership hop; event_date is the
       --     announcement or closing date to match. owned_by's event_date is the as-of date the
       --     quote states; null means the document's date confirms the hop.
+      --     2026-11-07 (ticket 25): owned_by adds holding (current|former, default current); a
+      --     former claim records a seller or an exit ("acquired the company from affiliates of
+      --     Wafra Inc.", "Realized: ..."). terminated = the quote says the deal was called off; it
+      --     ends a pending deal for that pair.
       --   lends_to: instrument (as written), reference_rate, spread_pct, interest_rate_pct,
       --     pik_rate_pct, floor_pct, principal, cost, fair_value, currency, scale, non_accrual,
       --     maturity_date, affiliation (non_affiliate|affiliate|control).
@@ -236,6 +240,23 @@ claims                         -- atomic, cited assertions
       -- Values over time are new claims, never edits: each filing gives a new claim; the edge
       -- shows the newest accepted claim by as-of date (event_date, else the document's date);
       -- same as-of date -> the later-filed document wins. A BDC is a fund with an 814- number.
+      -- 2026-11-07 (ticket 25, "Conflict, succession and co-investors"; ADR 0001 and 0002 amended):
+      -- Ownership stakes at the same as-of date: an official filing beats a non-official source,
+      -- else the later-filed document; two non-official stakes on opposite sides of 50% make the
+      -- hop's control sources_disagree. The newest stake decides control or minority; a stated
+      -- 0% is an exit. A hop ends only by (1) a former claim for that pair (naming a firm as
+      -- seller ends hops to the firm and all its funds), (2) a completed acquisition stating a
+      -- stake that can't be true beside the owner's stated stake, or (3) 18 months without
+      -- confirmation; every other overlap is co-ownership. A fund's stake for these rules is the
+      -- sum of its firm's funds' stated stakes. Within one document a current claim beats a
+      -- former claim for the pair; a quote that names the seller and says it keeps a stake gives
+      -- only the current claim (the hash ignores value). Undated claims take the document's own
+      -- date, else the fetch date, and never restart a hop a dated claim ended. Dates compare at
+      -- the coarser precision; a tie goes to the later-dated document. operated_by and
+      -- managed_by hold one at a time: a newer claim naming a different company ends the older
+      -- edge. Conflicts: stated stakes that can't all be true at once (or, for one-at-a-time
+      -- predicates, two companies with the same date), plus loops; lends_to and holds_position
+      -- never conflict.
   object_name (nullable), object_entity_id (nullable), event_date (nullable),
   event_date_precision (nullable: year|month|day),
       -- 2026-11-06 (ticket 21): event_date is the first day of the period the document gives
@@ -263,7 +284,11 @@ edges                          -- the published graph (derived from claims)
       -- from = the claim's subject. relation is never acquired_by: acquired_by and owned_by
       -- claims publish one owned_by edge (ticket 15). managed_by edges (fund → firm) are never
       -- hops; a fund and its firm, or two funds of one firm, count as one PE owner (ticket 65).
-  confidence (verified|reported|estimated),
+  confidence (verified|reported|estimated|sources_disagree),
+      -- 2026-11-07 (ticket 25): sources_disagree marks a contested edge, never shown as fact; the
+      -- card lists each side with links. A brand's category is sources_disagree only when the
+      -- contested readings give different categories. A fund with disputed managers inherits a
+      -- kind only if every disputed manager has the same kind.
       -- ownership_type removed 2026-10-26 (ADR 0001): owners carry owner_kind; each business's
       -- category + separation degree are computed by code from its ownership chains.
   published_at, retracted_at (nullable)
@@ -273,7 +298,8 @@ edge_claims                    -- which claims support which edge (ticket 04)
   id, edge_id, claim_id        -- unique (edge_id, claim_id)
 
 ~~review_items~~               -- dropped 2026-10-26 (ADR 0002). Its reasons now live elsewhere:
-      -- single_source → edge confidence = reported; conflict → business category sources_disagree;
+      -- single_source → edge confidence = reported; conflict → edge confidence sources_disagree, and
+      -- the category sources_disagree only when the readings differ (2026-11-07, ticket 25);
       -- low_confidence → claim rejection_reason = unsupported; community_flag → not in the MVP.
 
 owner_kind_evidence            -- 2026-11-07 (ticket 14, ADR 0001 amended)
@@ -403,7 +429,7 @@ Pure Python, no AI:
 1. Group verified claims by (subject, predicate, object). *(2026-11-06, "Claim value schemas": an edge's value comes from its newest accepted claim by as-of date; older claims are its history.)* *(2026-11-05, "Predicate semantics": `acquired_by` and `owned_by` claims for the same pair form one group, published as an `owned_by` edge; `acquired_by` supplies the start date.)*
 2. **Two independent documents agree → publish edge as `verified`.** ("Independent" = different `source_type` or different domains — a press release syndicated to five sites counts once.)
 3. One source → publish as `reported` (labeled as one source on the card).
-4. Conflicting claims (different controlling owners over overlapping dates) → no publication as fact; shown as "sources disagree" with links to each. *(Both updated by ADR 0002 (`docs/adr/0002-no-manual-review.md`).)*
+4. Conflicting claims (different controlling owners over overlapping dates) → no publication as fact; shown as "sources disagree" with links to each. *(Both updated by ADR 0002 (`docs/adr/0002-no-manual-review.md`).)* *(2026-11-07, engine "Conflict, succession and co-investors", ADR 0002 amended: a conflict is stated stakes that can't all be true at once; co-owners with no stated stakes never conflict; the contested edges get confidence `sources_disagree`.)*
 4b. Recompute each affected business's category and separation degree from its chains and owners' owner kinds (ADR 0001 (`docs/adr/0001-ownership-category-computed-by-code.md`)).
 5. `no_evidence_found` → business category `no_pe_evidence_found` *(2026-11-06: computed from the per-document outcomes by "Checked and coverage states")*, shown as "No PE evidence found (checked {date})" — never "independent" (ADR 0001).
 
