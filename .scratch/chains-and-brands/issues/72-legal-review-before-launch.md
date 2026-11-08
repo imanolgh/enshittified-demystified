@@ -20,7 +20,8 @@ Before the chains-and-brands site launches, what does a lawyer say about the leg
 3. **Crawling.** The bot uses its own name, follows robots.txt for its name and `*`, does not follow rules that name only AI crawlers, never gets around blocks, and stops when asked. Is ignoring AI-crawler-only rules a meaningful risk, given that page text goes to an AI model for extraction?
 4. **Takedowns.** Documents are never deleted (the evidence archive). What process is needed for a removal or correction request, and must stored copies ever be deleted?
 5. **Defamation.** The site publishes ownership facts ("PE-owned", "sources disagree", "formerly PE-owned") with sourced quotes and confidence labels. What wording, disclaimers or correction process lowers exposure?
-6. **Structure.** Should the product sit in a company (an LLC or similar) rather than with the developer personally?
+6. **Search results.** If a web search API is used to find a brand's past coverage ("Research: Web search APIs for finding a brand's past coverage"), most terms allow only transient storage of results. The engine would fetch each result's page itself and keep the page's URL as part of the stored document. Does keeping that URL count as storing search results under those terms?
+7. **Structure.** Should the product sit in a company (an LLC or similar) rather than with the developer personally?
 
 ## How to resolve
 

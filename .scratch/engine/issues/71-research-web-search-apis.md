@@ -1,7 +1,7 @@
 # Research: Web search APIs for finding a brand's past coverage
 
 Type: research
-Status: open
+Status: resolved
 Map: [engine](../map.md)
 
 ## Question
@@ -33,3 +33,16 @@ For each candidate API (at least: Google Programmable Search / Custom Search JSO
 ## How to resolve
 
 AFK: a subagent invokes the `research` skill and writes `.scratch/engine/research/web-search-apis.md`, then appends `## Answer` here. No branches, commits or pushes.
+
+## Answer
+
+- **Google Custom Search JSON API** is closed to new customers and stops on 2027-01-01. Since 2026-01-20, new Programmable Search engines cannot search the whole web (50-domain cap). Its terms bar automated queries and any non-transitory storage. Google's grounding terms (Gemini and Vertex) expressly forbid "using Links to identify destination pages for crawling or scraping".
+- **Bing Search APIs were retired on 2025-08-11** (memory confirmed). The successor, Grounding with Bing ($14 per 1,000), returns LLM answers with citations, and its terms name "indexing links" and "using links for crawling or scraping" among the uses that are not allowed.
+- **Brave** ($5 per 1,000, $5 monthly credit, 20 results, quotes, `site:`, custom date range): only "transient storage" unless on a plan with storage rights, whose price is not published. No AI training on results. The terms do not address fetching result URLs.
+- **Mojeek** (£2 per 1,000 with a 1-hour cache, or £3 per 1,000 with indefinite storage): AI and commercial use allowed, no attribution. The terms contemplate retrieving pages from result URLs and put publisher terms on the customer. Its date filters use the last-modified date, and exact-phrase search is not documented.
+- **Exa** ($4 to $7 per 1,000, $10 monthly free credit, 1,200-domain filter, published-date filter) and **Perplexity** ($5 per 1,000, 20-domain filter, publication-date filter): neither set of terms addresses storing results or fetching their URLs plainly. Exa may silently drop exact-phrase restrictions.
+- **SerpApi-style resellers** scrape paths that Google's and Bing's robots.txt disallow for all crawlers, and Google sued SerpApi on 2025-12-19.
+- **Launch cost:** 1,496 queries per quarterly run comes to roughly $2 to $11 per run on any raw-result API (under $50 a year). Free credits cover most of a run on Brave and Exa. Price does not separate the candidates; terms and coverage do.
+- **Open:** no vendor documents index depth for 2015 to 2024 pages, and testing it needs an account. Whether keeping a result URL after fetching counts as "storing results" is a legal question.
+
+[findings](../research/web-search-apis.md)
