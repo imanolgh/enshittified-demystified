@@ -16,3 +16,4 @@ What precisely makes two sources independent, and how is a syndicated or same-pu
 - Detection options: text similarity, shared-quote check, wire attribution, same issuer.
 - python-types-primer.md:55,107 shows the rule as distinct source_type only (omits domain).
 - **From "Claim identity"** (2026-11-06; notes in evidence_layer_plan.md §4 `claims`): claims from the same document share a hash when their names, predicate and quote match, so one document is one source; claims from different documents count separately, subject to this ticket's independence rule.
+- **From "Document storage, fetch log and last-confirmed"** (2026-11-07; notes in evidence_layer_plan.md §4 `documents` and `fetches`): each document row carries `domain`, the registrable domain from the public suffix list, and the same text on two URLs is two rows (Warburg's El Car Wash release on PR Newswire and on elcarwash.com). Detecting that they are one source is this ticket's.

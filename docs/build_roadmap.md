@@ -62,7 +62,7 @@ The foundation week-and-a-half. Slowest, most educational, entirely yours. Each 
 
 **Step 3 — FastAPI skeleton + the claims door (Days 2–3).** App factory, `pydantic-settings` config, DB session dependency, health route. Then the single most important small thing in the system: `POST /internal/claims` — the one door through which ALL connector output enters. Validation happens here or nothing gets in. *Teaches: routers, `Depends()`, request/response models, dependency-injected sessions.* *(2026-11-05, engine "Claim producers and the claims door": the door is an in-process function in `app/core` that takes claims and identity records; there is no `POST /internal/claims` route.)*
 
-**Step 4 — Document storage (Day 3).** `store_document(raw: RawDocument)`: boto3 put to MinIO/S3, sha256 dedup against `documents`, insert. ~30 lines, all yours. *Teaches: boto3, content-addressed storage.*
+**Step 4 — Document storage (Day 3).** `store_document(raw: RawDocument)`: boto3 put to MinIO/S3, sha256 dedup against `documents`, insert. *(2026-11-07, engine "Document storage, fetch log and last-confirmed": dedup by URL and extracted text; a same-text re-fetch advances `last_seen_at`; every attempt goes in `fetches`; see evidence_layer_plan.md §4.)* ~30 lines, all yours. *Teaches: boto3, content-addressed storage.*
 
 **Step 5 — Celery wiring (Day 4).** Celery app on Redis, one toy task, one `chain()`, Flower up. *Teaches: tasks, queues, `delay()` vs `apply_async`, retry config — your `Bus::chain()` translated.*
 

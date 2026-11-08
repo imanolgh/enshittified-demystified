@@ -181,7 +181,45 @@ location_brands                -- 2026-11-05 (ticket 15, "Predicate semantics")
 documents                      -- immutable once written
   id, source_type (nppes|form5500|form_adv|sec_filing|irs_exempt_org|sos|license_board|cafr|
       company_site|press_release|news),   -- ADR 0003; fetch method (bulk|api) + connector go in meta
-  public_id, url, retrieved_at, sha256, storage_path, mime_type, raw_text (nullable), meta JSONB
+  public_id, url, retrieved_at, sha256, storage_path, mime_type, raw_text (nullable), meta JSONB,
+  domain, published_on (nullable), last_seen_at, text_sha256, text_extractor_version,
+  parent_document_id (nullable)
+      -- 2026-11-07 (ticket 20, "Document storage, fetch log and last-confirmed"): one row per URL,
+      -- extracted text and extractor version: unique (url, text_sha256, text_extractor_version).
+      -- sha256 = the stored bytes' hash; storage_path = documents/{sha256}, written once, never
+      -- deleted, so identical bytes are stored once. domain = registrable domain (public suffix
+      -- list), for "Source independence and syndication". retrieved_at = first fetch of this
+      -- text; last_seen_at = the latest successful fetch of the same URL returning the same text
+      -- (or a 304 Not Modified to a conditional request); new bytes with the same text are not
+      -- stored. A URL's current version is its row with the newest last_seen_at; text that comes
+      -- back after a change reuses its old row. A hop's last-confirmed date is the newest
+      -- last_seen_at among the documents its accepted claims cite. A real text change makes a new
+      -- row, which the LLM re-reads whole.
+      -- published_on: from structured fields only (SEC filing date, feed publication date,
+      -- datePublished / article:published_time, a bulk file's release date); never the LLM or
+      -- HTTP Last-Modified. An undated claim's as-of date is published_on, else retrieved_at.
+      -- Parents and children: a filing, a full locator response or a bulk file is a parent
+      -- holding the original bytes; each citable part (a Schedule row's parsed-table text, a
+      -- rendered locator record, a header plus data line) is a child with its own raw_text and
+      -- parent_document_id. A child's url is its parent's stable address plus #row=<row key> (for
+      -- a bulk file whose URL changes each release, the connector supplies a stable dataset
+      -- address), so an unchanged recurring record is the same child. Children inherit domain
+      -- and published_on. verify_citations searches only raw_text.
+      -- Text: keep all visible text (only scripts, styles and hidden elements dropped; no
+      -- boilerplate removal); PDFs get a page marker at each page break; JavaScript pages are
+      -- stored as the rendered DOM with capture settings in meta. A fixed extractor applies to new
+      -- fetches; re-extracting old documents is a deliberate re-run that creates new rows.
+      -- RawDocument (contracts.py) gains published_on; a child names its parent and row key.
+      -- S3: document bytes under documents/; operational files (Anthropic batch files, crawl
+      -- caches) under a separate prefix with retention set by their tickets; the production
+      -- documents bucket uses versioning plus object lock ("Hosting, storage and deployment").
+
+fetches                        -- 2026-11-07 (ticket 20); operational, rows kept 90 days
+  id, url, fetched_at, outcome (ok|not_modified|failed|blocked|not_found), http_status
+      (nullable), error (nullable), document_id (nullable)
+      -- one row per fetch attempt; feeds the operator report and source_runs failed/blocked
+      -- outcomes. Connectors send the server's ETag or Last-Modified back (conditional requests).
+      -- After 90 days, documents.last_seen_at carries the confirmation record.
 
 claims                         -- atomic, cited assertions
   id, subject_name, subject_entity_id (nullable), predicate (acquired_by|owned_by|lends_to|
@@ -407,6 +445,8 @@ Each connector task:
 2. Stores the raw document to S3 (boto3), computes sha256, writes a `documents` row via SQLAlchemy.
 3. Extracts plain text (HTML → text via selectolax/BeautifulSoup; PDFs → pdfplumber; tables → camelot, structured JSON stored in `meta`). All in-process — no sidecar.
 4. Skips documents whose sha256 already exists (dedup).
+
+*(2026-11-07, engine "Document storage, fetch log and last-confirmed": dedup is by URL and extracted text, not by sha256 alone. A re-fetch with the same text advances `last_seen_at` and stores nothing; a changed text is a new version, re-read whole. Parsed tables become child documents with their own `raw_text`, not `meta`. Every attempt is logged in `fetches`. See §4 `documents`.)*
 
 Celery Beat (≈ Laravel Scheduler): recurring crawls of sponsor portfolio pages, DSO rosters, and news RSS to catch *new* acquisitions — this feeds the Acquisition Alarm feature.
 

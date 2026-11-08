@@ -46,7 +46,7 @@ Category `dental` + DSO link triggers this connector set for `ent_8821` + `ent_0
 | `retrieve_edgar_fts` | `https://efts.sec.gov/LATEST/search-index?q=%22Smile+Partners%22` | Form D from 2022 raise, if any |
 | `retrieve_sos_history` | Amendment/merger filings | Name changes, mergers |
 
-Each document → S3 (`docs/{sha256}.html`), `documents` row (url, retrieved_at, sha256, source_type). Dedup by sha256. The chord's callback fires `extract_claims` when all retrievals settle.
+Each document → S3 (`docs/{sha256}.html`), `documents` row (url, retrieved_at, sha256, source_type). Dedup by sha256. *(2026-11-07, engine "Document storage, fetch log and last-confirmed": bytes at `documents/{sha256}`; one row per URL and extracted text, so the same text on two URLs is two rows; a re-fetch with the same text only advances `last_seen_at`.)* The chord's callback fires `extract_claims` when all retrievals settle.
 
 ### Step 4 — Extraction (`extract_claims`)
 Assemble the 6–12 documents (text-extracted) → one Claude call (Sonnet-class) with the claim JSON schema. Pydantic-validated output, e.g.: *(2026-11-06, engine "Claim identity": the LLM now returns each side as the name as written, such as "Bright Smiles Dental", never an `ent_` id; the door resolves names to ids.)*
@@ -98,7 +98,7 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 
 **Trigger:** Celery Beat, nightly: `crawl_sponsor_registry` iterates ~500 known sponsor/DSO/rollup domains.
 
-1. `retrieve_portfolio_pages` refetches each portfolio/locations page → sha256 compare vs. last stored version. Unchanged (majority) → stop, $0 LLM spend.
+1. `retrieve_portfolio_pages` refetches each portfolio/locations page → sha256 compare vs. last stored version. Unchanged (majority) → stop, $0 LLM spend. *(2026-11-07, engine "Document storage, fetch log and last-confirmed": the compare is on extracted text, and an unchanged page advances `last_seen_at`. A changed page is a new version that the LLM re-reads whole; the diff only shows what changed, for events.)*
 2. Changed: diff the extracted text. New string detected: *"Hudson Valley Veterinary Group — joined 2026."*
 3. Dispatch `resolve_entity("Hudson Valley Veterinary Group")` → resolves or creates entity → targeted retrieval (press RSS for the name, EDGAR FTS) → extract → verify → publish `acquired_by` edge (initially `reported` if only the portfolio page attests; press pickup days later upgrades it to `verified` automatically when the second claim lands).
 4. **Event emission:** publication of a new `acquired_by` edge fires `acquisition_event` → notification fan-out to users following that entity/category/region (the Acquisition Alarm product) and to the public changelog.
@@ -132,7 +132,7 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 2. Per BDC: `retrieve_edgar_filing(cik, "10-K")` via `https://data.sec.gov/submissions/CIK{cik}.json` → latest 10-K/10-Q → S3.
 3. `parse_soi`: pdfplumber/camelot extract the **Schedule of Investments** tables (often 30–80 pages) → normalized rows: borrower name, instrument, rate (spot PIK terms), principal, fair value *(2026-11-06: the full field list is in evidence_layer_plan.md §4, engine "Claim value schemas")*, non-accrual flag.
 4. `bdc_soi` (the delegated parser, Step 21 — no LLM) emits `lends_to` claims directly — one per borrower — each quoting its table row text; plus fund-level facts (total PIK %, non-accrual %). The LLM runs only over the filing's narrative text (MD&A commentary), as for any other `sec_filing` document. *(Ruled 2026-10-26: parser only, no LLM fallback for unparseable tables; revisit with the per-filing failure-rate data after Step 21.)*
-5. Verification quirk: quotes match against the *parsed table text* stored on the document row; a numeric cross-check asserts the quoted principal equals the structured value. A failing row's claim is rejected; above a per-filing failure-rate threshold the filing is withheld as unparseable and an operational alert fires (ADR 0002).
+5. Verification quirk: quotes match against the *parsed table text* stored on the document row *(2026-11-07, engine "Document storage, fetch log and last-confirmed": each Schedule row is a child document of the filing with that text as its own `raw_text`, so `verify_citations` only ever searches `raw_text`)*; a numeric cross-check asserts the quoted principal equals the structured value. A failing row's claim is rejected; above a per-filing failure-rate threshold the filing is withheld as unparseable and an operational alert fires (ADR 0002).
 6. Borrower names → `resolve_entity` (no Places — these aren't storefronts; EDGAR/SoS/fuzzy only). This is where PC meets PE: **"Borrower: Smile Partners Management LLC" resolves to `ent_0455`** — and the cross-layer edge `lends_to(BDC_Fund → SmilePartners)` joins the graphs.
 
 ### B1c — Top-100 public pension CAFRs
