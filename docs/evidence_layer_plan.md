@@ -436,6 +436,35 @@ source_runs                    -- 2026-11-07 (ticket 28)
       -- pe_owned and pe_minority_stake can show; everything else reads not_yet_checked (ADR 0001).
       -- How the checked date reaches stored categories: "Category storage and recompute".
 
+entity_categories              -- 2026-11-07 (ticket 68, "Category storage and recompute")
+  id, entity_id (unique), category, confidence (verified|reported), checked_on (nullable),
+      deciding_owner_id (nullable), computed_at
+      -- one current row per brand (companies and locations only when a product needs them),
+      -- changed in place. An events row only when category or confidence changes; checked_on
+      -- (the oldest completed required run, ticket 28) advances quietly on each re-check. No
+      -- complete check gives not_yet_checked unless PE was found; a withdrawal falls back through
+      -- the same recompute. deciding_owner_id = the owner whose chain decided the category.
+
+entity_pe_owner_periods        -- 2026-11-07 (ticket 68)
+  id, entity_id, pe_owner_id, separation_degree, stake_role (control|minority), confidence,
+      phase (active|unconfirmed|ended), started_on (nullable), ended_on (nullable),
+      end_reason (nullable)
+      -- one row per brand, PE owner and period (ADR 0001's stored row). pe_owner_id = the firm, or
+      -- the fund when it has no managed_by edge (ticket 65); separation_degree = the shortest
+      -- path; started_on = the latest of the chain's hop starts. Ended rows are the "formerly
+      -- PE-owned {years}" history; an unconfirmed row shows "last confirmed {date}". Chains are
+      -- not stored: the card walks the edges on read.
+      -- Derivation order: owner kinds (including kinds funds inherit from their firm), then edges
+      -- (re-derived only for the touched pairs and relations; events only on visible change),
+      -- then categories and PE owner periods for every brand reached by walking edges downward
+      -- from the changed entity, each brand in its own Celery task, queued in chunks (size:
+      -- "Operational identity, budgets and guardrail values"). Triggers: a visible edge change
+      -- (including phase), an owner kind change, a check completing or withdrawn, a merge,
+      -- unmerge, type change or re-resolution. A recompute is a pure function of current edges,
+      -- owner kinds and source runs. A nightly task recomputes every stored brand from scratch;
+      -- any difference is fixed with events rows and raises an operational alert (a missed
+      -- trigger is a bug).
+
 ingest_batches / ingest_items  -- operator uploads only (decisions.md §15: no on-demand research)
   batch: id, name, status (running|done|halted)
       -- 2026-11-05 (ticket 04): halted = stopped by the spend cap or the operator; unfinished

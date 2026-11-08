@@ -16,3 +16,4 @@ Which pages does version 1 have, what does each show, and what does a shareable 
 - Accounts, follows and paid alerts are out of this map (later map), so v1 pages are public and anonymous.
 - **From engine "Schema conventions"** (2026-11-05): a readable name in page URLs (`/b/x7k2.../dunkin`) is this ticket's; the stable key is `entities.public_id` (12 random Crockford base32 characters, never reused).
 - **From "Brand and chain model"** (2026-11-06): launch has brand pages and no store pages; the store map is the first follow-up after launch (map "Not yet specified"). A rollup or other company appears only where it owns a brand; whether owners (companies, investment firms) get pages of their own is this ticket's.
+- **From engine "Category storage and recompute"** (2026-11-07): category pages and their shares read the stored `entity_categories` rows; formerly-PE history comes from ended `entity_pe_owner_periods` rows.
