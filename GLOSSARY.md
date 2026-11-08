@@ -139,7 +139,7 @@ A record a government agency publishes or requires by law, such as an NPPES prov
 _Avoid_: Government source, authoritative source
 
 **Independent sources**:
-Two sources from different publishers' datasets or different web domains. A press release copied onto five sites is one source.
+Two sources whose words come from different organizations that don't control each other, such as a buyer and its seller, or a firm and a news outlet. A press release copied onto five sites is one source, and a company and its owners speak with one voice, so a brand's site and its owner's site are one source. Two outlets describing the same deal in similar words are two sources.
 _Avoid_: Separate sources, multiple sources
 
 **Registry**:

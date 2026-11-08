@@ -8,7 +8,7 @@ Status: accepted (2026-10-26).
 
 - **Official** source types (one is enough to verify a fact; they also rank first for owner kind, ADR 0001) are a fixed list in code, not a separate enum: `nppes, form5500, form_adv, sec_filing, irs_exempt_org, sos, license_board, cafr`. Not official: `company_site, press_release, news`.
 - An SEC 8-K press-release exhibit (EX-99) is stored as `press_release`, not `sec_filing` — filing a press release does not make it official, and the same release on a wire must count once.
-- A sponsor portfolio page, a rollup roster, and a firm's About page are all `company_site`; the domain keeps them independent of each other.
+- A sponsor portfolio page, a rollup roster, and a firm's About page are all `company_site`; the domain keeps them independent of each other. *(2026-11-08, engine "Source independence and syndication": independence no longer comes from `source_type` or domain but from speakers (ADR 0002 amended). A firm's About page and its portfolio page are one speaker, and a rollup's roster and its sponsor's portfolio page are one ownership group, so one source for that hop. `source_type` still names the kind of publisher: it decides official self-verification and owner-kind ranks.)*
 - Google Places is never a source type: it is identity lookup only, and its terms forbid storing its content (only `place_id`).
 - Values join the enum only when a relationship type, or owner-kind evidence, takes evidence from them (court records and WARN notices are excluded until then). *("or owner-kind evidence" added 2026-11-07, engine "Owner kind": `form_adv` and `irs_exempt_org` exist for it.)*
 

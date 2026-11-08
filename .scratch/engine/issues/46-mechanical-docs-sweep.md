@@ -55,6 +55,10 @@ Apply the ~80 pure wording fixes the 2026-10-26 inventory found (no decision nee
 
 - "claim card" is retired. Replace the remaining mentions with **brand card** (a brand's whole verdict) or **receipt** (one fact's quote and source) by meaning: monetizationideas.md (lines about never metering claim cards), pre-launch-seeding.md (coverage table and checklist), stack_fastapi.md and evidence_layer_plan.md stack tables, evidence_layer_plan.md's "power the claim cards" line, research_flows.md's A2 line, and evidence_layer_glossary.md's "PC claim cards".
 
+## Added by "Source independence and syndication" (2026-11-08)
+
+- `python-types-primer.md` (to be archived) still shows the independence rule as "distinct source_type" only; independence now means different speakers (ADR 0002 amended). Fix or archive with a note.
+
 ## How to resolve
 
 AFK. Make the edits, then append `## Answer` listing what changed and anything skipped (with why). No commits.

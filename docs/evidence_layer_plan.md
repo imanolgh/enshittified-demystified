@@ -183,7 +183,19 @@ documents                      -- immutable once written
       company_site|press_release|news),   -- ADR 0003; fetch method (bulk|api) + connector go in meta
   public_id, url, retrieved_at, sha256, storage_path, mime_type, raw_text (nullable), meta JSONB,
   domain, published_on (nullable), last_seen_at, text_sha256, text_extractor_version,
-  parent_document_id (nullable)
+  parent_document_id (nullable), speaker_entity_id (nullable)
+      -- 2026-11-08 (ticket 24, "Source independence and syndication"; ADR 0002 amended):
+      -- speaker_entity_id (nullable) = the organization whose words the document is: the entity
+      -- holding the document's domain as an identifier, a press release's issuer (wherever the
+      -- copy sits), an adviser or a filer; null means the domain itself is the speaker (a news
+      -- outlet). Independence at scoring: one source per speaker group, where for a hop the owner,
+      -- its controlling owners and the companies it controls (owned brand included) are one
+      -- group, taken from the control relationships current when the edge is scored; the seller,
+      -- advisers, outlets and regulators are separate. Within one edge's claims, the same quote of
+      -- at least 80 characters (after normalization) from two speakers, or a wire tag in the text
+      -- ("/PRNewswire/", "/GLOBE NEWSWIRE/", "(BUSINESS WIRE)"), makes the later document a copy
+      -- with its original's speaker. No fuzzy matching. An edge's independent-source count is its
+      -- number of separate groups.
       -- 2026-11-07 (ticket 20, "Document storage, fetch log and last-confirmed"): one row per URL,
       -- extracted text and extractor version: unique (url, text_sha256, text_extractor_version).
       -- sha256 = the stored bytes' hash; storage_path = documents/{sha256}, written once, never
