@@ -33,11 +33,11 @@ One of two or more owners whose hops to the same brand or company overlap, such 
 _Avoid_: Partner, joint owner (in user-facing text)
 
 **Pending deal**:
-An announced acquisition that has not completed, such as Nestlé's agreed sale of Nature's Bounty to Yellow Wood Partners. It is not a hop and does not change a category until it completes; a deal that is called off is no longer pending.
+An announced acquisition that has not completed, such as Nestlé's agreed sale of Nature's Bounty to Yellow Wood Partners. It is not a hop and does not change a category until it completes. When the announcement gives an expected closing, such as "by the first half of 2027", the deal carries that range. A deal that is called off, or has not completed within 18 months, is no longer pending.
 _Avoid_: Proposed acquisition, rumored deal
 
 **Formerly PE-owned**:
-History shown for a brand, company or location whose chain to a private equity fund or firm has ended, with the years it lasted. It is history, not a current category.
+History shown for a brand, company or location whose chain to a private equity fund or firm has ended, with the years it lasted. It is history, not a current category. A chain that has only gone unconfirmed has not ended; it shows its last confirmed date instead.
 _Avoid_: Ex-PE, previously backed
 
 **No PE evidence found**:

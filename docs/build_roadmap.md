@@ -154,7 +154,7 @@ Hand-write a thin `classify()` interface in `app/core/` so the vendor is swappab
 
 *Note: Jev was early access with vendor-only benchmarks as of 2026-10; confirm API access, limits and pricing before this step.*
 
-**Step 28 — Retraction + changelog (Day 36).** `POST /internal/edges/{id}/retract` → end-date edge, append event, claims untouched; changelog = query over events. Small; it's the credibility story.
+**Step 28 — Retraction + changelog (Day 36).** `POST /internal/edges/{id}/retract` → end-date edge, append event, claims untouched *(superseded 2026-11-07, engine "Edge lifecycle: ending, retraction and staleness": no hand retraction endpoint; edges retract only when their claims or identity rows are retracted, as by withdrawing a producer version)*; changelog = query over events. Small; it's the credibility story.
 
 **Step 29 — Hardening (Days 37–38).** Idempotency audit (re-run a filing, prove zero duplicates), tenacity on every connector, dead-letter queue, structured logging with batch/entity correlation IDs end to end, full test suite green, Compose deploy documented. Manual test pass: you, a checklist, and every endpoint.
 

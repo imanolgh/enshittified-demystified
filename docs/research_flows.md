@@ -112,7 +112,7 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 | Press RSS/GDELT poll per tracked entity | every 6h |
 | EDGAR full-text poll (tracked sponsor names) | daily |
 | SoS re-check for tracked entities | monthly |
-| Re-verify stale `reported` edges (hunt for 2nd source) | weekly |
+| Re-verify stale `reported` edges (hunt for 2nd source) *(dropped 2026-11-07, engine "Edge lifecycle: ending, retraction and staleness": a second source comes from the brand's normal re-checks)* | weekly |
 | Refresh `no_evidence_found` entities | quarterly, and instantly on any mention in press feeds |
 
 ---
@@ -161,7 +161,7 @@ Marginal cost per analysis ≈ a few resolution calls + cache misses; the expens
 
 | Task | Cadence | Behavior |
 |---|---|---|
-| EDGAR submissions poll per tracked CIK (BDCs, interval funds) | daily | New 10-Q/10-K detected → B1b chain for that filing → **diff vs. prior quarter**: new borrowers (new `lends_to` edges), departed loans (edge end-dated), non-accrual/PIK deltas (*new claims, never edits: 2026-11-06*; claim updates + alert events) |
+| EDGAR submissions poll per tracked CIK (BDCs, interval funds) | daily | New 10-Q/10-K detected → B1b chain for that filing → **diff vs. prior quarter**: new borrowers (new `lends_to` edges), departed loans (edge end-dated), non-accrual/PIK deltas (*new claims, never edits: 2026-11-06*; claim updates + alert events) *(2026-11-07, engine "Edge lifecycle: ending, retraction and staleness": claims never update; a departed loan's edge ends when the next Schedule parses cleanly without it, as of that period end)* |
 | N-PORT refresh for funds appearing in user-monitored lineups | monthly cycle | Re-parse, diff holdings, alert on new PC exposure |
 | Form 5500 annual bulk reload | yearly (staggered release) | Reload, diff lineups per plan → "your plan added Fund X" alerts |
 | CAFR season sweep | annually per system's fiscal calendar | Re-parse, allocation trend claims (this year vs. last) |

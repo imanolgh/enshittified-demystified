@@ -264,7 +264,14 @@ claims                         -- atomic, cited assertions
       --     quote states; null means the document's date confirms the hop.
       --     2026-11-07 (ticket 25): owned_by adds holding (current|former, default current); a
       --     former claim records a seller or an exit ("acquired the company from affiliates of
-      --     Wafra Inc.", "Realized: ..."). terminated = the quote says the deal was called off; it
+      --     Wafra Inc.", "Realized: ..."). acquired_by adds expected_close_text on announced claims
+      --     (the closing phrase as written, in the quote; ticket 26), which code maps to the pending
+      --     edge's expected_close_from/to from a phrase table, relative phrases anchored to the
+      --     document's date (published_on, else first fetch): a quarter or half, a month, "by
+      --     {date}" or "by year-end", "in the coming days" +1 month, "in the coming weeks" +3
+      --     months, "shortly/soon/promptly" +3 months, "in the coming months" +6 months, "later this
+      --     year" to December 31, "early/mid/late {year}" Jan-Apr/May-Aug/Sep-Dec. Unknown phrases go
+      --     to the operator report; a newer announced claim moves the range. terminated = the quote says the deal was called off; it
       --     ends a pending deal for that pair.
       --   lends_to: instrument (as written), reference_rate, spread_pct, interest_rate_pct,
       --     pik_rate_pct, floor_pct, principal, cost, fair_value, currency, scale, non_accrual,
@@ -341,6 +348,40 @@ edges                          -- the published graph (derived from claims)
       -- category + separation degree are computed by code from its ownership chains.
   published_at, retracted_at (nullable)
       -- 2026-11-05 (ticket 04): supporting_claim_ids JSONB replaced by edge_claims.
+  phase (pending|active|unconfirmed|ended), started_on (nullable), started_on_precision
+      (nullable: year|month|day), ended_on (nullable), ended_on_precision (nullable),
+      end_reason (nullable: seller_or_exit|superseded_by_stake|replaced|absent_from_list|
+      terminated|pending_expired), ended_by_document_id (nullable), last_confirmed_on,
+      value_claim_id (nullable), expected_close_from (nullable), expected_close_to (nullable)
+      -- 2026-11-07 (ticket 26, "Edge lifecycle: ending, retraction and staleness"): one row per
+      -- ownership period (sold in 2019, bought back in 2024: two rows); at most one open
+      -- (non-ended, non-retracted) row per (from, to, relation). A row changes in place, with an
+      -- events row per visible change (confidence, phase, end, value); effective_date is
+      -- superseded by started_on. value_claim_id = the claim whose value the edge shows (the
+      -- newest accepted claim by as-of date, ticket 16). pending = an announced acquired_by (never
+      -- counts toward a category); the same row turns active on completion with started_on =
+      -- the closing date; terminated or 18 months without completion (pending_expired) ends it.
+      -- expected_close_from/to come from the claim's expected_close_text (below). unconfirmed =
+      -- a daily Beat sweep found last_confirmed_on over 18 months old: shown as "last confirmed
+      -- {date}", not counted toward categories, back to active when a later document confirms
+      -- it; it is not an end. Only ended rows feed "formerly PE-owned {years}".
+      -- last_confirmed_on = the newest last_seen_at among the documents its accepted claims cite
+      -- (ticket 20). ended_by_document_id = the document that showed the end (the former claim's
+      -- document; the clean Schedule that lacked a holding); null for pending_expired.
+      -- Retraction follows claims: an edge is never retracted directly. Code retracts claims or
+      -- identity rows, and an edge left with no accepted, correctly typed claims gets
+      -- retracted_at and an events row, so re-derivation can't resurrect it. Triggers (events
+      -- reasons): producer_withdrawn, entity_merged, entity_unmerged, claim_re_resolved,
+      -- entity_type_changed. No hand endpoint (ADR 0002); takedowns are out of scope.
+      -- Withdrawing a producer version (one operator command): retract its claims, set
+      -- retracted_at on its identity rows (undoing merges they triggered) and document reads,
+      -- recompute affected edges, write one events row for the command plus one per edge or
+      -- category that visibly changed (none per claim), and queue a re-run with the fixed version.
+      -- Disappearance: a lends_to or holds_position edge ends (absent_from_list) when the fund's
+      -- next Schedule parses cleanly and lacks the holding, as of that period end; one miss is
+      -- enough; an unparseable Schedule proves nothing. Ownership never ends by absence. Stores
+      -- and roster locations close after two complete crawls in a row miss them. A 404 or 410
+      -- never ends anything alone. Recompute mechanics: "Category storage and recompute".
 
 edge_claims                    -- which claims support which edge (ticket 04)
   id, edge_id, claim_id        -- unique (edge_id, claim_id)
