@@ -51,6 +51,10 @@ Apply the ~80 pure wording fixes the 2026-10-26 inventory found (no decision nee
 
 - `no_evidence` and `no_evidence_for` → `no_evidence_found` everywhere they remain (build_roadmap.md, research_flows.md, the bdc-parser and conformance-tests skills); `no_evidence_found` is a per-document outcome code derives, never a flag the LLM sets.
 
+## Added by "Brand card, receipt and edge shapes" (2026-11-07)
+
+- "claim card" is retired. Replace the remaining mentions with **brand card** (a brand's whole verdict) or **receipt** (one fact's quote and source) by meaning: monetizationideas.md (lines about never metering claim cards), pre-launch-seeding.md (coverage table and checklist), stack_fastapi.md and evidence_layer_plan.md stack tables, evidence_layer_plan.md's "power the claim cards" line, research_flows.md's A2 line, and evidence_layer_glossary.md's "PC claim cards".
+
 ## How to resolve
 
 AFK. Make the edits, then append `## Answer` listing what changed and anything skipped (with why). No commits.

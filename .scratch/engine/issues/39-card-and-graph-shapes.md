@@ -1,9 +1,10 @@
-# Claim card and graph output shapes
+# Brand card, receipt and edge shapes
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: 26, 27, 68  (Edge lifecycle: ending, retraction and staleness; Category precedence and public companies; Category storage and recompute)
 Map: [engine](../map.md)
+Formerly "Claim card and graph output shapes"; the graph endpoint and non-brand shapes moved to [Graph endpoint and non-brand output shapes](69-graph-endpoint-and-non-brand-shapes.md) on 2026-11-07.
 
 ## Question
 
@@ -28,3 +29,39 @@ What do the public output models contain — the business card, the per-claim re
 - **From "Document storage, fetch log and last-confirmed"** (2026-11-07; notes in evidence_layer_plan.md §4 `documents` and `fetches`): a claim's receipt links to its child document (a Schedule row, a locator record, a bulk row), which shows its parent filing or file.
 - **From "Edge lifecycle: ending, retraction and staleness"** (2026-11-07; notes in evidence_layer_plan.md §4 `edges`): edges carry a phase: `pending` (with an expected closing range when the release gave one), `active`, `unconfirmed` ("last confirmed {date}", not counted) and `ended` (with `end_reason`, feeding "formerly PE-owned {years}"). The shapes are this ticket's.
 - **From "Category storage and recompute"** (2026-11-07; tables `entity_categories` and `entity_pe_owner_periods` in evidence_layer_plan.md §4): a card reads the brand's `entity_categories` row (category, confidence, `checked_on`, deciding owner) and its `entity_pe_owner_periods` rows (`active` for current PE owners with separation degree and stake role, `unconfirmed` for "last confirmed", `ended` for "formerly PE-owned {years}"); the chains themselves are walked from the edges on read. This ticket is now takeable.
+
+## Comments
+
+### Round 1 (2026-11-07)
+
+- **Split** (Q0): the graph endpoint (depth caps, directions, relation filters, history edges, node caps), the category page, the public deal feed and company, fund and BDC shapes moved to new ticket "Graph endpoint and non-brand output shapes", which waits on this one; chains "Website pages and shareable cards" now also waits on it. This ticket keeps the brand card, the receipt, the edge and what may be shown from stored documents.
+- **Names** (Q1): **brand card** (everything a brand page shows about who owns the brand) and **receipt** (one fact's quote with its source and dates); "claim card" retired; both terms go in the glossary.
+- **Brand card sections** (Q2), each shown only when it has something: (1) verdict: category, confidence label, checked date or "not yet checked", a ticker when a public company is in the deciding chain ("PE-owned · NYSE: JMKE"); (2) PE owners: one line per active PE owner period (firm name, funds behind it, separation degree, control or minority, confidence; a listed parent as a label, "part of Blackstone Inc. (NYSE: BX)"); (3) other owners: controlling co-owners and minority holders, each with its chain label; (4) PE holders of a public company ("3G Capital, a PE firm, holds 22% of voting power"); (5) disputes, each side with receipts; (6) pending deals (buyer, announcement date, expected closing range); (7) last confirmed: unconfirmed owners with their date; (8) history: "formerly PE-owned {years}"; (9) the franchise note. BDC lenders join in the first follow-up. Field-level models are Claude's to draft in the spec.
+- **Chains** (Q3, refined after the developer asked whether several PE owners at several degrees would all show): the walk branches at every owner and each path stops at its first PE owner, so every PE owner on a separate path gets its own line, chain and degree (brand Z: 60% Company A → Fund X at degree 2, and Fund Y directly at degree 1; Smile Doctors: THL and Linden at degree 1). A PE owner can only sit above another on the same path through a stake in a firm itself (a listed parent, or a GP-stakes holder such as Blue Owl's funds, from memory); those appear as labels on the firm, never as hops or owners of the brand. Every active chain shows hop by hop (phase, confidence, stake, start date, receipts); unconfirmed and ended chains show only in sections 7 and 8, collapsed to owner and dates. Example: Dunkin' → Inspire Brands → Roark Capital.
+- **Receipts and stored documents** (Q4): a receipt shows the verbatim quote, the source's name and domain, the source type, a link to the live URL, `published_on`, the first fetch date and the last date the page still showed the same text. The archived copy is never served publicly (it stays internal, as the record in a dispute), except that a child document from an official filing or bulk file (a Schedule row, a Form ADV row, an IRS row) shows its full row text. A dead link gets "This page has changed or is gone; the quote was checked against our copy fetched {date}." The wire-terms question from "Research: Press-release and news feed sources" stays an open legal call for the developer.
+- **Edge shape** (Q5): from, to, relation, phase, confidence, `started_on`/`ended_on` with precision, `end_reason`, `last_confirmed_on`, the current value from `value_claim_id`, the expected closing range on a pending edge, the number of independent sources, and the receipts; output models read from database rows (Pydantic `from_attributes`).
+
+### Round 2 (2026-11-07)
+
+- **Passive holdings on a public company's card** (Q6): 13G holdings filed under Rule 13d-1(b) (BlackRock, Vanguard, T. Rowe Price) don't show on the card at all; the how-this-works page explains that index and mutual fund holdings are ordinary passive investments. PE holders and any controlling owner still show (Wendy's shows Trian, not BlackRock or Vanguard).
+- **How a fact was read** (Q7, option a): receipts show no reader; the how-this-works page explains that an AI model or a parser reads documents and that every quote is matched word for word against the stored copy. Turned down: a per-receipt "read by AI" label, which puts the method where the source should be.
+
+## Answer
+
+Resolved 2026-11-07 in a grilling session (two rounds, recorded under Comments). Split before round 1: the graph endpoint, category page, deal feed and company, fund and BDC shapes went to "Graph endpoint and non-brand output shapes"; this ticket was renamed from "Claim card and graph output shapes".
+
+- **Names:** **brand card** (everything a brand page shows about who owns the brand) and **receipt** (one fact's quote with its source and dates); "claim card" retired.
+- **Brand card sections**, each shown only when non-empty: verdict (category, confidence, checked date or "not yet checked", ticker when a public company is in the deciding chain); PE owners (firm, funds, degree, control or minority, confidence; listed parent as a label); other owners; PE holders of a public company; disputes; pending deals (with expected closing); last confirmed; history ("formerly PE-owned {years}"); the franchise note. BDC lenders join in the first follow-up. Passive 13d-1(b) holdings never show.
+- **Chains:** the walk branches at every owner and each path stops at its first PE owner, so every PE owner on a separate path has its own line, chain and degree; a PE firm's own owners (a listed parent, a GP-stakes holder) are labels on the firm. Active chains show hop by hop with receipts; unconfirmed and ended chains are collapsed into their sections.
+- **Receipts:** verbatim quote, source name and domain, source type, live link, `published_on`, first fetch date and last date the same text was seen. Archived copies are never served publicly, except the full row text of an official filing's or bulk file's child document; a dead link gets a fixed note. Receipts show no reader (LLM or parser); the how-this-works page explains the method.
+- **Edge shape:** from, to, relation, phase, confidence, start and end dates with precision, `end_reason`, `last_confirmed_on`, current value, expected closing range, number of independent sources, receipts; models read from database rows.
+- Docs: glossary "Brand card" and "Receipt"; evidence_layer_plan.md card endpoint note; decisions.md §4 note. No ADR.
+
+Handed on:
+- "Graph endpoint and non-brand output shapes": the moved shapes.
+- "Mechanical docs sweep": the remaining "claim card" mentions.
+- chains "Card wording and the how-this-works page": section wording, labels, the dead-link note, how-this-works explanations, private-credit term help.
+- chains "Website pages and shareable cards": the brand page is the brand card.
+- "Source independence and syndication": the independent-sources count.
+- "Press and EDGAR full-text connectors": no re-served wire copies; the wire-terms legal call.
+- "API conventions, internal auth and operator surface": output models and the receipt response.

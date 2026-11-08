@@ -122,6 +122,14 @@ _Avoid_: Verified, researched, scanned
 What a brand, company or location shows before its check is complete, unless private equity has already been found. Any owner found so far is still shown.
 _Avoid_: Unknown, pending, unresearched
 
+**Brand card**:
+Everything a brand's page shows about who owns the brand: the verdict, its owners and their chains, pending deals, and past private equity ownership, each fact backed by a receipt.
+_Avoid_: Claim card, profile, report
+
+**Receipt**:
+The evidence behind one fact: the exact words quoted from a source, the source's name, a link to it, and when the page was published and last seen saying it.
+_Avoid_: Citation (in user-facing text), proof, claim card
+
 **Last confirmed**:
 The most recent date any source still showed a fact. A hop not confirmed for a long stretch is shown with this date and stops counting as current ownership.
 _Avoid_: Stale, expired, out of date (in user-facing text)

@@ -59,7 +59,7 @@
 
 ## 7. Evidence Layer Is Core Free Product, Not a Premium Add-On
 
-**Decision:** The map does not ship as bare verdicts. Every pin carries a **claim card** — verdict, ownership type, sponsor, acquisition date, and 2–3 primary sources with quotes — as core free product. Progressive disclosure: pin → claim card → full dossier/graph.
+**Decision:** The map does not ship as bare verdicts. Every pin carries a **claim card** *(2026-11-07, engine "Brand card, receipt and edge shapes": now split into the **brand card**, a brand's whole verdict, and the **receipt**, one fact's quote and source; see GLOSSARY.md)* — verdict, ownership type, sponsor, acquisition date, and 2–3 primary sources with quotes — as core free product. Progressive disclosure: pin → claim card → full dossier/graph.
 
 **Why:** Even the beloved incumbent brand ledger drew immediate accuracy challenges and "did you use LLMs?" suspicion in its own viral thread. Users will not trust "some random app says my vet is PE-owned"; the receipts *are* the trust mechanism. What remains as the later premium/intelligence layer is depth: full rollup dossiers, connection/money-flow graphs, subscription reports, and eventual graph licensing.
 
