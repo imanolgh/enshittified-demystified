@@ -42,7 +42,7 @@ Category `dental` + DSO link triggers this connector set for `ent_8821` + `ent_0
 |---|---|---|
 | `retrieve_dso_roster` | Playwright fetch of smilepartners.com/locations | Location page listing Croton office → `operated_by` claim |
 | `retrieve_portfolio_pages` | Fetch known sponsor domains whose portfolio mentions "Smile Partners" (from sponsor registry crawl index) | e.g., sponsor page: "Smile Partners — Partnered 2022" |
-| `retrieve_press` | Google News RSS `q="Smile Partners Management"` + wire archives | PR: "Sponsor X announces growth investment in Smile Partners" |
+| `retrieve_press` | Google News RSS `q="Smile Partners Management"` + wire archives *(2026-11-08, engine "Press and EDGAR full-text connectors": Google News is dropped, blocked by robots.txt and its terms; wire feeds are discovery only, and releases are stored from the issuer's own site)* | PR: "Sponsor X announces growth investment in Smile Partners" |
 | `retrieve_edgar_fts` | `https://efts.sec.gov/LATEST/search-index?q=%22Smile+Partners%22` | Form D from 2022 raise, if any |
 | `retrieve_sos_history` | Amendment/merger filings | Name changes, mergers |
 
@@ -102,14 +102,14 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 2. Changed: diff the extracted text. New string detected: *"Hudson Valley Veterinary Group — joined 2026."*
 3. Dispatch `resolve_entity("Hudson Valley Veterinary Group")` → resolves or creates entity → targeted retrieval (press RSS for the name, EDGAR FTS) → extract → verify → publish `acquired_by` edge (initially `reported` if only the portfolio page attests; press pickup days later upgrades it to `verified` automatically when the second claim lands).
 4. **Event emission:** publication of a new `acquired_by` edge fires `acquisition_event` → notification fan-out to users following that entity/category/region (the Acquisition Alarm product) and to the public changelog.
-5. Same nightly loop covers DSO rosters (location adds/removals) and Google News RSS per tracked sponsor.
+5. Same nightly loop covers DSO rosters (location adds/removals) and Google News RSS per tracked sponsor. *(Google News dropped 2026-11-08, engine "Press and EDGAR full-text connectors".)*
 
 **Beat schedule (PE):**
 
 | Task | Cadence |
 |---|---|
 | Sponsor portfolio + DSO roster crawl | nightly |
-| Press RSS/GDELT poll per tracked entity | every 6h |
+| Press RSS/GDELT poll per tracked entity *(2026-11-08: GDELT dropped; wire subject feeds are polled for all tracked entities at once, faster than they turn over; intervals in "Retrieval fan-out, tracked entities and refresh cadence")* | every 6h |
 | EDGAR full-text poll (tracked sponsor names) | daily |
 | SoS re-check for tracked entities | monthly |
 | Re-verify stale `reported` edges (hunt for 2nd source) *(dropped 2026-11-07, engine "Edge lifecycle: ending, retraction and staleness": a second source comes from the brand's normal re-checks)* | weekly |

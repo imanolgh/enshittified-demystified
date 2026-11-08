@@ -60,11 +60,11 @@ The AI is a reading-comprehension engine over documents you fetched. Hallucinati
 |---|---|---|
 | **PE firm portfolio pages** | Scraping (public marketing pages) | Highest-yield PE source — sponsors brag about acquisitions. Maintain a registry of ~500 sponsor domains and crawl on schedule |
 | **SEC EDGAR full-text search** | Free API (`efts.sec.gov`) | Sponsor filings, Form D private-placement notices, 8-Ks mentioning acquisitions |
-| **Press release wires** | RSS/scraping (PRNewswire, BusinessWire, GlobeNewswire) + Google News RSS per entity | Acquisition announcements with dates — the acquisition-date feature comes from here |
+| **Press release wires** | RSS/scraping (PRNewswire, BusinessWire, GlobeNewswire) + Google News RSS per entity *(2026-11-08, engine "Press and EDGAR full-text connectors": wire feeds are discovery only and releases are stored from issuers' own sites, SEC exhibits or adviser pages; Google News is dropped, blocked by robots.txt and its terms)* | Acquisition announcements with dates — the acquisition-date feature comes from here |
 | **DSO / rollup location pages** | Scraping | The clinic-level roster that links "Bright Smiles of Croton" to "Smile Brands Inc." |
 | **WARN notices** | State DOL pages, mostly scraping/CSV | Post-acquisition layoff evidence for the worker-side surface |
 | **CourtListener RECAP API** | Free/nonprofit API | Litigation touching sponsors/portcos without paying PACER by the page |
-| **Local news** | Google News RSS, GDELT (free) | Small-market acquisition coverage national wires miss |
+| **Local news** | Google News RSS, GDELT (free) *(dropped 2026-11-08: Google News is blocked; GDELT deferred; past coverage awaits "Research: Web search APIs for finding a brand's past coverage")* | Small-market acquisition coverage national wires miss |
 
 ### 3.3 PC Evidence Connectors
 | Source | Access | Yields |
@@ -531,6 +531,13 @@ Each connector task:
 *(2026-11-07, engine "Document storage, fetch log and last-confirmed": dedup is by URL and extracted text, not by sha256 alone. A re-fetch with the same text advances `last_seen_at` and stores nothing; a changed text is a new version, re-read whole. Parsed tables become child documents with their own `raw_text`, not `meta`. Every attempt is logged in `fetches`. See §4 `documents`.)*
 
 Celery Beat (≈ Laravel Scheduler): recurring crawls of sponsor portfolio pages, DSO rosters, and news RSS to catch *new* acquisitions — this feeds the Acquisition Alarm feature.
+
+### Press connector (2026-11-08, engine "Press and EDGAR full-text connectors")
+
+- Wire feeds (PR Newswire and GlobeNewswire subject feeds) are read only to learn that a release exists: title, date and issuer (`dc:contributor`). Items are matched against tracked entities' names and aliases (whole words, exact phrases, case-insensitive); unmatched items are dropped unstored. Feeds are polled faster than they turn over their 20 items, with a daily backfill from the wires' news sitemaps.
+- A matched release is fetched and stored from the issuer's own site (found through its domain identifiers, newsroom or sitemap, by matching title and date), an SEC exhibit or an adviser's page, never from a wire site. A wire-only release can't be a source. A stored issuer copy with no date of its own takes the feed item's date as `published_on`.
+- A page on a wire domain (prnewswire.com, prweb.com, newswire.ca, globenewswire.com, businesswire.com, accessnewswire.com, accesswire.com, einpresswire.com) is `press_release`; elsewhere a page on the issuer's own domain or carrying a wire tag ("/PRNewswire/", "(GLOBE NEWSWIRE)", "(BUSINESS WIRE)") is `press_release`, otherwise `news`. The issuer sets `speaker_entity_id`; a news article's speaker is its outlet.
+- Bot rules: CLAUDE.md scrape etiquette. EDGAR full-text search and ownership filings: their own ticket.
 
 ### Producers and the door (2026-11-05, engine "Claim producers and the claims door")
 

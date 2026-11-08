@@ -14,3 +14,4 @@ Should a written rule keep competitor and other third-party compiled data out of
 - Terms seen: WhoIsMyDentist restricts automated access (its fetcher returned 403); Private Equity Vet bars automated collection outside its Excel download, republishing most of the data, and using it to train, test or improve AI systems. Reddit blocks the fetcher.
 - Grey cases: compiled public lists (the Ravenous restaurant list), editorial ledgers (Worse on Purpose), app databases (Buy'r).
 - Where the rule lives: CLAUDE.md working rules, and whether research tickets cite it.
+- **From "Press and EDGAR full-text connectors"** (2026-11-08; scrape etiquette in CLAUDE.md; press-connector note in evidence_layer_plan.md): the legal questions about stored copies, the wire services' terms, crawling rules, takedowns and defamation went to chains task "Legal review before launch"; whether third-party data tools may be used as sources stays here.
