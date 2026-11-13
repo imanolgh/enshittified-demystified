@@ -41,7 +41,7 @@ Category `dental` + DSO link triggers this connector set for `ent_8821` + `ent_0
 | Task | Call | Typical yield |
 |---|---|---|
 | `retrieve_dso_roster` | Playwright fetch of smilepartners.com/locations | Location page listing Croton office → `operated_by` claim |
-| `retrieve_portfolio_pages` | Fetch known sponsor domains whose portfolio mentions "Smile Partners" (from sponsor registry crawl index) | e.g., sponsor page: "Smile Partners — Partnered 2022" |
+| `retrieve_portfolio_pages` | Fetch known sponsor domains whose portfolio mentions "Smile Partners" (from sponsor registry crawl index) *(2026-11-12, engine "Rosters, portfolio pages and the registry": the crawl index is dropped. There is no per-name lookup: each registry pass reads every registry page whole, and its claims reach companies through the door; see evidence_layer_plan.md "Registry crawler")* | e.g., sponsor page: "Smile Partners — Partnered 2022" |
 | `retrieve_press` | Google News RSS `q="Smile Partners Management"` + wire archives *(2026-11-08, engine "Press and EDGAR full-text connectors": Google News is dropped, blocked by robots.txt and its terms; wire feeds are discovery only, and releases are stored from the issuer's own site)* | PR: "Sponsor X announces growth investment in Smile Partners" |
 | `retrieve_edgar_fts` | `https://efts.sec.gov/LATEST/search-index?q=%22Smile+Partners%22` | Form D from 2022 raise, if any |
 | `retrieve_sos_history` | Amendment/merger filings | Name changes, mergers |
@@ -96,7 +96,7 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 
 ## Scenario A3: Ongoing — Scheduled Sponsor-Page Diff Detects a New Acquisition
 
-**Trigger:** Celery Beat, nightly: `crawl_sponsor_registry` iterates ~500 known sponsor/DSO/rollup domains.
+**Trigger:** Celery Beat, nightly: `crawl_sponsor_registry` iterates ~500 known sponsor/DSO/rollup domains. *(2026-11-12, engine "Rosters, portfolio pages and the registry": the registry is one YAML file per organization; a pass covers every required portfolio, newsroom and about page with detail and paged pages, and its cadence belongs to "Retrieval fan-out, tracked entities and refresh cadence". DSO rosters are parked with local businesses and their selectors with "Selector producers: store locators and rosters".)*
 
 1. `retrieve_portfolio_pages` refetches each portfolio/locations page → sha256 compare vs. last stored version. Unchanged (majority) → stop, $0 LLM spend. *(2026-11-07, engine "Document storage, fetch log and last-confirmed": the compare is on extracted text, and an unchanged page advances `last_seen_at`. A changed page is a new version that the LLM re-reads whole; the diff only shows what changed, for events.)*
 2. Changed: diff the extracted text. New string detected: *"Hudson Valley Veterinary Group — joined 2026."*

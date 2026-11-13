@@ -144,8 +144,17 @@ entity_aliases
 entity_identifiers             -- 2026-11-05 (ticket 12); replaces entities.place_id and .npi
   id, entity_id, scheme (cik|ticker|ein|crd|sec_file_number|private_fund_id|domain|phone|
       place_id|npi), value, source_document_id (nullable: place_id only, ADR 0003),
-      producer, producer_version (both null when source_document_id is null), retracted_at
+      ingest_item_id (nullable: domain only), producer, producer_version (both null when
+      source_document_id is null), retracted_at
       -- (2026-11-06: the strong-scheme unique index skips rows with retracted_at set.)
+      -- 2026-11-12 (ticket 30, "Rosters, portfolio pages and the registry"): a domain row may be
+      -- sourced by a registry entry's intake item instead of a document (a CHECK allows
+      -- ingest_item_id only on the domain scheme, and never together with source_document_id;
+      -- place_id alone may have neither). Form ADV ingestion writes domain rows from the
+      -- adviser's Website Address, skipping social media and reference sites (the monthly file
+      -- keeps only the first of several websites, often LinkedIn). A registry entry's crd or cik
+      -- only helps resolve it and is never written here. A domain removed from an entry gets
+      -- retracted_at at the next sync, with an events row.
       -- strong schemes (cik, ein, crd, sec_file_number, private_fund_id, place_id, npi): one
       -- entity per (scheme, value); a second holder is a resolution or merge signal, never a
       -- second row. Weak schemes (ticker, domain, phone) may repeat. An entity may hold several
@@ -204,9 +213,10 @@ documents                      -- immutable once written
       -- text; last_seen_at = the latest successful fetch of the same URL returning the same text
       -- (or a 304 Not Modified to a conditional request); new bytes with the same text are not
       -- stored. A URL's current version is its row with the newest last_seen_at; text that comes
-      -- back after a change reuses its old row. A hop's last-confirmed date is the newest
-      -- last_seen_at among the documents its accepted claims cite. A real text change makes a new
-      -- row, which the LLM re-reads whole.
+      -- back after a change reuses its old row. ~~A hop's last-confirmed date is the newest
+      -- last_seen_at among the documents its accepted claims cite.~~ (2026-11-12, ticket 30:
+      -- corrected; see edges last_confirmed_on.) A real text change makes a new row, which the
+      -- LLM re-reads whole.
       -- published_on: from structured fields only (SEC filing date, feed publication date,
       -- datePublished / article:published_time, a bulk file's release date); never the LLM or
       -- HTTP Last-Modified. An undated claim's as-of date is published_on, else retrieved_at.
@@ -219,7 +229,13 @@ documents                      -- immutable once written
       -- and published_on. verify_citations searches only raw_text.
       -- Text: keep all visible text (only scripts, styles and hidden elements dropped; no
       -- boilerplate removal); PDFs get a page marker at each page break; JavaScript pages are
-      -- stored as the rendered DOM with capture settings in meta. A fixed extractor applies to new
+      -- stored as the rendered DOM with capture settings in meta. (2026-11-12, ticket 30, Q9
+      -- option e: a new HTML extractor version keeps the text of hidden elements too (closed
+      -- dialogs, hidden modals and panels, CSS-hidden sections) and writes each image's alt, each
+      -- link's title and each aria-label into the text where the element sits, as
+      -- "[image: Arby's]" and "[link: Alexia]"; scripts and styles are still dropped; class names
+      -- and data attributes never become text. Portfolio pages put names only in these attributes
+      -- on five of eight surveyed sites.) A fixed extractor applies to new
       -- fetches; re-extracting old documents is a deliberate re-run that creates new rows.
       -- RawDocument (contracts.py) gains published_on; a child names its parent and row key.
       -- S3: document bytes under documents/; operational files (Anthropic batch files, crawl
@@ -231,7 +247,9 @@ fetches                        -- 2026-11-07 (ticket 20); operational, rows kept
       (nullable), error (nullable), document_id (nullable)
       -- one row per fetch attempt; feeds the operator report and source_runs failed/blocked
       -- outcomes. Connectors send the server's ETag or Last-Modified back (conditional requests).
-      -- After 90 days, documents.last_seen_at carries the confirmation record.
+      -- After 90 days, documents.last_seen_at carries the confirmation record. (2026-11-12,
+      -- ticket 30: for registry pages the saved ETag and Last-Modified live on crawl_targets;
+      -- which sites block the bot, and since when, lives on site_access.)
 
 claims                         -- atomic, cited assertions
   id, subject_name, subject_entity_id (nullable), predicate (acquired_by|owned_by|lends_to|
@@ -378,8 +396,18 @@ edges                          -- the published graph (derived from claims)
       -- a daily Beat sweep found last_confirmed_on over 18 months old: shown as "last confirmed
       -- {date}", not counted toward categories, back to active when a later document confirms
       -- it; it is not an end. Only ended rows feed "formerly PE-owned {years}".
-      -- last_confirmed_on = the newest last_seen_at among the documents its accepted claims cite
-      -- (ticket 20). ended_by_document_id = the document that showed the end (the former claim's
+      -- ~~last_confirmed_on = the newest last_seen_at among the documents its accepted claims cite
+      -- (ticket 20).~~ 2026-11-12 (ticket 30, Q14): last_confirmed_on = the newest confirmation
+      -- among the edge's accepted claims, where a claim confirms by its document's source_type:
+      -- company_site documents (portfolio, about, detail and paged pages, which state the
+      -- present) confirm through the document's last_seen_at, so they confirm again each time
+      -- the page is seen with the company still on it; every other source type (press_release,
+      -- news, sec_filing and the other official types, which report a dated event or state a
+      -- holding as of a date) confirms only as of the claim's own date: its event_date, else the
+      -- document's published_on, else retrieved_at. A 2021 deal release still online confirms
+      -- through 2021, however often it is fetched. Newsroom releases are stored as
+      -- press_release, never company_site. Page dates are not used to tell the two apart
+      -- (WordPress stamps publish dates on ordinary pages). ended_by_document_id = the document that showed the end (the former claim's
       -- document; the clean Schedule that lacked a holding); null for pending_expired.
       -- Retraction follows claims: an edge is never retracted directly. Code retracts claims or
       -- identity rows, and an edge left with no accepted, correctly typed claims gets
@@ -494,6 +522,54 @@ ingest_batches / ingest_items  -- operator uploads only (decisions.md §15: no o
 
 ingest_item_candidates         -- 2026-11-05 (ticket 04); replaces ingest_items.candidates JSONB
   id, ingest_item_id, entity_id, score   -- set only when result = ambiguous
+
+registry_entries               -- 2026-11-12 (ticket 30, "Rosters, portfolio pages and the registry")
+  id, slug, name, ingest_item_id, entity_id (nullable), synced_at, removed_at (nullable)
+      -- one row per registry YAML file (registry/<slug>.yaml, one per organization), loaded by
+      -- the registry sync command on deploy. Each sync sends the entry through the door as an
+      -- operator intake item (name, identifiers, domains), resolved like any intake row;
+      -- entity_id is that resolution's current answer. Crawl state, not evidence: rows change in
+      -- place; an entry deleted from the repo gets removed_at.
+
+registry_pages                 -- 2026-11-12 (ticket 30)
+  id, registry_entry_id, url, role (portfolio|newsroom|about), render (http|browser),
+      paging_param (nullable), detail_links (nullable), required, status_selector (nullable),
+      removed_at (nullable)
+      -- one row per page listed in an entry. render = browser for pages whose names appear only
+      -- after JavaScript (L Catterton). paging_param names the query parameter for further pages
+      -- (Golden Gate's sf_paged). detail_links = a URL pattern for per-company pages or releases
+      -- to follow one level deep on the same site. required = false for a page walled when the
+      -- entry was researched: tried every pass, not waited for. status_selector names the
+      -- status-only selector config, where one exists ("Selector producers: store locators and
+      -- rosters"); a server-side status filter view (TSG's ?status=exited) is listed as its own
+      -- page with a selector. A page removed from the YAML gets removed_at.
+
+crawl_targets                  -- 2026-11-12 (ticket 30); operational crawl state
+  id, registry_page_id, url, discovered_on_target_id (nullable), etag (nullable),
+      last_modified (nullable), last_fetched_at (nullable), last_outcome (nullable:
+      ok|not_modified|failed|blocked|not_found), consecutive_failures, last_linked_at (nullable)
+      -- one row per URL fetched again each pass: listed pages, their paged URLs and discovered
+      -- detail pages (discovered_on_target_id = the page that linked it; null for listed pages).
+      -- etag and last_modified are sent back as conditional requests. consecutive_failures feeds
+      -- the operator report. last_linked_at = the last pass whose listing still linked a detail
+      -- page; a detail page unlinked for two passes stops being fetched (its last confirmation
+      -- stands). Release URLs are fetched once and are only documents, never targets. Changes in
+      -- place; the evidence trail stays in documents and fetches.
+
+site_access                    -- 2026-11-12 (ticket 30); operational
+  id, domain (unique), state (open|challenged|hard_blocked|robots_refused|rate_limited),
+      blocker (nullable: cloudflare|vercel|akamai|imperva|datadome|other), blocked_since
+      (nullable), last_checked_at, last_retry_cleared_at (nullable), required_pages,
+      optional_pages
+      -- one row per domain the bot fetches from; state from the latest pass. hard_blocked (an
+      -- explicit refusal such as Cloudflare's "Sorry, you have been blocked", a plain 403) and a
+      -- site asking us to stop both stop all fetching from the domain. last_retry_cleared_at =
+      -- the last time the honest browser retry cleared a challenge. Feeds the blocked-sites
+      -- dashboard ("API conventions and operator surface").
+
+site_access_changes            -- 2026-11-12 (ticket 30); operational, kept indefinitely
+  id, site_access_id, from_state, to_state, blocker (nullable), changed_at
+      -- one row per state change only, so it stays small and gives each site's block history.
 ```
 
 Key design points:
@@ -546,6 +622,19 @@ Celery Beat (≈ Laravel Scheduler): recurring crawls of sponsor portfolio pages
 - Each hit's file is its own document: `meta` holds accession, form, filer CIK and filing date; `published_on` is the filing date. An EX-99 press release is `press_release` spoken by its issuer (ADR 0003); everything else is `sec_filing` and self-verifies. Every hit is read whole by the LLM, however long (developer's ruling; spend: "Operational identity, budgets and guardrail values").
 - 13D and 13G: for each public company in the graph, its filings and amendments. Structured filings (since December 2024) are read by a `parser` producer: each reporting person is a child document rendered as sorted `field: value` lines, giving `owned_by` claims (holder name and CIK, percent of class, event date); the rule box (`designateRulePursuantThisScheduleFiled`) goes into document `meta`. Older text filings: code reads the cover-page checkbox; a box it can't read never makes the company PE minority stake; a 13D has no box and always counts.
 - Joint filers: within one 13D or 13G, the owner's stake is the larger of the largest single aggregate amount and the sum of the reporting persons' sole voting power, with the percent from the same share count (a fund, its general partner, the firm and its listed parent usually report the same shares, so a plain sum double-counts). A newer filing replaces an older one by event date; an amendment reporting 5% or less ends the hop; 0% is an exit; percent of class counts as voting unless a proxy or prospectus gives voting power.
+
+### Registry crawler (2026-11-12, engine "Rosters, portfolio pages and the registry")
+
+- **The registry** is one YAML file per organization in the repo (`registry/<slug>.yaml`): investment firms, companies and brands whose own pages the engine reads. Fields: `name`; `identifiers` (crd or cik, used only to find the entity); `domains` (every domain the organization's own pages sit on); `pages`, each with `url`, `role` (`portfolio`, `newsroom` or `about`) and crawl fields (`render`, `paging_param`, `detail_links`, `required`, `status_selector`); and `research` (kind, parent, evidence URLs, `documented|reported|inferred` confidence, notes), which code never reads. Claude researches entries with the registry-research skill and the developer approves each by committing it (ADR 0002 allows this: the registry only decides where to look). `registry sync` loads the files into `registry_entries` and `registry_pages` and sends each entry through the door as an operator intake item; its domains become `domain` identifier rows (§4 `entity_identifiers`). Replaces the registry-research skill's old format and build_roadmap.md's `{domain, roster_url, selectors, js_required}`.
+- **Who gets an entry:** every company or investment firm on a listed brand's ownership chain that has a portfolio page, newsroom or about page, plus each listed brand's own newsroom and about page. An operator gap report lists owners with no entry and listed brands with no newsroom or about page. Launch target: every owner on a listed brand's chain that publishes a portfolio page or newsroom has an entry.
+- **Nothing from the registry reaches extraction.** The LLM sees a registry page like any page (text, URL, domain); the entry's role, name and research block never reach the prompt. A page's speaker is the entity holding its domain.
+- **Portfolio and about pages** are `company_site` documents read by the LLM each time their text changes. Detail pages matching `detail_links` are followed one level deep on the same site; each is its own document, re-fetched every pass with conditional requests. Further pages come from `paging_param` (page 2, 3 and so on until a page adds no new items, capped at 50; value: "Operational identity, budgets and guardrail values"). Sitemaps are not used for portfolio pages. Where a page's items carry status only in markup (Roark's hidden "previous" section, LLCP's `data-status`, about 22 of 73 pages surveyed) or only through a server-side status filter (Golden Gate, BC Partners, Permira, Princeton, Freeman Spogli, TSG), a status-only selector writes name and status records alongside the LLM's read (Q9 option e; "Selector producers: store locators and rosters").
+- **Listed means current** unless the page marks the item former in text; a page that says it mixes current and former holdings without marking which gives no claim for unmarked items, and their status comes from other sources ("Extraction execution" writes this into the prompt). A name missing from a page means nothing: ownership never ends by absence ("Edge lifecycle"), whether or not the page lists only current holdings.
+- **Newsrooms:** the first crawl pages back through the index to the end of the archive; later passes fetch the index from the newest end and stop at the first index page with no new release links. Each release linked from the index (by `detail_links`) is fetched once as a `press_release` document spoken by the domain's entity; PDFs are read as PDFs; the LLM reads every release it hasn't read before (first-crawl spend cap: "Operational identity, budgets and guardrail values"). Releases are never re-fetched for confirmation (they confirm only as of their own date, §4 `edges`); checks that receipt links still work: "Retrieval fan-out, tracked entities and refresh cadence".
+- **JavaScript:** `render: browser` pages are fetched by the bot's own Playwright browser and stored as the rendered page; everything else uses the plain HTTP client.
+- **Challenges (Q11):** a fetch that returns a challenge page (Cloudflare's "Just a moment", `cf-mitigated: challenge`, Vercel's Security Checkpoint) gets one retry per page per pass in the bot's own Playwright browser: the bot's user agent, the browser as it ships (no stealth plugins, no faked fingerprint), no proxies, no solving services, no clicks or typing, waiting up to a fixed time (30 s suggested; value: "Operational identity, budgets and guardrail values") for the page to clear by itself. A page that clears is stored like any rendered page, with the cleared challenge noted in `meta`. A checkbox, a puzzle or a page that doesn't clear in time counts as blocked, and the next pass tries once more. A hard block or a site asking us to stop ends all fetching from that domain. robots.txt is read before any page, directly or through the same retry; if it can't be read, the whole site is blocked. Measured 2026-11-12 from a home IP: of 93 PE firm sites, 88 served a plain request, Warburg Pincus served the honest browser though it challenged the plain client, Ares had moved to an open domain, and Neuberger Berman (Vercel), Partners Group (hard block) and Anchorage (robots.txt) stayed closed (`.scratch/engine/research/portfolio-wall-survey.md`). The survey is re-run from production IPs before launch ("Hosting and deployment"). The project applies to Cloudflare's verified bot program with a Web Bot Auth signature ("Operational identity, budgets and guardrail values"). Getting around blocks stays out (CLAUDE.md); what to do about sites still walled is fog on the engine map ("Walled sites, later").
+- **Passes:** one `source_runs` row per pass covers every required registry page plus the new releases its newsrooms list (a shared source, §4 `source_runs`). A page walled when its entry is researched is written with `required: false`; the operator report says when it starts serving, and a code change makes it required. A required page that gets walled later stays required until the operator report flags it and a code change marks it. Pass cadence: "Retrieval fan-out, tracked entities and refresh cadence".
+- **The "sponsor registry crawl index"** (research_flows.md) is dropped: each pass reads every registry page whole, so nothing searches stored pages for a name.
 
 ### Producers and the door (2026-11-05, engine "Claim producers and the claims door")
 

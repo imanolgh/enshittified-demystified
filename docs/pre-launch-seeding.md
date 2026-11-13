@@ -88,7 +88,7 @@ Any business type is searchable from day one — the search box is not category-
 
 ## 5. Seeding Workstreams (the actual to-do list)
 
-**W1 — Sponsor & rollup registry curation (the big manual task).** Assemble the master list of ~300–500 sponsor/DSO/consolidator/rollup-brand domains across all §2 categories, each with: domain, roster/portfolio URL, category, static-vs-JS flag, candidate selectors. This is *research*, not code — Claude Code accelerates it (finding rollups per category from trade press and portfolio pages; drafting selector configs), you approve every entry. Expect this to consume more calendar time than any connector. Quality here = coverage at launch.
+**W1 — Sponsor & rollup registry curation (the big manual task).** Assemble the master list of ~300–500 sponsor/DSO/consolidator/rollup-brand domains across all §2 categories, each with: domain, roster/portfolio URL, category, static-vs-JS flag, candidate selectors. This is *research*, not code — Claude Code accelerates it (finding rollups per category from trade press and portfolio pages; drafting selector configs), you approve every entry. Expect this to consume more calendar time than any connector. Quality here = coverage at launch. *(2026-11-12, engine "Rosters, portfolio pages and the registry": for the chains-and-brands launch the registry is one YAML file per organization (investment firms, companies and brands), holding name, lookup identifiers, domains, pages with a role (`portfolio`, `newsroom`, `about`) and crawl fields, and a research block code never reads; `category`, `static-vs-JS` as an entry field and roster selectors are gone (selectors: "Selector producers: store locators and rosters"). Claude researches and writes entries; the developer approves each by committing it. The DSO and rollup roster work here stays with the parked local plan.)*
 
 **W2 — NPPES bulk census load.** Roadmap Step 11a. Download, filter to the taxonomies in §2A, load. One-time + monthly refresh job.
 
@@ -120,7 +120,7 @@ Any business type is searchable from day one — the search box is not category-
 
 ## 7. Launch Readiness Checklist
 
-- [ ] W1 registry ≥ target counts per §2 category (dental ≥30 DSOs, vet ≥15 consolidators, etc.)
+- [ ] W1 registry ≥ target counts per §2 category (dental ≥30 DSOs, vet ≥15 consolidators, etc.) *(2026-11-12, engine "Rosters, portfolio pages and the registry": for the chains-and-brands launch the target is a rule, not counts: every owner on a listed brand's ownership chain that publishes a portfolio page or newsroom has an entry, tracked by the operator gap report. These counts stay as the parked local plan's target.)*
 - [ ] NPPES census loaded + monthly refresh scheduled
 - [ ] Census × roster join published; §2A categories show all three seeded states correctly
 - [ ] Every launch state at full depth; review queue drained for them

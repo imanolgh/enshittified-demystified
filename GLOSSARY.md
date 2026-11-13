@@ -143,7 +143,7 @@ Two sources whose words come from different organizations that don't control eac
 _Avoid_: Separate sources, multiple sources
 
 **Registry**:
-The curated list of PE firms and rollups and where their pages are. It tells the crawler where to look and is never itself evidence.
+The curated list of investment firms, companies and brands whose own pages the engine reads: their portfolio pages, newsrooms and about pages. It tells the crawler where to look and is never itself evidence.
 _Avoid_: Database, list of PE firms (as a source)
 
 ## Coverage

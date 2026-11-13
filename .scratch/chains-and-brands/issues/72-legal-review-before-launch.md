@@ -22,6 +22,7 @@ Before the chains-and-brands site launches, what does a lawyer say about the leg
 5. **Defamation.** The site publishes ownership facts ("PE-owned", "sources disagree", "formerly PE-owned") with sourced quotes and confidence labels. What wording, disclaimers or correction process lowers exposure?
 6. **Search results.** If a web search API is used to find a brand's past coverage ("Research: Web search APIs for finding a brand's past coverage"), most terms allow only transient storage of results. The engine would fetch each result's page itself and keep the page's URL as part of the stored document. Does keeping that URL count as storing search results under those terms?
 7. **Structure.** Should the product sit in a company (an LLC or similar) rather than with the developer personally?
+8. **The honest browser retry.** When a site answers with a bot challenge, the bot retries once in its own unmodified browser, still named as our bot, with no clicks, and uses the page only if the site's own check lets it through (added 2026-11-12 by engine "Rosters, portfolio pages and the registry"). Warburg Pincus challenges a plain request but serves the browser this way. Is that a meaningful risk under computer-access law or a site's terms?
 
 ## How to resolve
 
