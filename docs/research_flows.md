@@ -15,7 +15,7 @@ All entity names in Scenario examples that reference real companies (e.g., Heart
 1. `load_nppes_census`: download the free NPPES bulk file → pandas filter to Tier-1 taxonomies → national entities for every dental/medical organization (names, addresses, authorized officials, other-name aliases). Same ETL pattern as Form 5500; no API calls, no Places, no LLM.
 2. Sponsor/DSO roster crawl (the Scenario A3 crawler, run in full): each roster location → `operated_by` claim citing the roster page.
 3. **The census match:** roster locations resolved against census entities. Matches publish the PE-connected layer; every unmatched census entity publishes as "no PE evidence found (checked {date})". *(2026-11-07, engine "What 'checked' means and coverage states": "checked" now means every source the product requires for the entity has finished a run, not the roster join alone; before that the entity reads "not yet checked". ADR 0001.)*
-4. Result: the national healthcare map lights up — PE-connected layer + honest-independent denominator — for a few dollars of extraction and zero per-lookup API cost. Deep per-entity research (A1) then adds launch-state-depth chains on top.
+4. Result: the national healthcare map lights up — PE-connected layer + honest-independent denominator — for a few dollars of extraction and zero per-lookup API cost *(2026-11-15: measured LLM cost about $0.0044 per document, engine "Extraction execution")*. Deep per-entity research (A1) then adds launch-state-depth chains on top.
 
 ## Scenario A1: Launch-State Depth — Every Dental & Vet Practice in a Launch State
 
@@ -49,7 +49,7 @@ Category `dental` + DSO link triggers this connector set for `ent_8821` + `ent_0
 Each document → S3 (`docs/{sha256}.html`), `documents` row (url, retrieved_at, sha256, source_type). Dedup by sha256. *(2026-11-07, engine "Document storage, fetch log and last-confirmed": bytes at `documents/{sha256}`; one row per URL and extracted text, so the same text on two URLs is two rows; a re-fetch with the same text only advances `last_seen_at`.)* The chord's callback fires `extract_claims` when all retrievals settle.
 
 ### Step 4 — Extraction (`extract_claims`)
-Assemble the 6–12 documents (text-extracted) → one Claude call (Sonnet-class) with the claim JSON schema. Pydantic-validated output, e.g.: *(2026-11-06, engine "Claim identity": the LLM now returns each side as the name as written, such as "Bright Smiles Dental", never an `ent_` id; the door resolves names to ids.)*
+~~Assemble the 6–12 documents (text-extracted) → one Claude call (Sonnet-class) with the claim JSON schema.~~ *(2026-11-15, engine "Extraction execution": one document per request, read once per producer version whatever entity it was fetched for, by DeepSeek V4.1 Flash on DeepSeek's own API; no brand named; long documents in windows. Details: evidence_layer_plan.md Stage 3.)* Pydantic-validated output, e.g.: *(2026-11-06, engine "Claim identity": the LLM now returns each side as the name as written, such as "Bright Smiles Dental", never an `ent_` id; the door resolves names to ids.)*
 
 ```json
 [
@@ -62,7 +62,7 @@ Assemble the 6–12 documents (text-extracted) → one Claude call (Sonnet-class
 ]
 ```
 
-Malformed items fail Pydantic → logged, dropped, batch flagged if failure rate >5%. *(2026-11-06, engine "ExtractedClaim and the extraction result envelope": the response is only a list of claims, so the `no_evidence_for` item above is dropped; no `lends_to` claim citing a document already means no lending evidence in it. The alert threshold is "Operational identity and guardrails"'s; a response that didn't finish fails as a request and gives no document `no_evidence_found`.)*
+Malformed items fail Pydantic → logged, dropped, ~~batch flagged if failure rate >5%~~ an operational alert when the dropped-item rate passes the threshold (2026-11-15: there are no batches). *(2026-11-06, engine "ExtractedClaim and the extraction result envelope": the response is only a list of claims, so the `no_evidence_for` item above is dropped; no `lends_to` claim citing a document already means no lending evidence in it. The alert threshold is "Operational identity and guardrails"'s; a response that didn't finish fails as a request and gives no document `no_evidence_found`.)*
 
 ### Step 5 — Mechanical Verification (`verify_citations`)
 Pure Python: normalize whitespace, substring-match each `quote` in its doc's stored text. Match → offset recorded, claim `accepted` once all checks pass. No match → claim `rejected` (reason `quote_not_found`) + logged for prompt tuning. Sanity checks: subject alias appears in doc; event_date within doc's plausible range.

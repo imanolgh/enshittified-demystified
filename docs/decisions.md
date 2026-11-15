@@ -92,7 +92,7 @@
 - **Google Places is lazy/on-demand only** — canonicalizing user searches and enriching entities, never bulk seeding. Used naively for a national census it would be the project's largest bill, exceeding all LLM spend combined.
 - **Bottom-up deep research** (full connector fan-out per entity) is reserved for the launch states (New York, with the NYC area first in run order, plus at most one more; pre-launch-seeding.md §2C) at launch, on-demand user searches (which permanently grow the graph and act as the crawl-prioritization signal), and review-queue follow-ups.
 
-**Cost consequence:** LLM extraction runs cents per entity (batch pricing, prompt caching, sha256 dedup making re-runs free); realistic launch seeding is a few hundred dollars of LLM spend total. The binding constraints on launch quality are connector coverage and review throughput, not money.
+**Cost consequence:** LLM extraction runs cents per entity (batch pricing, prompt caching, sha256 dedup making re-runs free); realistic launch seeding is a few hundred dollars of LLM spend total. *(2026-11-15, engine "Extraction execution": measured about $0.0044 per document, $45 to $54 per 10,000 documents, on DeepSeek V4.1 Flash with no batch; a new prompt or model version re-reads everything at that price.)* The binding constraints on launch quality are connector coverage and review throughput, not money.
 
 ## 12. Learning & Review Plan
 

@@ -4,7 +4,7 @@ Ownership-transparency platform: maps private equity ownership and private credi
 
 ## Stack (always true)
 - Python 3.12, FastAPI, SQLAlchemy 2.0 + Alembic, Pydantic v2, Celery + Redis (+ Beat, Flower), PostgreSQL 16, MinIO/S3 via boto3, httpx + tenacity, Playwright, pdfplumber/camelot, pandas/polars, pytest.
-- Anthropic API for extraction (Sonnet-class bulk via batch API; Opus-class for conflicts). Prompt lives in `app/core/`; Claude drafts it, the developer approves it, golden-fixture tests check it.
+- DeepSeek V4.1 Flash on DeepSeek's own API for extraction, called with httpx (JSON mode, every item validated, no batch, no escalation tier); fallback DeepSeek 1017 through OpenRouter on DeepInfra, InferenceNet and CoreWeave (engine "Extraction execution", 2026-11-15). Prompt lives in `app/core/`; Claude drafts it, the developer approves it, golden-fixture tests check it.
 - Package/deps: `uv`. Services: `docker compose up` (postgres, redis, minio).
 
 ## Role contract (non-negotiable; rewritten 2026-10-26)
@@ -51,7 +51,7 @@ Structure decisions (settled 2026-08-31, don't relitigate): thin route functions
 - When a source changes shape in production: update the fixture to the new reality FIRST, then the fix.
 - Scrape etiquette: per-domain Redis token bucket, identified user agent, robots.txt, prefer official APIs/bulk files. The bot uses the project's own name; robots.txt is followed path by path for that name and `*` (rules naming only AI crawlers don't stop it); it never gets around a block (no proxies, no CAPTCHA services, no stealth, Playwright identifies itself) and stops fetching from a site as soon as the site asks (engine "Press and EDGAR full-text connectors", 2026-11-08). A challenge page gets one retry per page per pass in the bot's own unmodified browser, with no clicks, and counts as blocked unless it clears by itself (engine "Rosters, portfolio pages and the registry", 2026-11-12).
 - Never introduce PitchBook/Preqin/CB Insights data or any paywalled secondary source. Public primary sources only.
-- Log per-call cost for paid APIs (Places, Anthropic) from day one.
+- Log per-call cost for paid APIs (Places, DeepSeek, OpenRouter) from day one.
 - Quality bar for anything you produce: the developer must be able to re-explain it from memory the next morning. Prefer boring, explicit code over clever code. (The hand-writing learning goal was dropped 2026-10-26; this bar stays.)
 
 ## Documentation rules

@@ -91,7 +91,7 @@ The AI is a reading-comprehension engine over documents you fetched. Hallucinati
 - No deletes and no soft-delete flags on evidence and identity tables (documents, claims, edges, events, aliases, identifiers, addresses, industries). Corrections go through status, `retracted_at` and events. Operational tables (cache, crawl state, cost log) may prune; their owning tickets set retention.
 - Money is `numeric`, never float, with its currency stated.
 - Indexes: every foreign-key column; every uniqueness rule as a unique index (claim hash, strong identifiers, public ids); `edges` on `from_entity_id`, `to_entity_id` and a partial index on non-retracted edges; a trigram index on aliases only if "Entity resolution algorithm" picks `pg_trgm`. Any other index needs a slow query behind it.
-- Tables defined in their own tickets: fetch log ("Document storage, fetch log and last-confirmed"), Anthropic batch jobs and extraction cache ("Extraction execution"), registry and crawl state ("Rosters, portfolio pages and the registry"), `api_costs` and operational alerts ("Operational identity, budgets and guardrail values"), `failed_tasks` ("Celery topology"), the search demand log ("Search and the demand log").
+- Tables defined in their own tickets: fetch log ("Document storage, fetch log and last-confirmed"), extraction requests and claim reads ("Extraction execution"; no batch or cache tables), registry and crawl state ("Rosters, portfolio pages and the registry"), `api_costs` and operational alerts ("Operational identity, budgets and guardrail values"), `failed_tasks` ("Celery topology"), the search demand log ("Search and the demand log").
 
 ```
 entities
@@ -353,10 +353,17 @@ claims                         -- atomic, cited assertions
       -- object_name or "", document_id, verbatim_quote], whitespace collapsed; no entity ids,
       -- producer or value. Unique index on claim_hash where status <> 'retracted'.
   producer (llm|parser|etl|selector), producer_version, extraction_model (nullable), extracted_at,
+  extraction_request_id (nullable),
       -- 2026-11-05 (ticket 17): producer_version = the prompt version (llm), a module constant
       -- (parser, etl) or the selector config revision; the producer declares it and golden-fixture
       -- tests force a bump when output changes. extraction_model is null except for llm. The task
       -- sets all three, never the model's output.
+      -- 2026-11-15 (ticket 22): for llm, producer_version = the prompt version plus the model name
+      -- sent (p8/deepseek-flash), so a model change is a new version; extraction_model = the model
+      -- name the API returned (a change under the same sent name raises an alert);
+      -- extraction_request_id = the request whose answer gave the claim (null for code producers).
+      -- producer_version is the first version that found the claim; claim_reads lists every read
+      -- that found it.
   status (pending|accepted|rejected|retracted),
   rejection_reason (nullable: quote_not_found|sanity_check_failed|unsupported)
       -- ruled 2026-10-26: pending = awaiting verify_citations; accepted = passed every check,
@@ -414,7 +421,9 @@ edges                          -- the published graph (derived from claims)
       -- retracted_at and an events row, so re-derivation can't resurrect it. Triggers (events
       -- reasons): producer_withdrawn, entity_merged, entity_unmerged, claim_re_resolved,
       -- entity_type_changed. No hand endpoint (ADR 0002); takedowns are out of scope.
-      -- Withdrawing a producer version (one operator command): retract its claims, set
+      -- Withdrawing a producer version (one operator command): retract its claims (2026-11-15,
+      -- ticket 22: only those no other non-retracted read found, by claim_reads, so a fixed
+      -- version can run first and no edge drops in between), set
       -- retracted_at on its identity rows (undoing merges they triggered) and document reads,
       -- recompute affected edges, write one events row for the command plus one per edge or
       -- category that visibly changed (none per claim), and queue a re-run with the fixed version.
@@ -462,6 +471,29 @@ document_reads                 -- 2026-11-07 (ticket 28, "What 'checked' means a
       -- cites it (ticket 21); unreadable = unparseable filing or failed response; claims_rejected
       -- = claims were made but all failed verify_citations. A new producer version leaves earlier
       -- rows standing; withdrawing a version sets retracted_at on its rows ("Edge lifecycle").
+      -- 2026-11-15 (ticket 22), llm: a new version's finished read of a document supersedes the
+      -- older version's read of it (retracted_at set) and retracts the claims only older reads
+      -- found; a failed new read leaves the old one standing. A document read in windows still
+      -- has one row: the outcome is set when every window finished, and one failed window makes it
+      -- unreadable.
+
+extraction_requests            -- 2026-11-15 (ticket 22, "Extraction execution")
+  id, document_id, window_index, window_count, producer_version, model_sent,
+  model_returned (nullable), host, attempt, status (succeeded|failed),
+  failure_reason (nullable: http_error|rate_limited|timeout|payment|output_limit|empty|refusal|
+      bad_json), finish_reason (nullable), input_tokens, output_tokens, reasoning_tokens,
+  cached_tokens, seconds, sent_at
+      -- one row per API call: a read is one or more windows, each up to three attempts plus one
+      -- fallback try. The raw response is written once to S3 at extraction-responses/{id}.json
+      -- and kept for good. Dollar cost: one api_costs row per call carrying this id ("Operational
+      -- identity, budgets and guardrail values"). No cache table: before calling, code looks for a
+      -- finished document_reads row for the document under the version. No batch tables.
+
+claim_reads                    -- 2026-11-15 (ticket 22)
+  claim_id, document_read_id   (unique together)
+      -- every read that found a claim, the first included, for every producer. The claim hash
+      -- ignores the version, so a claim found again by a later read keeps its row and gains a row
+      -- here. Supersession and withdrawal retract a claim only when no non-retracted read found it.
 
 source_runs                    -- 2026-11-07 (ticket 28)
   id, entity_id, source, started_at, finished_at (nullable), outcome (completed|failed|blocked)
@@ -664,18 +696,21 @@ Every claim, whatever produced it, quotes a stored document, enters as `pending`
 **Code producer failures.** Every `etl` run first compares the file header with the expected columns and reads columns by name. Every `selector` run first checks that items still come back with the expected fields and roughly the usual count. A failed shape check stops the run before it writes anything and raises an alert. A per-record failure (a rejected claim or an unwritten identity record) raises an alert naming the producer, version and document, and the run keeps going. When per-record failures in one run pass the spec's threshold, the rest of the run stops. Rows already written can be found by `producer_version`.
 
 ### Stage 3 — LLM Extraction (`extract_claims`, was `ExtractClaimsJob`)
-Runs per entity once its retrieval chord completes (the `chord()` callback ≈ `Bus::batch()->then(...)`).
+*(2026-11-15, engine "Extraction execution": rewritten. It replaced per-entity multi-document calls, Claude through the Anthropic SDK and Sonnet/Opus tiering. Measured on 157 test documents: research/extraction-model-comparison.md.)* Runs per document, not per entity: each stored document version is read once per producer version, whatever entity it was fetched for.
 
 *(Experimental, Step 27b)* **Jev pre-filter:** before extraction, Jev answers a true/false question per document ("does this contain ownership, acquisition or lending evidence about X?"). Only positives are sent to Claude. It is adopted only if A/B testing shows near-zero loss of evidence-bearing documents.
 
-1. Assemble the document set (text + parsed tables) for the entity, chunked to context limits.
-2. Call Claude (Anthropic Python SDK) with a strict system prompt; the response is parsed straight into Pydantic `Claim` models — anything that fails validation is dropped and logged before it can reach the DB:
+1. One document per request, with no brand or entity named and nothing from the registry. A document up to 200,000 tokens goes whole; a longer one is read in windows of up to 150,000 tokens, split at block line breaks with 2,000 tokens of overlap. Quotes are checked against the whole stored text.
+2. Call DeepSeek V4.1 Flash on DeepSeek's own API with httpx: JSON mode with the schema written in the system prompt, thinking on, output limit 120,000 tokens, 15-minute timeout. The system prompt comes first and the document last, so DeepSeek's automatic prefix cache covers the prompt. The answer is parsed item by item into Pydantic models; a bad item is dropped and logged before it can reach the DB (2026-11-15: `document_label` is gone; code sets the document from the request):
    - Emit claims only in the fixed predicate vocabulary.
    - **Every claim must include a verbatim quote copied exactly from the provided document.**
    - ~~Classify ownership_type~~ — removed 2026-10-26 by ADR 0001 (`docs/adr/0001-ownership-category-computed-by-code.md`): the LLM never classifies ownership categories. It may only extract a quoted self-description of an owner (e.g. "Oak Ridge is a private equity firm"), the lowest-ranked owner-kind source. *(2026-11-07, engine "Owner kind": the response gains `owner_descriptions`, each with the owner's name as written, the describing phrase as written, the document label and the quote; a term table in code maps the phrase to a kind, never the model.)*
    - ~~If the documents contain no ownership/exposure evidence, return an explicit `no_evidence_found` result~~ *(2026-11-06, engine "ExtractedClaim and the extraction result envelope": the response is only `claims: list[ExtractedClaim]`, possibly empty. Code gives each document in the request that no claim cites the outcome `no_evidence_found`, and only from a response that finished and parsed. A bad item is dropped and logged; a response that stopped at the token limit or doesn't parse fails as a request and is retried, giving no document an outcome; a document cited only by dropped items gets no outcome.)*
-3. Model tiering: Sonnet-class for bulk; escalate to Opus-class when documents conflict or classification is ambiguous.
-4. Write raw response to the claim rows (`extraction_model`, `extracted_at`). *(2026-11-05: claims go through the door above; the task sets `producer = llm`, `producer_version` and `extraction_model`, never the model's output.)*
+3. ~~Model tiering: Sonnet-class for bulk; escalate to Opus-class when documents conflict or classification is ambiguous.~~ *(2026-11-15: one model, no escalation tier.)* Failures: an HTTP error or timeout, an output-limit stop, empty content, a refusal or content filter, or JSON that doesn't parse into the envelope. Up to three attempts with backoff; an output-limit stop is split in half once. When the attempts fail on availability (server error, rate limit, timeout, payment error), one try through the fallback, DeepSeek V4.1 Flash 1017 through OpenRouter on DeepInfra, InferenceNet or CoreWeave (its reads carry their own version name, such as `p8/deepseek-v4.1-flash-1017`); a bad answer never switches. Then the read is `unreadable`, an alert fires and the source run stays incomplete. A daily sweep retries `unreadable` reads of the current version for 7 days.
+4. ~~Write raw response to the claim rows (`extraction_model`, `extracted_at`).~~ *(2026-11-05: claims go through the door above; the task sets `producer = llm`, `producer_version` and `extraction_model`, never the model's output. 2026-11-15: also `extraction_request_id`; one `extraction_requests` row per call, raw response in S3, cost in `api_costs`.)*
+5. Timing *(2026-11-15)*: bulk work (the first seeding pass, re-reads after a new version, the daily sweep) waits for DeepSeek's off-peak hours (prices double 01:00–04:00 and 06:00–10:00 UTC on weekdays); single new documents from routine crawls go at once.
+6. Portfolio re-read *(2026-11-15)*: a document fetched from a registry `portfolio` page whose answer has no claim naming the page's owner is read once more, and both answers' claims are kept. Code triggers it from the registry role; nothing from the registry enters the prompt. A second read of every document is revisited with production numbers (it found about 5% more known facts in testing, at double the cost).
+7. New versions *(2026-11-15)*: a new prompt or model version re-reads every document older versions read, queued when it ships, under the spend cap; each finished new read supersedes the older read of that document, and `claim_reads` keeps the claims both found. A weekly golden-document check alerts when answers drift; a silent model change behind DeepSeek's `deepseek-flash` name shows only there. Measured cost: about $0.0044 per document off-peak, about $45 to $54 per 10,000 documents.
 
 ### Stage 4 — Mechanical Citation Verification (`verify_citations`, was `VerifyCitationsJob`)
 Pure Python, no AI:
@@ -724,7 +759,7 @@ Form 5500 deserves emphasis: it's a **bulk annual CSV download**, not a scrape �
 - **Two-source rule in code**, not policy (Stage 5).
 - **Public corrections log** — retraction workflow, never silent edits. In a market allergic to overclaiming, visible corrections are a feature.
 - **Scrape etiquette** — per-domain rate limits, identified user agent, robots.txt respect, prefer official APIs/bulk data wherever they exist. Most of your best sources (EDGAR, NPPES, Form 5500, CourtListener) are official and free — lead with those.
-- **Cost controls** — LLM spend is per-document-set per entity; cache extractions by document sha256 so re-runs are free; batch API pricing for the big seeding runs. Rough planning figure: a few cents to a few tens of cents per entity depending on document volume — real money at 100k entities, trivial at pilot scale.
+- **Cost controls** — ~~LLM spend is per-document-set per entity; cache extractions by document sha256 so re-runs are free; batch API pricing for the big seeding runs. Rough planning figure: a few cents to a few tens of cents per entity depending on document volume — real money at 100k entities, trivial at pilot scale.~~ *(2026-11-15, engine "Extraction execution": each document version is read once per producer version, whatever entity it serves, and a same-text re-fetch costs nothing; bulk reads wait for DeepSeek's off-peak hours. Measured: about $0.0044 per document, $45 to $54 per 10,000 documents; a new prompt or model version re-reads everything at that price. Every call's cost goes to `api_costs`.)*
 - **Defamation posture** — publish only quote-verified, sourced claims; label confidence honestly; show the evidence inline. "PE-owned (verified — 3 sources)" with clickable receipts is a fundamentally different legal and trust position than a bare pin on a map.
 
 ---

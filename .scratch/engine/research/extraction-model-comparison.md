@@ -115,3 +115,77 @@ Remaining non-prompt issue: a company in Roark's CSS-hidden "Previous Investment
 ## Limits
 
 One run, 50 documents, default thinking settings, one prompt (not tuned per model); precision checked on 20 claims per route only. Qwen3.8-Max untested. DeepSeek's own API can't pin a version and stores data in China (see the research note). Raw responses and scripts are kept outside the repo at `~/.local/share/extraction-eval/`.
+
+## Haiku and DeepSeek through OpenRouter (2026-11-14)
+
+At the developer's request, to judge DeepSeek through OpenRouter as the fallback route and compare Claude Haiku 5.5 on the same terms. Both read the 157 clean-text documents with the v8 prompt (tuned on DeepSeek, which may favor it), the brand named as before, a 120,000-token output limit, zero data retention and a strict JSON schema. DeepSeek was pinned to `deepseek-v4.1-flash-1017` on FP8 hosts, excluding Parasail and StepFun. Haiku ran on Google's endpoint (OpenRouter's choice). Each route ran twice. Spent: $5.99 of the OpenRouter balance ($4.98 left). Raw outputs: `~/.local/share/extraction-eval/out/` (`*-v8`, `*-v8-r2`), scorer `scripts/score_clean.py`.
+
+| | Haiku 5.5 (OpenRouter) | DeepSeek 1017 (OpenRouter) | DeepSeek's own API (earlier v8 run) |
+|---|---|---|---|
+| Answers lost, two runs | 0 of 314 | 5 of 314 | 0 of 157 (one run) |
+| Claims, run 1 / run 2 | 944 / 900 | 1,357 / 1,414 | 1,376 |
+| Exact quotes, run 1 / run 2 | 100% / 99.7% | 91.2% / 99.6% | 98.8% |
+| Known facts found (strict metric, of 218) | 122 / 119 | 133 / 136 | 135 |
+| Billed per document | $0.0106 / $0.0108 | $0.0083 / $0.0098 | about $0.0045 |
+| Median seconds | 9.7 | 17 | 11.7 |
+| Distinct claims found in both runs | 68% | 64% | (v5: 51%) |
+
+- **Haiku's cost is in long filings.** Its tokenizer counts about 60% more tokens than DeepSeek's for the same text (3.98M against 2.43M), so 14 filings crossed 100,000 prompt tokens, where its price rises from $0.10 / $0.50 to $0.50 / $2.50 per million. Those 14 cost $1.27 of run 1's $1.67 ($0.091 each); the other 143 documents cost $0.0028 each. DeepSeek through OpenRouter: $0.037 per long filing, $0.0056 per other document. Anthropic's own Batch API would halve Haiku's figures; OpenRouter offers no zero-retention batch.
+- **Haiku skips large portfolio pages** (corrected below: on Leonard Green's page this came from the test's brand line, not the model). Leonard Green's 108-company page: 1 claim in both runs (DeepSeek through OpenRouter 71 and 107 Leonard Green claims; DeepSeek's own API 110). Roark's page: no Roark claims in either run (DeepSeek through OpenRouter 86 and 85, with exactly the 30 former ones marked former in run 1 and none in run 2).
+- **"Prior to RiverGlade" affects both models.** Haiku run 1 and DeepSeek through OpenRouter run 2 each gave the 11 or 12 deals listed under "Prior to RiverGlade" as former RiverGlade holdings, with bare-name quotes that pass the quote check. The exception belongs in the prompt whichever model is used.
+- **DeepSeek's losses came from hosts.** Run 1: Morph rewrote all 94 quotes on one portfolio page ("[link: Alexia]" where the page has "[link: Close]") and once returned nothing; Makora put a stray quote mark before all 22 quotes on one filing; Cohere cut one answer off. Run 2: Mistral (twice) and SiliconFlow spent the whole 120,000-token limit reasoning and returned no answer. Morph matched every quote in the first test. Hosts with no failures in either run: DeepInfra, InferenceNet, CoreWeave (plus Novita and Venice, with few documents). DeepSeek's own API never ran away like this.
+
+**Blind precision check** (40 claims each from Haiku and DeepSeek through OpenRouter, 20 from DeepSeek's own API as a control, run 1, at most two per document per route; judged by a separate agent that never saw the key; items, verdicts and key in `out/precision5-*`):
+
+| Route | Fully correct | Partly right | Wrong |
+|---|---|---|---|
+| Haiku 5.5 (OpenRouter) | 34 of 40 (85%) | 6 | 0 |
+| DeepSeek 1017 (OpenRouter) | 37 of 40 (92.5%) | 3 | 0 |
+| DeepSeek's own API (control) | 18 of 20 (90%) | 1 | 1 |
+
+Haiku's partly right claims are mostly deal stage: announced deals given as completed or as current ownership (5 of 6), which would show a pending deal as done. DeepSeek's: one sponsor credited with control five sponsors share, a "decision to acquire" taken as a completed exit, a continuing owner named as acquirer. The wrong one: a bare menu item ("Golden Nozzle") quoted as a holding. The judge also flagged licensed brands on a maker's "Our Brands" page (Meyer listing KitchenAid) as a case for the prompt rules.
+
+## Haiku without the brand line (2026-11-14 diagnostic)
+
+Every run so far opened the request with "These documents were fetched while researching the brand X", which production will not send ("Extraction execution" Q3). Haiku also ran at its default effort (medium), thinking about 1,700 tokens on Leonard Green's page where DeepSeek thought 20,000 to 26,000. Before v7, every model, DeepSeek included, gave Leonard Green's page one claim. Three portfolio pages re-run with v8 ($0.11 on OpenRouter, a few cents on DeepSeek's own API; outputs `out/probe-*`, script in the session scratchpad):
+
+| Run | Leonard Green: claims naming LGP (former) | Roark: claims naming Roark (former) | RiverGlade: former holdings from "Prior to RiverGlade" |
+|---|---|---|---|
+| Haiku, brand line, default effort (earlier runs) | 1 | 0 | 0 to 12 |
+| Haiku, no brand line, default effort | 107 (36) | 0 | 11 |
+| Haiku, no brand line, high effort | 111 (40) | 0 | 12 |
+| Haiku, brand line, high effort | 111 (40) | 0 | 0 |
+| DeepSeek's own API, no brand line | 108 (37) | 86 (30) | 12 |
+
+- Leonard Green's page: Haiku reads it as fully as DeepSeek once the brand line goes or effort rises. With the brand line at medium effort it answered only for the named brand (Aspen Dental). The "skips portfolio pages" finding was a test artifact on this page.
+- Roark's page (no relationship stated in words): Haiku gave brand-to-company claims from the entries ("GoTo Foods is the parent company of Auntie Anne's…") and no Roark claim in any setting. A real difference with v8 as written.
+- Without the brand line, both models gave the "Prior to RiverGlade" deals as former RiverGlade holdings (11 and 12, every quote passing). The brand line had been hiding this for Haiku. It belongs to "Extraction prompt rules".
+- Cost on Leonard Green's page with no brand line: Haiku about $0.023, DeepSeek's own API about $0.03 off-peak and $0.06 peak (50,800 output tokens).
+- Every other Haiku figure above (known facts, precision) was measured with the brand line, so it may understate Haiku. Cross-model check from existing runs: DeepSeek's own API plus a Haiku run finds 144 known facts, the same as plus a second DeepSeek run (145 and 146); Haiku found 8 facts no DeepSeek run found (5 in filings), DeepSeek 27 that no Haiku run found (16 on pages).
+
+## DeepSeek and Qwen3.8-27B with no brand named (2026-11-15)
+
+At the developer's request, after Haiku testing was stopped: DeepSeek V4.1 Flash on DeepSeek's own API against Qwen3.8-27B through OpenRouter, both under production conditions: v8 prompt, no brand line, all 157 clean-text documents, two runs each. Qwen ran on zero-retention hosts at FP8 or BF16 with at least 131,072 output tokens (Chutes, Near AI, Ionstream, PrimeIntellect and Venice excluded for their 65,536 cap); its hosts allow 262,144 tokens of input plus output, so the two largest filings were read in windows (two and three) split at line breaks with about 2,000 tokens of overlap. DeepSeek ran with a 120,000-token output limit. Spent: OpenRouter $17.60 (Qwen runs $13.72, tuning $3.81), DeepSeek $1.37. Outputs `out/*-v8-nb`, `*-v8-nb2`, `*-v8q-qt*`; scripts `run.py` (`--no-brand`, Qwen windows), `compare_routes.py`, `sample_precision6.py`.
+
+| | DeepSeek, own API | Qwen3.8-27B, OpenRouter |
+|---|---|---|
+| Answers lost (314) | 0 | 3, all on Wafer: two ran to the 131,072-token limit repeating text, one returned nothing after 43,000 reasoning tokens |
+| Exact quotes | 94.4% / 99.9% (81 of run 1's 84 failures on TSG's page, "[link: Alexia]" for "[link: Close]") | 99.3% / 98.4% |
+| Known facts per run (of 218) | 141 / 142 | 129 / 133 |
+| Pages / portfolio pages / filings, per run | 98 / 13 / 30 and 97 / 16 / 29 | 89 / 13 / 27 and 92 / 15 / 26 |
+| Known facts in either run | 149 (101 / 16 / 32) | 151 (101 / 15 / 35) |
+| Run-to-run agreement, distinct claims | 71% | 53% |
+| Blind precision, 40 claims each | 37 correct, 2 partly, 1 wrong (92.5%) | 37, 2, 1 (92.5%) |
+| Cost per document | $0.0044 (off-peak Sunday) | $0.044 |
+| Median / slowest answer | 13 s / 2.5 min | 80 s / 28 min |
+| Output tokens per run | 0.87 million | 3.0 to 3.4 million (about 2.8 million reasoning) |
+| Leonard Green, claims naming the firm | 108 / 108 | 1 / 108 |
+| Roark, claims naming Roark (former) | 86 (30) / 85 (29) | 85 (0) / 86 (30) |
+| "Prior to RiverGlade" false holdings | 12 / 12 | 0 / 12 |
+
+- Without the brand line DeepSeek improved on every earlier DeepSeek run: more known facts, Roark read correctly in both runs, run-to-run agreement up from 64 to 65% to 71%. The TSG quote rewrite earlier blamed on the Morph host also happens on DeepSeek's own API, so it is the model on that page; the quote check rejects those claims.
+- Qwen's runs swing: Leonard Green's page got one claim in run 1 after 175,000 characters of reasoning that planned all 108 companies ("If too long, maybe truncated") and 108 in run 2.
+- Cross-model second read: DeepSeek plus a Qwen run finds 150 to 155 known facts, against 149 for two DeepSeek runs.
+- **Qwen tuning round** (v8 plus two sentences: never shorten a long answer; claim described owners and owners who retain a stake), two runs on the 27 documents where Qwen v8 missed facts DeepSeek found ($3.81): known facts there rose from 19 to 34 and 42 (DeepSeek 44 and 41 on the same documents, chosen for Qwen's misses), and Leonard Green was read fully in both runs. But both runs made the "Prior to RiverGlade" error, one gave no Roark claims, and blind precision fell to 87.5% (35, 2, 3): "privately owned" claimed as an owner twice. No full run of the tuned prompt.
+- Judge's notes for "Extraction prompt rules": "privately owned" and "run by family" name no owner; "an affiliate of" is not ownership; a stake type stated for a group of sponsors is not each sponsor's; Meyer's "Our Brands" list mixes owned and licensed brands (KitchenAid).
+

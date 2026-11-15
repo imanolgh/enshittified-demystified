@@ -110,7 +110,7 @@ Any business type is searchable from day one — the search box is not category-
 
 | Item | Estimate |
 |---|---|
-| LLM extraction (rosters + launch-state batches + BDC parse, batch pricing, cached prompts) | **Low hundreds of dollars, one-time**; re-runs free via sha256 dedup |
+| LLM extraction (rosters + launch-state batches + BDC parse, batch pricing, cached prompts) | **Low hundreds of dollars, one-time**; re-runs free via sha256 dedup *(2026-11-15, engine "Extraction execution": about $0.0044 per document read, $45 to $54 per 10,000; a new prompt or model version re-reads everything; BDC parsing is the `parser` producer, no LLM)* |
 | NPPES, Form 5500, EDGAR, license-board data | $0 (free/official) |
 | Google Places | Near-$0 at seeding (lazy-only policy, decisions.md §11); scales with user searches post-launch |
 | Compute/storage (workers, Postgres, S3-compatible) | Tens of dollars/month at this scale |
