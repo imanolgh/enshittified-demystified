@@ -88,3 +88,4 @@ Handed on:
 - "Operational identity, budgets and guardrail values": the incident alerts.
 - "Celery topology": waiting reads, the 5-minute checks, the bulk hold, 429 handling.
 - "Testing and acceptance": the version check and the growing targeted set.
+- 2026-11-15 (developer): approved the refined `extraction_requests.failure_reason` values (`connection|server_error|timeout|rate_limited|balance_empty|key_rejected|bad_request|output_limit|empty|refusal|bad_json`), replacing `http_error` and `payment`.
