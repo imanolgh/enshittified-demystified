@@ -47,7 +47,7 @@ _Avoid_: Independent, PE-free, not PE-owned
 ## Entities
 
 **Brand**:
-A name a company sells under at several locations or on products, such as Dunkin' or Ray-Ban. A brand owns nothing. Its owner is usually a company, but a source may name a fund, investment firm or family directly, and a brand can pass from one owner to another.
+A name a company sells under at several locations or on products, such as Dunkin' or Ray-Ban. A brand owns nothing. Its owner is whoever owns the name itself, never a licensee that makes or sells products under it: KitchenAid cookware made by Meyer is still Whirlpool's brand. The owner is usually a company, but a source may name a fund, investment firm or family directly, and a brand can pass from one owner to another.
 _Avoid_: Label, marque, chain (as its own kind of thing)
 
 **Company**:

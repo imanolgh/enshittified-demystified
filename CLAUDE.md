@@ -4,7 +4,7 @@ Ownership-transparency platform: maps private equity ownership and private credi
 
 ## Stack (always true)
 - Python 3.12, FastAPI, SQLAlchemy 2.0 + Alembic, Pydantic v2, Celery + Redis (+ Beat, Flower), PostgreSQL 16, MinIO/S3 via boto3, httpx + tenacity, Playwright, pdfplumber/camelot, pandas/polars, pytest.
-- DeepSeek V4.1 Flash on DeepSeek's own API for extraction, called with httpx (JSON mode, every item validated, no batch, no escalation tier); fallback DeepSeek 1017 through OpenRouter on DeepInfra, InferenceNet and CoreWeave (engine "Extraction execution", 2026-11-15). Prompt lives in `app/core/`; Claude drafts it, the developer approves it, golden-fixture tests check it.
+- DeepSeek V4.1 Flash on DeepSeek's own API for extraction, called with httpx (JSON mode, every item validated, no batch, no escalation tier); fallback DeepSeek 1017 through OpenRouter on DeepInfra, InferenceNet and CoreWeave, only when DeepSeek's API is down (engine "Extraction execution", 2026-11-15; trigger from "Extraction prompt rules"). Prompt lives in `app/core/`; Claude drafts it, the developer approves it, golden-fixture tests check it.
 - Package/deps: `uv`. Services: `docker compose up` (postgres, redis, minio).
 
 ## Role contract (non-negotiable; rewritten 2026-10-26)
