@@ -33,7 +33,7 @@ The AI is a reading-comprehension engine over documents you fetched. Hallucinati
 | Scheduling | **Celery Beat** | Laravel Scheduler (`app/Console/Kernel`) | Recurring crawls and filing polls |
 | HTTP client | **httpx** (async) + **tenacity** (retry/backoff) | Laravel HTTP client (Guzzle) + retry middleware | Per-domain rate limiting via a Redis token bucket ≈ `RateLimiter` |
 | Scraping | **Playwright** (JS-heavy pages) + BeautifulSoup / `selectolax` | Browsershot/Dusk + `symfony/dom-crawler` | Meaningfully stronger ecosystem than PHP's |
-| PDF / table extraction | **pdfplumber** + **camelot**, in-process | (no good PHP option — would have been AWS Textract) | Schedule of Investments and CAFR tables parse natively; no sidecar, no per-page bill |
+| PDF / table extraction | **pdfplumber** + **camelot**, in-process | (no good PHP option — would have been AWS Textract) | Schedule of Investments and CAFR tables parse natively; no sidecar, no per-page bill *(2026-11-16: BDC Schedules are read from Inline XBRL tags, not PDFs; CAFR tables still need this.)* |
 | Bulk data | **pandas** / **polars** | `COPY` + raw SQL via `DB::` | Form 5500 CSVs → clean → Postgres |
 | LLM | **Anthropic Python SDK** (Sonnet-class bulk, Opus-class escalation) | Anthropic PHP SDK / plain HTTP | Structured outputs pair with Pydantic |
 | Search / fuzzy match | **Meilisearch** Python client + **rapidfuzz** | Laravel Scout + Meilisearch | Entity/alias matching (Stage 1) and consumer search (Stage 7) |
@@ -69,7 +69,7 @@ The AI is a reading-comprehension engine over documents you fetched. Hallucinati
 ### 3.3 PC Evidence Connectors
 | Source | Access | Yields |
 |---|---|---|
-| **SEC EDGAR — BDC filings (10-K/10-Q, N-2)** | Free API | Schedule of Investments tables: which fund lends to which company, at what rate, non-accrual status. The core PC dataset |
+| **SEC EDGAR — BDC filings (10-K/10-Q, N-2)** | Free API | Schedule of Investments tables: which fund lends to which company, at what rate, non-accrual status. The core PC dataset *(2026-11-16: 10-K and 10-Q only, no N-2; "BDC connector and Schedule parser".)* |
 | **Form ADV (SEC IAPD)** | Free bulk data downloads | Private fund advisers, AUM, fund lists |
 | **DOL Form 5500 + Schedule H** | Free bulk datasets (annual CSVs) | Every private-sector retirement plan's investment lineup — the backbone of the 401(k) exposure checker |
 | **Public pension CAFRs/ACFRs** | PDF downloads from each system's site | Alternatives allocation %, sometimes fund-level commitments. Top ~100 systems first |
@@ -307,6 +307,10 @@ claims                         -- atomic, cited assertions
       --     pik_rate_pct, floor_pct, principal, cost, fair_value, currency, scale, non_accrual,
       --     maturity_date, affiliation (non_affiliate|affiliate|control).
       --   holds_position: instrument, units, cost, fair_value, currency, scale, affiliation.
+      --   2026-11-16 (ticket 36): lends_to and holds_position add other_name (a trailing dba, aka or
+      --   bare parenthesis from the name cell, as written, e.g. "dba Dental365"); it never makes an
+      --   ownership claim. A control-section equity row also gives owned_by (stake_basis voting, no
+      --   stake_pct). Mapping from the tags: "BDC connector and Schedule parser" (§5).
       --   BDC rows: event_date = the Schedule's period end. Amounts in full units with currency
       --     (required when an amount is present) and scale (1|1000|1000000, the table's "(in
       --     thousands)" factor); rates are percent numbers (5.25 = 5.25%).
@@ -389,8 +393,15 @@ edges                          -- the published graph (derived from claims)
   phase (pending|active|unconfirmed|ended), started_on (nullable), started_on_precision
       (nullable: year|month|day), ended_on (nullable), ended_on_precision (nullable),
       end_reason (nullable: seller_or_exit|superseded_by_stake|replaced|absent_from_list|
-      terminated|pending_expired), ended_by_document_id (nullable), last_confirmed_on,
-      value_claim_id (nullable), expected_close_from (nullable), expected_close_to (nullable)
+      terminated|pending_expired|fund_closed), ended_by_document_id (nullable), last_confirmed_on,
+      value_claim_id (nullable), value_document_id (nullable), expected_close_from (nullable),
+      expected_close_to (nullable)
+      -- 2026-11-16 (ticket 36, "BDC discovery and Schedule of Investments parsing"): one lends_to
+      -- edge per BDC (or venture) and borrower pair, one holds_position edge per pair; each
+      -- Schedule row is its own claim. For these edges value_document_id is the newest Schedule's
+      -- filing, value_claim_id stays null, and the card reads that filing's claims for the pair
+      -- (every tranche). fund_closed: the BDC filed an N-54C or Form 15; its open lends_to,
+      -- holds_position and control owned_by edges end as of its last Schedule's period end.
       -- 2026-11-07 (ticket 26, "Edge lifecycle: ending, retraction and staleness"): one row per
       -- ownership period (sold in 2019, bought back in 2024: two rows); at most one open
       -- (non-ended, non-retracted) row per (from, to, relation). A row changes in place, with an
@@ -427,7 +438,9 @@ edges                          -- the published graph (derived from claims)
       -- retracted_at on its identity rows (undoing merges they triggered) and document reads,
       -- recompute affected edges, write one events row for the command plus one per edge or
       -- category that visibly changed (none per claim), and queue a re-run with the fixed version.
-      -- Disappearance: a lends_to or holds_position edge ends (absent_from_list) when the fund's
+      -- Disappearance (2026-11-16, ticket 36: also a control owned_by hop backed only by Schedule
+      -- rows, ADR 0001; "clean" = no failed rows and totals add up; a partial Schedule ends nothing):
+      -- a lends_to or holds_position edge ends (absent_from_list) when the fund's
       -- next Schedule parses cleanly and lacks the holding, as of that period end; one miss is
       -- enough; an unparseable Schedule proves nothing. Ownership never ends by absence. Stores
       -- and roster locations close after two complete crawls in a row miss them. A 404 or 410
@@ -686,6 +699,18 @@ Celery Beat (≈ Laravel Scheduler): recurring crawls of sponsor portfolio pages
 - **One firm, several registrations:** joined only through the firm's registry entry, which lists its CRDs. Nothing groups registrations automatically; umbrella registrations are already one row.
 - **Not loaded:** advisers without private funds; the IRS exempt-org file, moved to the local-businesses map (Form ADV ticket Q4).
 
+### BDC connector and Schedule parser (2026-11-16, engine "BDC discovery and Schedule of Investments parsing")
+- **Universe, monthly:** every entity with an `814-` file number that files a 10-K or 10-Q, listed, non-traded or private (about 187). The `etl` producer takes the union of the SEC BDC data-set CIKs and the yearly BDC Report, confirms each by an `814-` file number on a 10-K or 10-Q in its submissions JSON, and emits a `fund` identity record (`cik`, `sec_file_number`) plus rank-1 `owner_kind_evidence` for `other_investment_fund`.
+- **Filings:** every 10-K and 10-Q; an amendment only when it carries a tagged Schedule (then it is a later-filed document for the period). No N-2s or prospectuses. A daily check of each BDC's submissions JSON finds new filings, parsed the same day. History: every tagged Schedule since the BDC began Inline XBRL tagging (August 2022 to May 2023 by BDC; about 2,400 filings). Untagged filings before that are not read.
+- **Lender and borrower:** the lender is the BDC (a `fund`); its adviser connects only through `managed_by`, which the `llm` producer reads from each 10-K's Item 1 Business section, cut out by code as its own child document (internally managed BDCs give none). The LLM reads nothing else in BDC filings. The borrower is the company the row names. Chain: brand → company ← lends_to ← BDC → managed_by → investment firm.
+- **Parser (`parser` producer, module `bdc_soi`):** reads the filing's own Inline XBRL document. One table row is one holding; values come from that row's tags with their scale (`scale` 3 = 1,000, 6 = 1,000,000); the name comes from the visible row. Each row is a child document keyed by the holding's identifier string; its `raw_text` is the row's visible cells in order, with name and description cells copied down from the borrower's first row where the filer left them blank, rendered by code. The claim quotes the whole `raw_text`. The hidden identifier groups a row's tags and is never quoted or used as a name. The SEC BDC data set is not a source.
+- **Rows into claims:** loan rows give `lends_to` (BDC → borrower), equity rows give `holds_position`; an equity row under "Control investments" also gives `owned_by` (company → BDC) with `stake_basis: voting` and no `stake_pct`. Affiliation comes from section headings or footnote markers (filers never tag it per holding). Name as written: the name cell after the copy-down, minus footnote markers and appended tranche words; two names joined by "and" or "&", each ending in an entity suffix, give one claim per company with the same quote. A trailing parenthesis comes off the name: f/k/a or fka gives a `renamed_from` claim; dba, aka and bare parentheses go to `value.other_name` as written, never an ownership claim.
+- **Joint ventures:** a venture schedule tagged inside the 10-Q is read with the venture as lender: the venture is a `fund` identity record named as written (schedule heading or identifier ending, e.g. "Emerald JV LP"), its rows give `lends_to` from the venture, and the BDC's stake row gives `holds_position` (BDC → venture). Untagged EX-99 venture schedules are not read.
+- **Layouts:** generic rules first (blank name copies down; trailing "(n)" is a footnote; a heading or footnote matching a fixed phrase list sets affiliation); per-filer overrides in code, each with a real fixture from that filer, only where the rules fail. No hand step in production.
+- **Outcomes per Schedule** (the BDC's own and each venture's): a row fails when its shown numbers differ from its tags after scaling, it has no name after the copy-down, or the door rejects its claim. Clean = no failed rows and fair values add up to the tagged total within the filer's rounding: claims publish and pairs missing from it end their edges. Partial = failed rows at or below the threshold, or totals off: claims publish, no edge ends from it, operational alert. Failed = above the threshold: nothing publishes, the read is `unreadable`, operational alert (ADR 0002). Threshold value: "Operational identity and guardrails".
+- **Cross-check:** the SEC's monthly BDC data set is the independent copy. Build tests match each fixture filing's holdings to its rows (count and fair value per holding, by identifier); in production each monthly file is compared with that month's parsed filings and any difference raises an operational alert, never changing or withholding claims.
+- **Closed BDCs:** an N-54C or Form 15 ends the BDC's open `lends_to`, `holds_position` and control `owned_by` edges as of its last Schedule's period end (`fund_closed`).
+
 ### Producers and the door (2026-11-05, engine "Claim producers and the claims door")
 
 Four producers turn stored documents into output. Each one records itself in `producer`:
@@ -699,7 +724,7 @@ Every claim, whatever produced it, quotes a stored document, enters as `pending`
 
 - Page or filing text: an exact span of the document's text.
 - A bulk row (header line + data line): the whole data line, exactly as in the file.
-- A BDC holding: the row's parsed-table text. If the parser reads the SEC BDC dataset, each holding is a bulk row.
+- A BDC holding: the row's parsed-table text. If the parser reads the SEC BDC dataset, each holding is a bulk row. *(2026-11-16, engine "BDC discovery and Schedule of Investments parsing": the parser reads the filing's own tags, never the data set; the row text is the visible row with blank name cells copied down, rendered by code, as in "BDC connector and Schedule parser".)*
 - A roster item on an HTML page: the item's text, which must appear in the page's text.
 - A store-locator JSON record: one document per record. Code writes the record's text as one `field: value` line per field, sorted, with nested fields dotted (`address.city: Atlanta`) and list items indexed (`brands.0: Dunkin'`). The quote is the lines the claim uses. `meta` records the rendering format's version and points at the full response, which is stored as the original.
 
@@ -801,7 +826,7 @@ Load the NPPES bulk census (national); add the NPPES API, state SoS for launch s
 CSV batch intake at thousands-of-entities scale; Celery Beat re-crawls; diff detection on portfolio pages/rosters → new-acquisition events → Acquisition Alarm notifications.
 
 **Phase 4 — PC layer**
-Form 5500 bulk load (pandas); camelot BDC Schedule of Investments parsing; top-100 pension CAFR ingestion; PC claim types + jargon decoder content. This is where the Python choice pays back most visibly. This lights up MyRetirementX-Ray on the same graph.
+Form 5500 bulk load (pandas); camelot BDC Schedule of Investments parsing; *(2026-11-16: Inline XBRL, not camelot)* top-100 pension CAFR ingestion; PC claim types + jargon decoder content. This is where the Python choice pays back most visibly. This lights up MyRetirementX-Ray on the same graph.
 
 **Phase 5 — Graph depth**
 Cross-link the layers (sponsor → PC lender → pension LP where public evidence exists, `estimated` edges labeled as such; *2026-11-07: `estimated` was dropped from edge confidence (engine "What 'checked' means and coverage states"); the retirement map may add it back*); expose the money-flow graph views; ~~open community submissions into the review queue~~ (not in the MVP, 2026-10-26).

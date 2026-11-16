@@ -17,3 +17,4 @@ What does the graph endpoint return (depth cap, directions, relation filters, hi
 - **From "Category storage and recompute"** (2026-11-07): category pages and shares read stored `entity_categories` rows; formerly-PE history comes from ended `entity_pe_owner_periods` rows.
 - **From "Entity lifecycle"** (2026-11-06): a merged entity's card and graph redirect to the survivor's; a `closed` entity still shows its history.
 - At launch every page is a brand page ("Brand and chain model"), so company, fund and BDC pages may be later; whether they exist at launch is part of the question.
+- **From "BDC discovery and Schedule of Investments parsing"** (2026-11-16; section "BDC connector and Schedule parser" in evidence_layer_plan.md §5): BDC and joint-venture pages (if any) can show: the BDC's adviser (`managed_by`), its lending and position edges with every tranche from the newest Schedule (`value_document_id`), ventures it holds, and lenders that are ventures of a BDC.

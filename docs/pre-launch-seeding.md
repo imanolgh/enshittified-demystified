@@ -80,7 +80,7 @@ Any business type is searchable from day one — the search box is not category-
 | Surface | Seeded? | Source |
 |---|---|---|
 | Employer → 401(k) plan lineup lookup + **free headline exposure number** | ✅ Yes | Form 5500/EFAST bulk load (Scenario B1a) — effectively every private-sector plan |
-| BDC loan books as `lends_to` edges (incl. the PE↔PC cross-links where borrowers resolve) | ✅ Yes | ~150 BDC latest 10-K/10-Qs parsed (B1b) |
+| BDC loan books as `lends_to` edges (incl. the PE↔PC cross-links where borrowers resolve) | ✅ Yes | ~150 BDC latest 10-K/10-Qs parsed (B1b) *(2026-11-16: about 187 BDCs, every tagged Schedule since 2022–23; first follow-up, ADR 0004)* |
 | Public pension lookup (CAFR allocations) | 🔜 Fast-follow, not launch | Top-100 CAFRs; roadmap Phase 5+. UI at launch: "public pension coverage coming — get notified" |
 | Deep-dive analysis / retirement monitor | ✅ At launch, free during the ~3-month founding-member beta; paid after (monetizationideas.md §3A) | Composes over the above; requires the securities-attorney wording review and billing/tiers built before launch |
 
@@ -98,7 +98,7 @@ Any business type is searchable from day one — the search box is not category-
 
 **W5 — Launch-state deep batches.** Scenario A1 across every dental + vet practice in the launch states; work the review queue to zero on conflicts before launch.
 
-**W6 — PC bulk loads.** Form 5500 (B1a) + 150-BDC parse (B1b) + borrower resolution pass (the graph join).
+**W6 — PC bulk loads.** Form 5500 (B1a) + 150-BDC parse (B1b) *(2026-11-16, engine "BDC discovery and Schedule of Investments parsing": BDC loan data is the first follow-up after the chains launch (ADR 0004): about 187 BDCs, every tagged Schedule since 2022–23.)* + borrower resolution pass (the graph join).
 
 **W7 — QA & honesty pass.** *(System QA, not fact review — ADR 0002: findings become fixes to code, fixtures, thresholds or the prompt, then a re-run; no fact is hand-edited.)* Hand-spot-check 50 random entities per coverage state against their sources; verify every "no evidence" entity really matched against the full roster set; confirm checked-dates render; confirm A2 on-demand works end to end for an unseeded category.
 
@@ -125,7 +125,7 @@ Any business type is searchable from day one — the search box is not category-
 - [ ] Census × roster join published; §2A categories show all three seeded states correctly
 - [ ] Every launch state at full depth; review queue drained for them
 - [ ] Form 5500 lookup returns lineups for arbitrary employer names; headline exposure number renders
-- [ ] ≥1 full cross-layer chain (clinic → DSO → sponsor ← BDC) live and traversable
+- [ ] ≥1 full cross-layer chain (clinic → DSO → sponsor ← BDC) *(2026-11-16, engine "BDC discovery and Schedule of Investments parsing": the BDC lends to the company: brand → company ← lends_to ← BDC.)* live and traversable
 - [ ] On-demand search (A2) works for an unseeded category, honest states included
 - [ ] Every claim card resolves to stored source documents; retraction/changelog path tested
 - [ ] Beat schedules running: roster diffs, press polls, EDGAR polls — launch data doesn't rot

@@ -31,7 +31,7 @@ Label: wayfinder:map · Tracker: local markdown (`docs/agents/issue-tracker.md`)
 - **Store map** (first follow-up after launch, ruled 2026-11-06 in "Brand and chain model"): stores from brand store locators (selector producers), each with its address and brand, the brand's verdict labeled as the brand's, and a line saying the store's operator isn't checked; open map tiles; a geographic index; monthly re-crawl. No operators.
 
 - **Seeding plan** for chains and brands: sources, order and runbook. ADR 0004 says it follows the category audit; it replaces nothing in `pre-launch-seeding.md`, which stays as the parked local plan.
-- **BDC lenders on brand pages**: how a PE-owned chain's page shows which public funds lend to it, once engine "BDC discovery and Schedule of Investments parsing" closes (first follow-up, ADR 0004).
+- **BDC lenders on brand pages**: how a PE-owned chain's page shows which public funds lend to it, once engine "BDC discovery and Schedule of Investments parsing" closes (first follow-up, ADR 0004). Engine resolved it 2026-11-16: lenders are BDCs and their joint ventures, one edge per BDC and borrower with every tranche; borrowers are often holding companies, and a trailing dba or aka in the borrower name is stored as `other_name` ("dba Dental365"), which this follow-up can use to link a loan to a brand. Also open here: whether a brand counts as "checked" only after the BDC Schedules' latest complete pass.
 
 ## Out of scope
 

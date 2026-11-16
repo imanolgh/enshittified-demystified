@@ -92,6 +92,10 @@ _Avoid_: Sponsor, GP, asset manager (as entity labels)
 A pool of money that one investment firm manages at a time, and that owns or lends to companies. Most of its money comes from outside investors, so the firm manages the fund without owning it or what it owns. Whether it owns or lends is a relationship, not part of what it is.
 _Avoid_: Lender, vehicle
 
+**BDC**:
+A fund that the SEC registers as a business development company, recognized by its 814- file number. It lends to and invests in private companies and lists every holding in a public Schedule of Investments each quarter. It may trade on an exchange, sell shares to the public without a listing, or be offered privately. A BDC can co-own a joint venture, a separate fund that lends in its own name.
+_Avoid_: Private credit fund (as an entity label)
+
 **Rollup**:
 A company that owns or operates many local practices, such as a dental support organization, a vet group, or a physician management company.
 _Avoid_: DSO (for anything that is not dental), consolidator, platform
@@ -141,6 +145,9 @@ _Avoid_: Government source, authoritative source
 **Independent sources**:
 Two sources whose words come from different organizations that don't control each other, such as a buyer and its seller, or a firm and a news outlet. A press release copied onto five sites is one source, and a company and its owners speak with one voice, so a brand's site and its owner's site are one source. Two outlets describing the same deal in similar words are two sources.
 _Avoid_: Separate sources, multiple sources
+
+**Schedule of Investments**:
+The table in a BDC's 10-K or 10-Q that lists every loan and investment it holds at the period end, one row per holding.
 
 **Registry**:
 The curated list of investment firms, companies and brands whose own pages the engine reads: their portfolio pages, newsrooms and about pages. It tells the crawler where to look and is never itself evidence.

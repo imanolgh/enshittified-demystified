@@ -59,6 +59,10 @@ Apply the ~80 pure wording fixes the 2026-10-26 inventory found (no decision nee
 
 - `python-types-primer.md` (to be archived) still shows the independence rule as "distinct source_type" only; independence now means different speakers (ADR 0002 amended). Fix or archive with a note.
 
+## Added by "BDC discovery and Schedule of Investments parsing" (2026-11-16)
+
+- The bdc-parser skill is already rewritten XBRL-first (drop its items from the Skills lists above). build_roadmap Steps 20 to 22, research_flows B1b and pre-launch-seeding got dated notes (no SIC, about 187 BDCs, `bdc_soi`, the corrected lender diagram); the sweep can fold them into the text. evidence_layer_glossary.md:27 still calls BDCs "publicly traded" (many are non-traded or private) and :148 still says pdfplumber/camelot read the Schedule.
+
 ## How to resolve
 
 AFK. Make the edits, then append `## Answer` listing what changed and anything skipped (with why). No commits.
