@@ -27,6 +27,7 @@ None yet.
 - **Privacy rule:** individuals own most homes. The product names a family only as its sources do and never profiles a person; this map needs a firm rule that only company and fund owners are shown, and what happens to a building whose owner is a person.
 - **Coverage plan:** which places first (cities with rental registries, counties with open parcel data), and what a building outside them shows.
 - **Property managers:** how a building shows a manager whose owner differs from the building's owner.
+- **Hotels** (moved here 2026-11-16 from chains "Launch industries", Q13): a hotel's PE sits in who owns the building (KSL resorts, Blackstone real estate funds), separate from the brand on the sign (Marriott) and the company that runs it, so a brand page shows none of it. It needs this map's building-to-owner role and property records. Taking hotels widens this map's destination beyond homes; when the map is unparked, the developer decides whether they stay here or get their own map.
 
 ## Out of scope
 
