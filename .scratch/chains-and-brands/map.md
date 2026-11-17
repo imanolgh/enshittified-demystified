@@ -44,3 +44,4 @@ Label: wayfinder:map · Tracker: local markdown (`docs/agents/issue-tracker.md`)
 - **Local businesses and retirement**: parked in the [local-businesses](../local-businesses/map.md) and [retirement](../retirement/map.md) maps.
 - **Housing search** (buildings and houses by address, and who owns or runs them): its own parked [housing map](../housing/map.md), ruled 2026-11-07 in engine "Funds and their investment firm". Landlords that rent under their own name were screened in "Research: Industry screen" (25% PE by brand row); whether they launch is "Launch industries".
 - **Outreach and partnerships** (Worse on Purpose, creators): the developer's call, not a spec question.
+- **Non-PE owners** (conglomerates, brand licensors and their licensees, short-term owners, past owners that weren't PE): a post-launch add-on in its own parked [non-PE owners map](../non-pe-owners/map.md), ruled 2026-11-16 (ADR 0004). v1 stays as specified.
