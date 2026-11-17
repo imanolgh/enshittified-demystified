@@ -1,0 +1,21 @@
+# Launch industries
+
+Type: grilling
+Status: open
+Blocked by: 80, 82  (Research: Industry screen; Research: Where PE owns consumer brands)
+Map: [chains-and-brands](../map.md)
+
+## Question
+
+Which industries launch in version 1, which wait for a second batch, and what is each industry's label?
+
+## Context
+
+- Split off "Product categories: vocabulary and assignment" on 2026-11-16 (round 1 Q2 revised): the thirteen audited industries came from the pivot proposal's candidate list, so the launch list waits on a screen of twelve more ("Research: Industry screen") and full audits of any that look like about 20% PE or higher.
+- Numbers so far (PE-owned plus PE minority stake by brand row, strict rule): car washes 53%, veterinary care 52% (21 rows), dental care 50%, restaurants 40%, women's apparel 38%, gyms 33%, mattresses 30%, pet stores 19% (61% of locations), dollar and discount 16%, eyewear 13% (20.5% of sales), cookware 13% (five licensed-name rows), supplements 10%, pharmacies 7% (30.7% of ranked prescription sales). Brand-direct affiliate programs on brands that are not PE-owned: mattresses 5 to 6, women's apparel 4, eyewear 4, cookware 9, supplements 2, pet stores 1, pharmacies 1. Findings: [category-audit-pilot](../research/category-audit-pilot.md), [category-audit-full](../research/category-audit-full.md).
+- Claude's first proposal (before the split, not decided): car washes, veterinary care, dental care, restaurants, women's apparel, gyms, mattresses and pet stores; eyewear, cookware, supplements, dollar and discount, and pharmacies as second-batch candidates. Cookware's licensed names were the extra reason against it.
+- Selection test from the pivot proposal (a proposal, not decided): about 20% PE or higher, at least three industries with affiliate income; about 8 to 10 industries and roughly 1,000 brands.
+- Landlord brands are in the screen; property managers are ruled out ("Product categories", Q6).
+- Settled in "Product categories": the word is **industry** everywhere, and the site's browse pages are industry pages; a brand can sit in several industries.
+- **From "Research: Industry screen"** (2026-11-16; [findings](../research/industry-screen.md)): PE share by brand row in twelve more industries: collision repair 90%, urgent care 80%, physical therapy 80%, home services franchises 69% (composite), child care 60%, oil change and auto service 50%, bowling and family entertainment 45% (64% if Atairos counted), hair salons 30%, golf 29%, landlord brands 25% strict, ski resorts 12.5%, funeral homes 0%. Seven were judged worth a full audit (about 340k tokens each by the full audit's figure); golf only as an operator audit. Open here: whether to run those audits before choosing, and the workers' five questions: owners whose Form ADV says no PE funds (Atairos, Meritage), a public holding company as a holder (Icahn Enterprises), real estate funds as landlords (the engine's `real_estate` kind), industries where PE sits in local-name rollups, and home services' size measure.
+- **From "Product categories"** (2026-11-16, Q11): the launch list also waits on "Research: Where PE owns consumer brands", a bottom-up scan of PE portfolio pages and BDC borrower sectors, because both candidate lists so far were guesses. Q7 there: if cookware or another licensing-heavy industry makes the list, revisit the known gap (a licensee's brand list that never says "licensed" can still give a claim that the licensee owns the brand).

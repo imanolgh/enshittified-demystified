@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 54, 64, engine/28  (Product categories: vocabulary and assignment; USPTO trademark data: adopt as a source?; What "checked" means and coverage states)
+Blocked by: 54, 64, 81, engine/28  (Product categories: vocabulary and assignment; USPTO trademark data: adopt as a source?; What "checked" means and coverage states; Launch industries)
 Map: [chains-and-brands](../map.md)
 
 ## Question
@@ -21,3 +21,4 @@ How is a category's brand list chosen and kept current, what has to have happene
 - **From engine "What 'checked' means and coverage states"** (2026-11-07; ADR 0001 amended): the engine side is settled. A brand is checked when every source on its required list has finished a run (finding nothing counts); its checked date is the oldest run's; a failed or robots-blocked source leaves it unchecked. Shared sources (sponsor pages, press feeds, Form ADV, BDC Schedules) count through their latest complete pass after the brand was added. A check is judged against the list in force when it ran. Before a check completes, a brand shows only PE-owned or PE minority stake, else "not yet checked". Which sources make up the brand list, and how long a check stays fresh, are this ticket's.
 - **From engine "Press and EDGAR full-text connectors"** (2026-11-08): press as a required source for a brand means the wire feeds going forward (releases stored from issuers' own sites) plus the historical route, which "Retrieval fan-out, tracked entities and refresh cadence" decides after "Research: Web search APIs for finding a brand's past coverage".
 - **From engine "EDGAR full-text search and ownership filings"** (2026-11-08): EDGAR full-text search per brand (exact-phrase query per brand and company name over deal, prospectus, annual-report, proxy and merger forms since 2001) is a candidate required source for a brand's check.
+- **From "Product categories: vocabulary and assignment"** (2026-11-16): a brand's industries come only from the industry brand lists that include it (nothing else assigns one), so the list is the assignment; rollups whose locations keep local names are never list entries; a brand can sit on several lists. Open here: whether brands outside the launch industries get seeded at all (for example Walgreens, Sycamore-owned since 2025, while pharmacies may not launch).

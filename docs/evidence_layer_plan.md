@@ -178,7 +178,7 @@ entity_industries              -- 2026-11-05 (ticket 12)
       -- came in (an intake row, incl. a brand-list upload; or a document such as an NPPES record
       -- whose taxonomy code maps to an industry), never by the LLM, never a claim.
       -- 2026-11-05 (ticket 04): a CHECK requires exactly one of ingest_item_id and
-      -- source_document_id. Chains values and display: chains-and-brands "Product categories".
+      -- source_document_id. Chains values and display: chains-and-brands "Product categories" (2026-11-16: a brand's industries come only from the industry brand lists that include it, which are intake uploads; a brand can have several; the values are chosen in "Launch industries").
 
 location_brands                -- 2026-11-05 (ticket 15, "Predicate semantics")
   id, location_id, brand_id, source_document_id, producer, producer_version, retracted_at

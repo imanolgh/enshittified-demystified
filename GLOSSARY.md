@@ -63,8 +63,12 @@ One person or a family who owns a company in their own name, named only as sourc
 _Avoid_: Founder, individual, person (as an owner)
 
 **Industry**:
-What line of business an entity is in, such as dental care, restaurants or gyms. It is not the entity's ownership category.
-_Avoid_: Category, vertical, sector
+What line of business an entity is in, such as dental care, restaurants or gyms. A brand can belong to several. It is not the entity's ownership category.
+_Avoid_: Category, product category, vertical, sector
+
+**Industry page**:
+The page that lists the brands in one industry.
+_Avoid_: Category page, product category
 
 **Operator**:
 The company that runs a location. A franchisee is the operator of its stores. A location is company-run when its operator is in the brand owner's ownership chain, and franchised when it isn't.
@@ -97,7 +101,7 @@ A fund that the SEC registers as a business development company, recognized by i
 _Avoid_: Private credit fund (as an entity label)
 
 **Rollup**:
-A company that owns or operates many local practices, such as a dental support organization, a vet group, or a physician management company.
+A company that owns or operates many local businesses that keep their own names, such as a dental support organization, a vet group, a physician management company or a funeral home group.
 _Avoid_: DSO (for anything that is not dental), consolidator, platform
 
 **Retirement plan**:

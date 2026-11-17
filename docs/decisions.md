@@ -112,7 +112,7 @@ Reading order for the document set: `painpoints.md` → `marketgaps.md` → `evi
 
 **Decision:** recorded in `docs/adr/0004-chains-and-brands-first.md`. The active product is national chains and brands, and version 1 is a website. Local businesses are parked on record. The retirement lookup is deferred, BDC loan data is the first follow-up, and Form ADV ingestion stays.
 
-**Money model:** free, unmetered search; paid alerts when a followed brand changes hands; affiliate links on product categories, with a visible disclosure and ranked by a published rule, never by commission. The pivot proposal suggested about $5/mo or $49/yr for alerts. `monetizationideas.md` stays canonical for prices and still critiques $5/mo alerts for local follows (§1 row 1), so the alert price is open until that doc is updated.
+**Money model:** free, unmetered search; paid alerts when a followed brand changes hands; affiliate links on product categories *(industries since 2026-11-16)*, with a visible disclosure and ranked by a published rule, never by commission. The pivot proposal suggested about $5/mo or $49/yr for alerts. `monetizationideas.md` stays canonical for prices and still critiques $5/mo alerts for local follows (§1 row 1), so the alert price is open until that doc is updated.
 
 **Ticket layout:** `.scratch/engine/` (shared), `.scratch/chains-and-brands/` (active), `.scratch/local-businesses/` (parked) and `.scratch/retirement/` (parked), each with its own spec. Engine tickets hold no parked work: local-only and retirement-only bullets were split into their own maps' tickets, and engine tickets don't wait on parked tickets (ruled 2026-11-04). Ticket numbers stay unique across folders.
 
