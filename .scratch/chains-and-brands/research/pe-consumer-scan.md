@@ -1,6 +1,6 @@
 # Research: Where PE owns consumer brands (bottom-up scan)
 
-Ticket: [82 Research: Where PE owns consumer brands](../issues/82-research-where-pe-owns-consumer-brands.md) · Step 1 run 2026-11-16 by four background workers, assembled by the parent session. Worker reports with every firm's list: [1 large diversified](pe-consumer-scan/1-large-diversified.md), [2 consumer-focused](pe-consumer-scan/2-consumer-focused.md), [3 mid-market](pe-consumer-scan/3-mid-market.md), [4 services and healthcare](pe-consumer-scan/4-services-healthcare.md). Step 3 screened twelve new industries (the developer chose all twelve); results below.
+Ticket: [82 Research: Where PE owns consumer brands](../issues/82-research-where-pe-owns-consumer-brands.md) · Step 1 run 2026-11-16 by four background workers, assembled by the parent session. Worker reports with every firm's list: [1 large diversified](pe-consumer-scan/1-large-diversified.md), [2 consumer-focused](pe-consumer-scan/2-consumer-focused.md), [3 mid-market](pe-consumer-scan/3-mid-market.md), [4 services and healthcare](pe-consumer-scan/4-services-healthcare.md). Step 3 screened twelve new industries (the developer chose all twelve), and a newsroom rebuild covered the five biggest firms without a portfolio list; results below.
 
 ## Method
 
@@ -80,6 +80,20 @@ New counting questions from step 3 (for "Launch industries"): a PE partner at cl
 
 Bot slips reported in step 3: worker A followed four cross-host redirects before reading the new host's robots.txt (all four allow the bot) and fetched twice inside a 10-second crawl-delay; worker B followed one redirect to a disallowed path (response deleted unread) and one cross-host redirect before reading robots.txt (no restrictions); worker D retried two 403 responses (Kumon, Huntington) in the browser without checking whether they were challenges; the developer ruled to drop both rows' evidence (Q14), which changes no PE share. Each fetcher was patched to stop following redirects to unread hosts or disallowed paths.
 
+## Newsroom rebuild of the biggest firms (Q13)
+
+Blackstone, Apollo, Bain, Brookfield and Ares publish no portfolio list, so two workers rebuilt their US consumer holdings from their own newsrooms (deals since 2015, titles filtered in code, consumer targets kept, exits checked; real estate, credit and infrastructure deals left out). Reports: [n1 Blackstone and Apollo](pe-consumer-scan/n1-blackstone-apollo.md), [n2 Bain, Brookfield and Ares](pe-consumer-scan/n2-bain-brookfield-ares.md). 90 of 90 quotes matched.
+
+| Firm | Newsroom items since 2015 | Current US consumer companies | Examples |
+|---|---|---|---|
+| Blackstone | 1,144 | 15 | Jersey Mike's, Tropical Smoothie Cafe, 7 Brew, SERVPRO, Champions Group, Supergoop!, ZO Skin Health, SPANX, Ancestry, Chamberlain (LiftMaster), Rover, DECA Dental; Bumble public (22.9%) |
+| Apollo | 646 | 12 | The Fresh Market, Cardenas and Tony's Fresh Market, Michaels, Shutterfly, The Venetian, Yahoo, Brightspeed; PetSmart minority; Albertsons preferred |
+| Bain Capital | 1,600 (541 releases) | 20 | Fogo de Chão, Sizzling Platter, Gong cha, Maesa, 1440 Foods, ConvenientMD, Rodeo Dental, U.S. Renal Care, Power Home, Concert Golf; Surgery Partners public (take-private pending) |
+| Ares | 533 releases | 4 | Aspen Dental (with LGP), Cooper's Hawk, DuPage Medical, Elara Caring; Savers Value Village public (Ares 75.83%, controlled) |
+| Brookfield | 706 titles | 0 | its PE deals are B2B, industrial or non-US; its retail PE fund holds Spring Education only as debt |
+
+"Current" means no exit found in the firm's newsroom, and exits are rarely announced (Bain's newsroom has an exit release for 0 of its 26 kept companies), so these counts overstate current holdings; newsrooms are also selective and thin before 2019 (Apollo's ADT, Qdoba and LifePoint, Blackstone's TeamHealth, Ares's 99 Cents Only and Guitar Center are missing). Two rows look stale against other findings: ClubCorp (KSL lists Invited Clubs, its later name, as bought back from Apollo in 2026) and CARD (its founder bought it out of bankruptcy in 2023). The rebuild adds clusters no screen has measured: **grocery** (The Fresh Market, Cardenas, Tony's, Smart & Final; with Erewhon, Hungryroot and Weee! from step 1), **thrift stores** (Savers Value Village, America's Thrift Stores), arts and crafts retail (Michaels; LGP's JOANN), casinos, consumer apps and rural broadband.
+
 ## Caveats
 
 - Counts are firm listings, not brands or market share; a cluster with many listings can still be a small share of its industry (packaged food's top brands belong to large public companies).
@@ -89,4 +103,4 @@ Bot slips reported in step 3: worker A followed four cross-host redirects before
 
 ## Cost
 
-Step 1: about 1.0M agent tokens (harness counts 280k, 234k, 246k and 239k), 50 to 70 minutes per worker, roughly 520 HTTP requests and 25 browser renders. Step 3: about 1.19M agent tokens (274k, 313k, 299k and 307k), 30 to 50 minutes per worker. Total so far about 2.2M (estimate approved with option (b): about 2.1M).
+Step 1: about 1.0M agent tokens (harness counts 280k, 234k, 246k and 239k), 50 to 70 minutes per worker, roughly 520 HTTP requests and 25 browser renders. Step 3: about 1.19M agent tokens (274k, 313k, 299k and 307k), 30 to 50 minutes per worker. Newsroom rebuild: about 0.53M (260k and 268k). Total about 2.72M (approved: about 2.1M for option (b) plus about 0.5M for Q13).

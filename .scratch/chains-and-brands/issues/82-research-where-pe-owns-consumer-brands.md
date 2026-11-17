@@ -1,7 +1,7 @@
 # Research: Where PE owns consumer brands
 
 Type: research
-Status: claimed
+Status: resolved
 Blocked by: none
 Map: [chains-and-brands](../map.md)
 
@@ -27,6 +27,21 @@ Starting from what PE firms own rather than from a guessed list, which consumer-
 - Industry sorting here is a research note for a human decision, not the engine's industry assignment (which comes only from industry brand lists).
 - Findings go to `.scratch/chains-and-brands/research/pe-consumer-scan.md`.
 
+## Answer
+
+Resolved 2026-11-16 by ten background workers in three passes (about 2.72M tokens). Findings: [pe-consumer-scan](../research/pe-consumer-scan.md), with the worker reports in [research/pe-consumer-scan/](../research/pe-consumer-scan/).
+
+- **Bottom-up scan (step 1):** 73 of 88 PE firms gave a readable current portfolio, about 735 distinct consumer-facing US companies. It confirms the measured industries (restaurants 70 listings, home services 57, gyms 24, dental 22, women's apparel 18, vet, car washes, auto service, urgent care, child care, physical therapy) and surfaces unmeasured clusters (specialty physician practices, packaged food, beauty, behavioral health, home care, personal care, pet food, beverages, primary care, med spas, education).
+- **Twelve new industries screened (step 3), PE share of the top brands:** med spas and beauty services 100%, behavioral health 77%, education and youth activities 58%, home care and hospice 43% (all worth a full audit); primary care 25%, pet food 20% (company rows), sporting goods 10%, apparel 7%; beauty, personal care, packaged food and beverages 0% at top 10 with dozens of PE brands below.
+- **Biggest firms without a portfolio list:** true on their sites; their retail PE funds' SEC filings give only an industry mix; newsroom rebuilds found 15 current US consumer companies for Blackstone, 12 for Apollo, 20 for Bain, 4 for Ares and none for Brookfield, an overcount because exits are rarely announced. They add grocery, thrift stores, arts and crafts retail and casinos as unmeasured clusters.
+- **Step 2 dropped:** the SEC BDC data set's per-holding industry field is filled on 3% of holdings.
+- **Rulings during the ticket:** Q12 all twelve industries (developer chose (b) over Claude's eight); Q13 newsroom rebuild; Q14 Kumon and Huntington evidence dropped (read on browser retries after a 403).
+- **Bot slips** by research workers are recorded in the findings (redirects followed before reading robots.txt, a disallowed path, crawl-delay misses, 403 retries, one loop of 401s); a redirect and 403 rule was proposed on engine "Operational identity and guardrails".
+
+Handed on:
+- "Launch industries": every result above, the unmeasured clusters (grocery, thrift stores, arts and crafts, specialty physician practices, hotels), how to count product industries (top 10 vs long tail), and the counting questions collected from the screen and the scan.
+- engine "Operational identity and guardrails": the redirect and 403 rule.
+
 ## Comments
 
 ### 2026-11-16 run
@@ -39,3 +54,4 @@ Starting from what PE firms own rather than from a guessed list, which consumer-
 - **Step 3 done** (about 1.19M tokens; ticket total about 2.2M): med spas and beauty services 10 of 10 (100%), behavioral health 10 of 13 (77%), education and youth activities 7 of 12 (58%), home care and hospice 6 of 14 (43%) all judged worth a full audit; primary care 25%, pet food 20% by company row, sporting goods 10%, apparel 7%, beauty, personal care, packaged food and beverages 0% at top 10 (PE sits in the long tail). Seven new counting questions handed to "Launch industries". Bot slips recorded in the findings. Q13 (the biggest firms' newsrooms) still pending; the ticket stays open until the developer answers it.
 - **Q13 approved** (2026-11-16): the newsroom rebuild for Blackstone, Apollo, Bain, Brookfield and Ares launched as two background workers (about 0.5M tokens; ticket total about 2.7M). Deals since 2015 from each firm's own newsroom, filtered by title in code, consumer targets kept, exits checked; private equity, growth and hybrid funds only (real estate, credit and infrastructure deals noted separately). Workers were told to check robots.txt before following any redirect and never to retry a plain 403.
 - **Q14** (2026-11-16; the developer asked whether the robots slips mattered, since most sites allowed the bot anyway; answered: most were process slips where the site's answer was yes, but three broke a site's stated rule (Bregal Partners `Disallow: /`, one request; BAYADA's disallowed `/archive/`, one request; Harvest and Transom's 10-second crawl-delay, a few requests; nothing from the banned pages used) and the Kumon and Huntington browser retries after a 403 are a gray area): the Kumon and Huntington evidence is dropped and both rows read "not found" until sourced again from a page the site serves normally. No PE share changes.
+- **Newsroom rebuild done** (about 0.53M tokens; ticket total about 2.72M): Blackstone 15, Apollo 12, Bain 20, Ares 4 current US consumer companies, Brookfield 0; exits rarely announced, so current overstates; new clusters grocery, thrift stores, arts and crafts, casinos. One slip: a loop of six requests to Ares's content API kept going after a 401. Ticket resolved.
