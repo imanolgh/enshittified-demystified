@@ -123,3 +123,7 @@ Handed on:
 | 36 | Home furnishings | `home_furnishings` | 6.7% (2 of 30) | follow-up audit; named exception |
 
 - Casinos measured 3.1% (2 of 64) and don't launch.
+
+### Amended 2026-11-17 (from "Category brand lists and checked", round 1 Q6)
+
+- **Pharmacies launch** as a named exception by the developer's decision, "despite the pe influence being low": label "Pharmacies" (`pharmacies`), 6.7% by brand row (2 of 30), 35% of ranked prescription sales. 37 launch industries in all. The 10% bar stays for every other industry; the earlier note that a 5% bar was turned down still holds, since pharmacies come in as an exception, not by a lower bar.

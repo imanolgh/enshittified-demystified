@@ -180,7 +180,7 @@ entity_industries              -- 2026-11-05 (ticket 12)
       -- came in (an intake row, incl. a brand-list upload; or a document such as an NPPES record
       -- whose taxonomy code maps to an industry), never by the LLM, never a claim.
       -- 2026-11-05 (ticket 04): a CHECK requires exactly one of ingest_item_id and
-      -- source_document_id. Chains values and display: chains-and-brands "Product categories" (2026-11-16: a brand's industries come only from the industry brand lists that include it, which are intake uploads; a brand can have several; the values are chosen in "Launch industries").
+      -- source_document_id. Chains values and display: chains-and-brands "Product categories" (2026-11-16: a brand's industries come only from the industry brand lists that include it, which are intake uploads; a brand can have several; the values are chosen in "Launch industries"; 2026-11-17, "Category brand lists and checked": lists only grow, a brand leaving its industry list only when discontinued or out of that industry).
 
 location_brands                -- 2026-11-05 (ticket 15, "Predicate semantics")
   id, location_id, brand_id, source_document_id, producer, producer_version, retracted_at
@@ -524,7 +524,8 @@ api_incidents                  -- 2026-11-15 (ticket 77, "Extraction prompt rule
 source_runs                    -- 2026-11-07 (ticket 28)
   id, entity_id, source, started_at, finished_at (nullable), outcome (completed|failed|blocked)
       -- one row per entity per required source run (the required list per entity type is the
-      -- product's: chains "Category brand lists and brand-level checked"). completed only when
+      -- product's: chains "Brand-level checked: required sources and freshness", split off "Category
+      -- brand lists and brand-level checked" on 2026-11-17). completed only when
       -- every document the run found has a non-retracted read of cited or no_evidence_found;
       -- failed = errors after retries; blocked = robots.txt or site terms. Shared sources
       -- (registry sponsor pages, press feeds, Form ADV, BDC Schedules) count through their latest
