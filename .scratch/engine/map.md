@@ -73,7 +73,7 @@ Local-only decisions (NPPES research, launch states, SoS and vet boards) moved t
 - **Retirement lookup** — employer → plan and the headline exposure number: deferred in the [retirement map](../retirement/map.md) (ADR 0004).
 - **Housing**: which apartment buildings and houses are owned or run by PE; parked in the [housing map](../housing/map.md) (ADR 0004 amended 2026-11-07).
 - **Product and website questions** — brands, categories, card wording, pages: in the [chains-and-brands map](../chains-and-brands/map.md).
-- **Launch backend** — accounts, follows, billing, digest, retirement brief, deep-dive, founding-member beta: a separate body of decisions; candidate next map (scope ruling 2026-10-26).
+- **Launch backend** — accounts, follows, billing, digest, founding-member beta: the parked [launch backend map](../launch-backend/map.md), charted 2026-11-18 (the retirement brief and deep-dive stay with the [retirement map](../retirement/map.md)); first scoped out 2026-10-26.
 - **Alerts to users** — need accounts. Events, the public changelog and operational alerts to the developer stay in scope.
 - **Jev (Step 27b)** — vendor unconfirmed, experimental; a later effort with real engine data (scope ruling 2026-10-26).
 - **CAFR ingestion**, including the Phase 5 one-system spike — pensions are a fast-follow (pre-launch-seeding.md §4).

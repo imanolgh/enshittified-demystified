@@ -46,7 +46,7 @@ Label: wayfinder:map · Tracker: local markdown (`docs/agents/issue-tracker.md`)
 ## Out of scope
 
 - **Property managers** (Greystar and similar): ruled out 2026-11-16 in "Product categories" (Q6), because a manager's page would report the manager's owner, not the building's.
-- **Accounts, follows, paid alerts and billing**: a later map. The alert price is open until `monetizationideas.md` is updated (decisions.md §14).
+- **Accounts, follows, paid alerts and billing**: the parked [launch backend map](../launch-backend/map.md) (charted 2026-11-18, ADR 0004); v1 launches public and anonymous. The alert price is open there until `monetizationideas.md` is rewritten (decisions.md §14).
 - **Barcode scanning and a native app**: later (ADR 0004).
 - **Local businesses and retirement**: parked in the [local-businesses](../local-businesses/map.md) and [retirement](../retirement/map.md) maps.
 - **Housing search** (buildings and houses by address, and who owns or runs them): its own parked [housing map](../housing/map.md), ruled 2026-11-07 in engine "Funds and their investment firm". Landlords that rent under their own name were screened in "Research: Industry screen" (25% PE by brand row); whether they launch is "Launch industries".
