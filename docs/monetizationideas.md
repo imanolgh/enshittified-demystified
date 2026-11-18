@@ -46,8 +46,8 @@ Two small overlapping subscriptions (#1 + #3) sell worse than one; subscription 
 
 ### Supply side (independent businesses pay, users never do)
 - **Certified Independent** verification: $200–500/yr (marketgaps.md 5C) *(Not in the MVP — ruled 2026-10-26.)* Later feature; granted only by automated checks against official records (ADR 0001).
-- Featured placement among alternatives — scrupulously disclosed as sponsored (this audience checks)
-- Affiliate revenue on alternative click-throughs / bookings
+- Featured placement among alternatives — scrupulously disclosed as sponsored (this audience checks) *(Not in v1 — ruled 2026-11-17, chains "Alternatives and affiliate links": a paid slot breaks the published order ADR 0004 requires.)*
+- Affiliate revenue on alternative click-throughs / bookings *(2026-11-17, same ticket: a brand's own program or a retailer program such as Amazon, linking only to a qualifying brand's own pages; never on PE-owned or PE minority stake brands; commission never sets the order.)*
 
 ### Research/Pro — ~$20–30/mo (post-launch, ruled 2026-10-16)
 - Market-wide intelligence for professionals (journalists, lawyers, investors, litigation funders): quarterly BDC loan-book diffs (new borrowers, departed loans, non-accrual and PIK trends), full rollup dossiers, cross-layer exposure maps, and eventually the insurer/NAIC exposure map as flagship.

@@ -12,6 +12,7 @@ Before the chains-and-brands site launches, what does a lawyer say about the leg
 
 - Created 2026-11-08 from engine "Press and EDGAR full-text connectors" (Q6, developer ruling). HITL: the developer takes these questions to a lawyer; Claude records the answers and turns any required changes into tickets. It blocks launch, not the current tickets (gate recorded in engine "Testing and acceptance bars").
 - Claude's notes in that ticket are not legal advice; case references there are from memory.
+- **From "Alternatives and affiliate links"** (2026-11-17), questions to add: (a) FTC endorsement-guide disclosure for affiliate links: is "We earn a commission if you buy through this link" next to every link, plus a how-this-works section, enough? (b) Retailer program terms: Amazon Associates' required statement, its rules on where links may point (the plan links only to a brand's own store or product pages) and its Product Advertising API conditions.
 
 ## Questions for the lawyer
 

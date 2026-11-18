@@ -70,6 +70,10 @@ _Avoid_: Category, product category, vertical, sector
 The page that lists the brands in one industry.
 _Avoid_: Category page, product category
 
+**Alternative**:
+A brand on the same industry list as a PE-owned or PE minority stake brand, with a completed check and no private equity found in its ownership, shown on that brand's page in the list's order. Being an alternative says nothing about quality.
+_Avoid_: Approved alternative, recommended brand, independent brand
+
 **Operator**:
 The company that runs a location. A franchisee is the operator of its stores. A location is company-run when its operator is in the brand owner's ownership chain, and franchised when it isn't.
 _Avoid_: Manager, franchisee (as the general term)

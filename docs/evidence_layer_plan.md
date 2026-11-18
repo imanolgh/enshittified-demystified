@@ -615,6 +615,17 @@ crawl_targets                  -- 2026-11-12 (ticket 30); operational crawl stat
       -- stands). Release URLs are fetched once and are only documents, never targets. Changes in
       -- place; the evidence trail stays in documents and fetches.
 
+affiliate_links                -- 2026-11-17 (chains "Alternatives and affiliate links")
+  id, brand_id, store (the brand itself, or a retailer: amazon|walmart|target|...), url,
+      program (direct, or the network: impact|cj|rakuten|...), ingest_item_id, added_at,
+      removed_at (nullable)
+      -- operator data uploaded in batches like brand lists; never through the claims door, never
+      -- evidence. A link shows only while its brand qualifies as an alternative (a completed check,
+      -- no PE in its ownership, no pending deal to a PE buyer); code hides it otherwise. A
+      -- retailer link must land on the brand's own store or product pages there, never on search
+      -- or category pages. Never a link for a PE-owned or PE minority stake brand. Dead links go
+      -- to the operator report.
+
 site_access                    -- 2026-11-12 (ticket 30); operational
   id, domain (unique), state (open|challenged|hard_blocked|robots_refused|rate_limited),
       blocker (nullable: cloudflare|vercel|akamai|imperva|datadome|other), blocked_since
