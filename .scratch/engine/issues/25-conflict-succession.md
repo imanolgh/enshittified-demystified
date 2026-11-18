@@ -63,3 +63,8 @@ Handed on:
 - "Events and the public changelog": hop endings, category flips, terminated deals.
 - "Claim card and graph output shapes": co-owners, a disputed owner line, pending deals.
 - chains "Card wording and the how-this-works page": wording for co-owners, disputes and pending or called-off deals.
+
+### Amended 2026-11-18 (from chains "Licensed names in v1")
+
+- **Set-aside rule for licensed names:** a `listing` owner claim (brand → X) makes no hop while the brand has a current `licensed_to` claim naming X, or a current `license_grant` owner claim naming a different company. The claim stays stored, shows nowhere in v1 and never makes "sources disagree". Trademark notices (no basis) set nothing aside, so a brand whose notice names an unlinked IP-holding subsidiary (Dunkin', "DD IP Holder LLC") keeps its listed owner's chain.
+- **USPTO guard** (ADR 0001 amended): in seven licensing-prone industries, a brand whose only PE chains start with a `listing` hop, and whose USPTO registered owner is a different, unlinked company, reads "owner type not confirmed". Accepted trade-off recorded there.

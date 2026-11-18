@@ -90,3 +90,7 @@ Handed on:
 - "Rosters, portfolio pages and the registry": rosters write `operated_by` claims and `location_brands` rows.
 - "BDC discovery and Schedule of Investments parsing": equity rows, "control investments" rows.
 - chains-and-brands "Brand and chain model" and "Product categories".
+
+### Amended 2026-11-18 (from chains "Licensed names in v1")
+
+- **`licensed_to` joins the closed predicate set** (Q6's licensing ruling revisited: "Revisit when 'Product categories' adds a category built on licensing, such as apparel"; clothing and shoes now launches). Role: brand → company; the object makes or sells under the brand's name by license. Never a hop and never shown in v1. A current `licensed_to` claim naming X sets aside the brand's `listing` owner claims to X. Role table in evidence_layer_plan.md §4 `claims`; CLAUDE.md predicate list updated.

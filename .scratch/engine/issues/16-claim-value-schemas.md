@@ -60,3 +60,7 @@ Handed on:
 - "Owner kind": a BDC's owner kind.
 - chains "Card wording and the how-this-works page": pending deals.
 - retirement "Form 5500 ingestion and the headline exposure number": `allocates_to`.
+
+### Amended 2026-11-18 (from chains "Licensed names in v1")
+
+- **`basis` on brand-subject `owned_by` and `acquired_by`** (`listing|license_grant`, null otherwise): `listing` when the brand only appears on a brands or portfolio page; `license_grant` when the owner says it licenses the name out. Notes in evidence_layer_plan.md §4 `claims`.

@@ -161,9 +161,9 @@ entity_identifiers             -- 2026-11-05 (ticket 12); replaces entities.plac
       -- values of one scheme: an investment firm holds one crd per adviser registration (ticket 65).
       -- sec_file_number = 801-|802-|814-; private_fund_id = 805-. phone only from stored
       -- documents, never Places. Added later: SoS entity number, license number and plan
-      -- EIN+PN when their efforts start; trademark serial only if USPTO is
-      -- adopted, which v1 doesn't do (ticket 64, 2026-11-17; the question moved to the parked
-      -- non-PE owners map, ticket 88).
+      -- EIN+PN when their efforts start; no trademark serial scheme: v1 uses USPTO
+      -- only for a licensing check, with the serial in the document's address (ticket 64,
+      -- amended 2026-11-18).
 
 entity_addresses               -- 2026-11-05 (ticket 12)
   id, entity_id, kind (site|principal_office|mailing), street, city, state, postal_code,
@@ -191,7 +191,9 @@ location_brands                -- 2026-11-05 (ticket 15, "Predicate semantics")
 
 documents                      -- immutable once written
   id, source_type (nppes|form5500|form_adv|sec_filing|irs_exempt_org|sos|license_board|cafr|
-      company_site|press_release|news),   -- ADR 0003; fetch method (bulk|api) + connector go in meta
+      company_site|press_release|news|uspto),   -- ADR 0003; fetch method (bulk|api) + connector go in meta
+      -- uspto added 2026-11-18 (chains "USPTO trademark data", amended in "Licensed names in v1"): a
+      -- reported source, not an official filing; v1 uses it only for the licensing check.
   public_id, url, retrieved_at, sha256, storage_path, mime_type, raw_text (nullable), meta JSONB,
   domain, published_on (nullable), last_seen_at, text_sha256, text_extractor_version,
   parent_document_id (nullable), speaker_entity_id (nullable)
@@ -255,7 +257,7 @@ fetches                        -- 2026-11-07 (ticket 20); operational, rows kept
 
 claims                         -- atomic, cited assertions
   id, subject_name, subject_entity_id (nullable), predicate (acquired_by|owned_by|lends_to|
-      holds_position|allocates_to|operated_by|renamed_from|managed_by),
+      holds_position|allocates_to|operated_by|renamed_from|managed_by|licensed_to),
       -- 2026-11-06 (ticket 18): subject_name/object_name = the name as written in the document
       -- (the LLM never returns ids; a keyed code-producer claim takes its identity record's main
       -- name). Claim content (names, quote, value, document) never changes. The entity ids are
@@ -280,6 +282,10 @@ claims                         -- atomic, cited assertions
       --     old name, which must appear in the quote; an accepted claim makes code write a
       --     former_name alias; a same-type entity under the old name merges only once the rename
       --     is verified; never a hop. object_entity_id is nullable for renamed_from only.
+      --   licensed_to: brand → company (2026-11-18, chains "Licensed names in v1"); the object
+      --     makes or sells under the brand's name by license ("we hold a license to the Farberware
+      --     brand"; "used under license" on the licensee's own page). Never a hop, never shown in
+      --     v1. A current licensed_to claim naming X sets aside the brand's listing claims to X.
       -- 2026-11-07 (ticket 65): the role-table check runs when edges are built, not when a claim
       -- is accepted. A claim whose quote passes is accepted; its edge forms only once the current
       -- entity types fit (a company later typed fund by a Form ADV record), as a null id never
@@ -294,6 +300,12 @@ claims                         -- atomic, cited assertions
       --     (announced|completed|terminated); only completed backs an ownership hop; event_date is the
       --     announcement or closing date to match. owned_by's event_date is the as-of date the
       --     quote states; null means the document's date confirms the hop.
+      --     2026-11-18 (chains "Licensed names in v1"): owned_by and acquired_by with a brand
+      --     subject add basis (listing|license_grant; null otherwise). listing = the brand only
+      --     appears on a brands or portfolio page; license_grant = the owner says it licenses the
+      --     name out (Whirlpool for KitchenAid). A listing claim (brand → X) makes no hop while the
+      --     brand has a current licensed_to claim naming X or a current license_grant claim naming
+      --     a different company. A trademark notice has no basis and sets nothing aside.
       --     2026-11-07 (ticket 25): owned_by adds holding (current|former, default current); a
       --     former claim records a seller or an exit ("acquired the company from affiliates of
       --     Wafra Inc.", "Realized: ..."). acquired_by adds expected_close_text on announced claims

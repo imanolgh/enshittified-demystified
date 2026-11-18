@@ -35,3 +35,12 @@ Resolved 2026-11-17 in a grilling session (one round, recorded under Comments).
 Handed on:
 - non-PE owners "Brand licensors and licensees on the brand page": the USPTO question in full.
 - "Category brand lists and checked": no USPTO on the required list; the v1 licensee gap. This was its last open blocker.
+
+### Amended 2026-11-18 (from "Licensed names in v1", round 1)
+
+- **USPTO joins v1, narrowly.** One licensing check per brand in the seven licensing-prone launch industries (cookware, clothing and shoes, beauty products, personal care, home furnishings, sporting goods and outdoor gear, pet food and supplies; about 210 brands): the live registration for the brand's name in that industry's goods classes, nothing recorded when several live registrants match. The registered owner is a **reported** owner fact (not an official filing: recording is ministerial). One source type, `uspto` (ADR 0003). No identifier scheme; the serial number is in the document's address.
+- **Its use is a guard against false PE, never an override:** when a brand's only chain to private equity starts with a list fact and USPTO names a different, unlinked company as the name's owner, that chain cannot make the brand PE-owned or PE minority stake; the brand reads "owner type not confirmed" until a source links the two.
+- **Accepted trade-off (developer, 2026-11-18):** some PE-owned product brands whose name is registered to an unlinked IP-holding subsidiary may read "owner type not confirmed" instead of "PE-owned" until a source links the two companies. A false "PE-owned" is the worse error, so the guard errs toward "not confirmed".
+- **Why reopened:** the licensee gap ("Licensed names in v1") has a name-owner document for only about half of licensed names (2 of 5 in cookware), and USPTO names the registered owner of nearly every live mark.
+- **Still with the parked non-PE owners map:** USPTO for every brand, USPTO as a self-verifying official filing, recorded sales of names with dates, and showing licensees.
+- Access (a TSDR API key; how to search by mark name; whether ID.me is needed) goes to a task ticket for the developer.
