@@ -161,7 +161,9 @@ entity_identifiers             -- 2026-11-05 (ticket 12); replaces entities.plac
       -- values of one scheme: an investment firm holds one crd per adviser registration (ticket 65).
       -- sec_file_number = 801-|802-|814-; private_fund_id = 805-. phone only from stored
       -- documents, never Places. Added later: SoS entity number, license number and plan
-      -- EIN+PN when their efforts start; trademark serial only if USPTO is adopted (ticket 64).
+      -- EIN+PN when their efforts start; trademark serial only if USPTO is
+      -- adopted, which v1 doesn't do (ticket 64, 2026-11-17; the question moved to the parked
+      -- non-PE owners map, ticket 88).
 
 entity_addresses               -- 2026-11-05 (ticket 12)
   id, entity_id, kind (site|principal_office|mailing), street, city, state, postal_code,

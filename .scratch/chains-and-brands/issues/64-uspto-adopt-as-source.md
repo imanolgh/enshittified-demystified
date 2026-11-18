@@ -1,7 +1,7 @@
 # USPTO trademark data: adopt as a source?
 
 Type: grilling
-Status: open
+Status: resolved
 Map: [chains-and-brands](../map.md)
 
 ## Question
@@ -16,3 +16,22 @@ Does the engine adopt USPTO trademark data as a source, and if so: as which sour
 - ADR 0003:13: a value joins `SourceType` only when a relationship takes evidence from it.
 - "Category brand lists and brand-level checked" lists "USPTO if adopted" among the sources a check runs; it waits on this ticket.
 - Load `grilling` and `domain-modeling`.
+
+## Comments
+
+### Round 1 (2026-11-17)
+
+- **Adoption** (Q1, option c): not in v1. Facts weighed (from "Research: USPTO trademark data as an official source"): the registered owner named the PE sponsor in 0 of 8 spot checks, and in 5 of 8 it was a brand-level IP subsidiary (for Subway, Arby's and Crunch no other primary source links it upward); stock acquisitions leave no record; recording is ministerial, Jersey Mike's owner field disagrees with a 2019 assignment, and cancelled registrations keep frozen owners; access needs a USPTO.gov account, an ID.me check for the bulk API, or a TSDR key; recorded sales of a name do carry seller, buyer and date. USPTO's main value is licensing, and it fixes the licensee gap only with a precedence rule (the registered owner of a live mark outranks a brand list that never says who owns the name), which belongs to the licensing design. Options turned down: a narrow v1 lookup for licensing-heavy industries, a broad lookup as a required source for every brand, and never.
+
+## Answer
+
+Resolved 2026-11-17 in a grilling session (one round, recorded under Comments).
+
+- **USPTO is not a v1 source.** No `SourceType` value, no official-filing status, no identifier scheme, and no place on any brand's required list for "checked".
+- **The question moves** to the parked non-PE owners map, "Brand licensors and licensees on the brand page", with every sub-question this ticket held (self-verification, facts supported, source-type count, identifier, access, matching marks to brands) and the precedence rule USPTO would need.
+- **v1's licensee gap stays open** for "Category brand lists and checked" or a change to engine "Extraction prompt rules", without USPTO.
+- Docs: `evidence_layer_plan.md` §4 `entity_identifiers` note updated (no trademark serial in v1). No ADR, no glossary change.
+
+Handed on:
+- non-PE owners "Brand licensors and licensees on the brand page": the USPTO question in full.
+- "Category brand lists and checked": no USPTO on the required list; the v1 licensee gap. This was its last open blocker.
