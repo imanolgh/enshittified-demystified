@@ -1,7 +1,7 @@
 # Research: Follow-up audits of four industries
 
 Type: research
-Status: open
+Status: resolved
 Blocked by: none
 Map: [chains-and-brands](../map.md)
 
@@ -34,3 +34,38 @@ In grocery, home furnishings, thrift and resale stores, and casinos, what share 
 
 - Any industry that passes the bar joins the launch list ("Launch industries"); the developer approves its label when this ticket resolves.
 - "Category brand lists and checked": the four lists.
+
+## Comments
+
+### 2026-11-17 run
+
+- Launched as four background workers: grocery (30 banners, about 340k), home furnishings (30 brands, about 340k), thrift and resale stores (every multi-state brand, about 150k), casinos (every multi-location name, about 250k). Reports go to `research/follow-up-audits/`; the summary and quote re-check follow when all four finish.
+- Same shared SEC data and page cache as tickets 91 and 92; workers reuse the screen workers' saved pages. SEC kept at 1 request per second per worker.
+- Briefs tightened after the two robots slips: a host may be requested only after its robots.txt was read and parsed in an earlier, separate command; a refused request means stop and report.
+
+### Resolution rulings (2026-11-17)
+
+- **Grocery and thrift launch** (Q9): "Grocery stores" (`grocery_stores`), 6 of 30 banners (20.0%, all Albertsons banners as PE minority stakes); "Thrift and resale stores" (`thrift_and_resale_stores`), 5 of 23 (21.7%), every multi-state brand. Savers' four store names count as four rows under "Brand and chain model" (each runs stores in two or more states); as one brand the share is 10.0%, still passing. Resale franchises stay in scope (Q6 of "Research: Screen of five more industries").
+- **Home furnishings** (Q10): launches as a named exception by the developer's decision, the same call as pet food at the same share (6.7%). Label "Home furnishings" (`home_furnishings`).
+- **Casinos** (Q11): don't launch (2 of 64, 3.1%; 5.5% by location); no exception.
+- **Budget:** the run used 1,371,017 tokens by harness count, over the approved 1.3M stop; workers can't see the harness count and their own estimates ran low. Future worker budgets carry a margin against the harness count.
+
+## Answer
+
+Resolved 2026-11-17 by four background workers (1.37M tokens) and the rulings above. Findings: [follow-up-audits](../research/follow-up-audits.md), with the worker reports in [research/follow-up-audits/](../research/follow-up-audits/).
+
+| Industry | PE share by brand row | Outcome | Label |
+|---|---|---|---|
+| Thrift and resale stores | 5 of 23 (21.7%), every multi-state brand | launches | Thrift and resale stores |
+| Grocery | 6 of 30 banners (20.0%) | launches | Grocery stores |
+| Home furnishings | 2 of 30 (6.7%) | launches, named exception | Home furnishings |
+| Casinos | 2 of 64 (3.1%), every multi-location name | doesn't launch | none |
+
+- Quote check: every evidence quote matched; 0 of 343 altered copies matched.
+- Process: one robots slip (a browser retry followed a redirect to svdpseattle.org before reading its robots.txt; it disallows nothing). The brief's separate-command rule doesn't cover a browser's own redirects.
+
+Handed on:
+- "Launch industries": three more launch industries (amended there; 36 in all).
+- "Category brand lists and checked": the grocery banner list and its sizing method (store-weighted sales; Kroger's banner counts rest on leads), thrift's 23 brands and 11 unconfirmed candidates, home furnishings' list (no free ranking of direct-to-consumer home brands exists).
+- engine "Operational identity, budgets and guardrail values": the shared-fetcher proposal must also stop redirects inside a browser before they're followed.
+- Seeding plan (map fog): Kroger's Giant Eagle purchase is pending (closing expected 2027).

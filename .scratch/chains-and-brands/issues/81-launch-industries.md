@@ -111,3 +111,15 @@ Handed on:
 - **Fewer than 30 national brands:** counting every national brand replaces the 30-brand audit under 20% (arts and crafts 7, thrift about 13 to 15, casinos about 15 to 20).
 - **Old deal documents:** selection counts a deal as current when no exit is found, for every industry; the site applies the 18-month rule itself.
 - **Pending:** "Research: Follow-up audits of four industries" (grocery, home furnishings, thrift and resale stores, casinos) may add more under the same bar.
+
+### Amended 2026-11-17 (from "Research: Follow-up audits of four industries")
+
+- **Three more launch industries, 36 in all:**
+
+| # | Label | Code value | PE share | Measured by |
+|---|---|---|---|---|
+| 34 | Grocery stores | `grocery_stores` | 20.0% (6 of 30 banners) | follow-up audit |
+| 35 | Thrift and resale stores | `thrift_and_resale_stores` | 21.7% (5 of 23, every multi-state brand) | follow-up count |
+| 36 | Home furnishings | `home_furnishings` | 6.7% (2 of 30) | follow-up audit; named exception |
+
+- Casinos measured 3.1% (2 of 64) and don't launch.
