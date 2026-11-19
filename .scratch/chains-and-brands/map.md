@@ -55,7 +55,7 @@ Label: wayfinder:map · Tracker: local markdown (`docs/agents/issue-tracker.md`)
 - **Barcode scanning and a native app**: later (ADR 0004).
 - **Local businesses and retirement**: parked in the [local-businesses](../local-businesses/map.md) and [retirement](../retirement/map.md) maps.
 - **Housing search** (buildings and houses by address, and who owns or runs them): its own parked [housing map](../housing/map.md), ruled 2026-11-07 in engine "Funds and their investment firm". Landlords that rent under their own name were screened in "Research: Industry screen" (25% PE by brand row); whether they launch is "Launch industries".
-- **Community notes** (reader threads on brand pages, free accounts to comment): after launch, in their own parked map, ruled 2026-11-18 in "Source-link submissions".
+- **Community notes** (reader threads on brand pages, free accounts to comment): after launch, in the parked [community notes map](../community-notes/map.md), ruled 2026-11-18 in "Source-link submissions" (ADR 0004).
 - **Outreach and partnerships** (Worse on Purpose, creators): the developer's call, not a spec question.
 - **Rollup industries** (funeral homes, ski resorts, specialty physician practices): ruled out of the launch list and the second batch 2026-11-16 in "Launch industries" (Q6), because their PE sits in rollups whose locations keep local names, which v1 never shows; they wait for the store map or the [local-businesses](../local-businesses/map.md) map.
 - **Hotels**: moved to the parked [housing map](../housing/map.md) 2026-11-16 in "Launch industries" (Q13), because a hotel's PE sits in who owns the building, not in the brand on the sign.
