@@ -24,3 +24,5 @@ What does the public how-this-works page cover, in what order, and how does it l
   - funding and affiliate links: which programs, that commission never sets order, Amazon's required line ("Alternatives and affiliate links");
   - that the site covers brands' US businesses ("Product categories: vocabulary and assignment");
   - plain-language help for private-credit terms once BDC lenders show on brand pages (map fog).
+- **From "What would change this"** (2026-11-18): the page can explain that the "What would change this" lines come from fixed rules, not written by hand or by an AI model, and what kinds of document change a verdict.
+

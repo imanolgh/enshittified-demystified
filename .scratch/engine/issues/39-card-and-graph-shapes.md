@@ -69,3 +69,7 @@ Handed on:
 ### Amended 2026-11-18 (from chains "Card wording")
 
 - The brand card shape gains: the deciding owner beside the verdict label (two PE names, then "+N more"); a pending deal placed directly under the verdict; a "Products under this name" section (`licensed_to` claims as "Licensed to {company}", set-aside listing claims as "Also listed among {company}'s brands"); a "What we checked" section (each required source's last completed `source_runs` row with its date and the brand's `document_reads` count, the documents listed); and, in disputes, each reading's resulting category. Section order and wording: chains "Card wording", Answer.
+
+### Amended 2026-11-18 (from chains "What would change this")
+
+- The brand card shape gains a "What would change this" list: one to three lines from twelve fixed templates chosen by the brand's state (category, confidence, stake, unconfirmed hops, pending deal, USPTO guard, check progress), plus "Next check due {Mon YYYY}" once a refresh cadence exists. Templates and order: chains "What would change this", Answer.
