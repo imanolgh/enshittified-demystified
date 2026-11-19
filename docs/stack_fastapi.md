@@ -26,7 +26,7 @@ Python is the native language of this workload: scraping, PDF/table parsing, dat
 | Search / fuzzy matching | **Meilisearch** via its Python client (+ `rapidfuzz` for cheap local scoring) | Same engine as the Laravel path |
 | Admin / review UI | **The honest gap.** Options: (a) **Starlette-Admin** or **SQLAdmin** for CRUD + custom review views, (b) build the review queue as a small Vue app on FastAPI endpoints, (c) Streamlit for a scrappy internal v1 | Budget real days here; nothing matches Filament's completeness |
 | Auth/API | FastAPI dependencies + `fastapi-users` (or roll JWT) | Serves claim cards / graph to Vue |
-| Frontend | Vue 3 | Identical in either architecture — FastAPI's auto-generated OpenAPI schema can even generate your TS client |
+| Frontend | ~~Vue 3~~ **Astro, static output** *(2026-11-18, chains "Website stack and hosting")* | Static pages built by Cloudflare Pages from the engine's public read API; React islands only where needed; TypeScript types generated from FastAPI's OpenAPI schema |
 | Storage | S3 via `boto3` | Immutable document archive |
 | Testing | pytest + httpx test client | Citation-verification loop tests first |
 | Deploy | Docker: `uvicorn` (API) + Celery workers + Beat + Redis + Postgres; fly.io/Render/VPS | More moving parts than a Forge deploy, standard once containerized |

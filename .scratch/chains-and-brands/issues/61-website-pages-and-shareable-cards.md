@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 60, 58, 108, engine/29, engine/40, engine/69  (Website stack and hosting; Card wording; The how-this-works page; Events and the public changelog; Search and the demand log; Graph endpoint and non-brand output shapes)
+Blocked by: 60, 58, 108, 117, engine/29, engine/40, engine/69  (Website stack and hosting; Card wording; The how-this-works page; Site name and domain; Events and the public changelog; Search and the demand log; Graph endpoint and non-brand output shapes)
 Map: [chains-and-brands](../map.md)
 
 ## Question
@@ -23,4 +23,5 @@ Which pages does version 1 have, what does each show, and what does a shareable 
 - **From "Card wording"** (2026-11-18): the brand card's section order and every fixed line are in its Answer (verdict with owner name and explanation line; pending deal under the verdict; PE owners with chain count; private equity shareholders; other owners; products under this name; disputes with each reading's result; history; franchise note; alternatives; what we checked; receipts). The prototype's look (https://claude.ai/artifact/Gqhsabk2oDKkKhfk4Wtasu) is not a design decision; layout, type and styling are this ticket's.
 - **From "What would change this"** (2026-11-18): a "What would change this" section of one to three generated lines sits after the verdict and the pending deal on every brand card.
 - **From "The how-this-works page"** (2026-11-18): one public page of eleven question-headed sections with a contents list; each section has a stable link name (`#verified`, `#private-equity-test`) and every label or term on a card links to its section. v1 stays without accounts or sign-in (the developer reaffirmed it: "not having any sort of sign up or login is much better").
+- **From "Website stack and hosting"** (2026-11-18): Astro static pages in `web/` (React islands only where needed), built by Cloudflare Pages from the engine's public read API; share images made at build time with satori from a card template (flexbox-only CSS, fonts as files), whose content is this ticket's; a web app manifest and icons in v1.
 
