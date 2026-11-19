@@ -52,3 +52,7 @@ Handed on:
 - "Brand-level checked: required sources and freshness": the brand's own website; the USPTO check as a required source for brands in the seven industries.
 - "Card wording and the how-this-works page": the guard's one-line reason.
 - non-PE owners "Brand licensors and licensees on the brand page": showing licensees (`licensed_to` is now stored).
+
+### Amended 2026-11-18 (from "Card wording", round 2 Q5)
+
+- **Licensees now show in v1**, labeled only as far as sources go: a "Products under this name" section lists "Licensed to {company}" where the company itself says it holds a license, and "Also listed among {company}'s brands" for a set-aside listing, plus "This page reports who owns the name." The licensee's own ownership isn't shown. This replaces round 2 Q4's "don't show in v1".

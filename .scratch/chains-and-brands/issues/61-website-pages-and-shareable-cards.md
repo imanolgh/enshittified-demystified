@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 60, 58, engine/29, engine/40, engine/69  (Website stack and hosting; Card wording and the how-this-works page; Events and the public changelog; Search and the demand log; Graph endpoint and non-brand output shapes)
+Blocked by: 60, 58, 108, engine/29, engine/40, engine/69  (Website stack and hosting; Card wording; The how-this-works page; Events and the public changelog; Search and the demand log; Graph endpoint and non-brand output shapes)
 Map: [chains-and-brands](../map.md)
 
 ## Question
@@ -20,4 +20,5 @@ Which pages does version 1 have, what does each show, and what does a shareable 
 - **From engine "Brand card, receipt and edge shapes"** (2026-11-07; formerly "Claim card and graph output shapes"): a brand page shows the brand card, each fact opening its receipt; archived copies are never served publicly.
 - **From "Category brand lists and checked"** (2026-11-17): each industry page shows a one-line method ("The 30 largest US grocery banners by 2025 sales (NRF Top 100), each banner a brand"), the current top 30 first, then "also checked" (lists only grow), and a count of brands and how many are checked; each brand row shows its own checked date. An industry goes live only when every brand on its list is checked. Some seeded brands belong to no industry (PE-owned brands found outside launch industries) and have only brand pages.
 - **From "Alternatives and affiliate links"** (2026-11-17): PE-owned and PE minority stake brand pages carry an alternatives block, grouped by industry, in each list's order, collapsed after 10, each alternative with its own verdict line and "Shop at {brand}" / "On Amazon" links where they exist (`rel="sponsored"`); industry pages get a "Show only brands with no PE found" filter. No paid placement.
+- **From "Card wording"** (2026-11-18): the brand card's section order and every fixed line are in its Answer (verdict with owner name and explanation line; pending deal under the verdict; PE owners with chain count; private equity shareholders; other owners; products under this name; disputes with each reading's result; history; franchise note; alternatives; what we checked; receipts). The prototype's look (https://claude.ai/artifact/Gqhsabk2oDKkKhfk4Wtasu) is not a design decision; layout, type and styling are this ticket's.
 

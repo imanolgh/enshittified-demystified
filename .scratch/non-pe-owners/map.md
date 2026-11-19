@@ -30,7 +30,7 @@ None yet.
 - **Coverage and "checked":** if the add-on adds required sources (licensee filings, for example), whether a brand needs them before it reads "No PE evidence found", and what it shows while they are still running (engine "What 'checked' means and coverage states").
 - **Re-reading stored documents:** a new prompt version that claims licensees, or descriptions of non-PE owners, would re-read documents already stored. Its cost, order and trigger.
 - **Company pages** for conglomerates and licensors, such as a page listing every brand Authentic Brands owns. Waits on engine "Graph endpoint and non-brand output shapes".
-- **Card wording and the how-this-works page** for whatever the tickets add, on top of chains "Card wording and the how-this-works page".
+- **Card wording and the how-this-works page** for whatever the tickets add, on top of chains "Card wording" and "The how-this-works page".
 
 ## Out of scope
 

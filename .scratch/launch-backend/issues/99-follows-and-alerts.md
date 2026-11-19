@@ -15,5 +15,5 @@ What can a user follow (brands, companies, whole industries), which changes trig
 - ADR 0004: paid alerts tell a user when a followed brand changes hands.
 - Candidate triggers, all from the engine's stored changes: a new PE owner (category becomes PE-owned or PE minority stake), a PE exit ("formerly PE-owned"), a pending deal announced, called off or completed (GLOSSARY "Pending deal"), a category change of any kind, sources disagreeing, a hop going "last confirmed". Which events exist and their shapes are engine "Events and the public changelog", which this ticket waits on.
 - Delivery: email first (no app in v1, ADR 0004); immediate or batched; quiet periods.
-- Wording follows the card rules (no AI-written prose; computed labels and quotes; chains "Card wording and the how-this-works page").
+- Wording follows the card rules (no AI-written prose; computed labels and quotes; chains "Card wording").
 - Retractions: a claim retracted after an alert went out (engine "Edge lifecycle"); whether a correction alert follows.

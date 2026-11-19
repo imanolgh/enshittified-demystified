@@ -1,0 +1,255 @@
+<!doctype html>
+<!-- PROTOTYPE, throwaway. Chains ticket 58 "Card wording". Question: what does each section of a brand card say?
+     One layout (engine "Brand card, receipt and edge shapes": nine sections); cases switch with ?case= and the bottom bar.
+     Layout and styling are "Website pages and shareable cards" (ticket 61), not this prototype. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Card wording prototype</title>
+<style>
+  :root { --ink:#1d2228; --muted:#5d6670; --line:#dde2e7; --bg:#f6f7f9; --card:#fff; --accent:#1f5fbf;
+          --pe:#9a2b1e; --pe-bg:#fbeeec; --ok:#24603a; --ok-bg:#eaf5ee; --warn:#7a5a00; --warn-bg:#fdf5dc; --grey-bg:#eef1f4; }
+  * { box-sizing: border-box; }
+  body { margin:0; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); padding:16px 16px 96px; }
+  .banner { max-width:1100px; margin:0 auto 16px; background:#fff3c4; border:1px solid #e6cf76; border-radius:8px; padding:10px 14px; font-size:14px; }
+  .wrap { max-width:1100px; margin:0 auto; display:grid; grid-template-columns: minmax(0,1fr) 340px; gap:20px; }
+  @media (max-width: 860px) { .wrap { grid-template-columns: 1fr; } }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:22px 24px; }
+  .brand { font-size:26px; font-weight:650; margin:0; }
+  .industries { color:var(--muted); font-size:13px; margin:2px 0 14px; }
+  .verdict { border-radius:8px; padding:12px 14px; margin-bottom:6px; }
+  .verdict.pe { background:var(--pe-bg); } .verdict.ok { background:var(--ok-bg); } .verdict.warn { background:var(--warn-bg); } .verdict.grey { background:var(--grey-bg); }
+  .verdict .label { font-size:19px; font-weight:650; }
+  .verdict.pe .label { color:var(--pe); } .verdict.ok .label { color:var(--ok); } .verdict.warn .label { color:var(--warn); }
+  .verdict .explain { margin-top:2px; }
+  .verdict .meta { color:var(--muted); font-size:13px; margin-top:6px; }
+  .reason { margin-top:6px; font-size:14px; }
+  h3 { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:22px 0 8px; border-top:1px solid var(--line); padding-top:14px; }
+  .owner { margin:0 0 12px; }
+  .owner .name { font-weight:600; }
+  .owner .kind { color:var(--muted); }
+  .owner .line2 { font-size:14px; }
+  .conf { display:inline-block; font-size:12px; border:1px solid var(--line); border-radius:999px; padding:1px 8px; margin-left:4px; color:var(--muted); white-space:nowrap; }
+  .chain { font-size:14px; color:var(--muted); margin:2px 0; }
+  details { margin:4px 0 0; font-size:13px; }
+  summary { cursor:pointer; color:var(--accent); }
+  blockquote { margin:6px 0; padding:6px 10px; border-left:3px solid var(--line); background:#fafbfc; }
+  .src { color:var(--muted); }
+  .note { font-size:13px; color:var(--muted); }
+  .alt { display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line); font-size:14px; }
+  .alt:last-child { border-bottom:0; }
+  .alt .v { color:var(--muted); text-align:right; }
+  .aff { font-size:13px; }
+  .aff a { color:var(--accent); }
+  .side { background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px 18px; font-size:14px; align-self:start; }
+  .side h4 { margin:0 0 6px; font-size:14px; }
+  .side ul { margin:6px 0 12px; padding-left:18px; }
+  .side .open { background:#fdf5dc; border-radius:6px; padding:8px 10px; }
+  .tag { font-size:11px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; border-radius:4px; padding:1px 6px; margin-left:6px; vertical-align:2px; }
+  .tag.real { background:#e3eefc; color:#1f4f99; } .tag.fake { background:#f3e3fb; color:#6b2a8f; }
+  .bar { position:fixed; left:50%; bottom:16px; transform:translateX(-50%); background:#111; color:#fff; border-radius:999px; display:flex; align-items:center; gap:6px; padding:6px 8px; box-shadow:0 6px 24px rgba(0,0,0,.25); font-size:14px; z-index:10; max-width:calc(100vw - 32px); }
+  .bar button { background:#2b2b2b; color:#fff; border:0; border-radius:999px; width:34px; height:34px; font-size:16px; cursor:pointer; }
+  .bar .lbl { padding:0 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+</style>
+</head>
+<body>
+<div class="banner"><b>Prototype, not published facts.</b> Draft wording for chains ticket 58 "Card wording". Real brands use facts from the 2026 category audits (quotes copied from them); checked dates and some details are placeholders. Brands tagged <i>invented</i> show cases the research has no real example of. Switch cases with the bar at the bottom or the ← → keys.</div>
+<div class="wrap">
+  <main class="card" id="card"></main>
+  <aside class="side" id="side"></aside>
+</div>
+<div class="bar">
+  <button id="prev" aria-label="Previous case">←</button>
+  <span class="lbl" id="lbl"></span>
+  <button id="next" aria-label="Next case">→</button>
+</div>
+
+<script>
+// ---- Fixed wording (decided in ticket 58 round 1) ----
+const EXPLAIN = {
+  pe_owned: "A private equity firm owns this brand, directly or through other companies.",
+  pe_minority_stake: "A private equity firm owns part of this brand, less than half.",
+  public_company_owned: "A company whose shares trade on a stock exchange controls this brand. No private equity found in its ownership.",
+  owner_type_not_confirmed: "We found who owns it, but no source says what kind of owner it is.",
+  no_pe_evidence_found: (d) => `On ${d} we finished checking every source on our list and found no private equity in its ownership.`,
+  sources_disagree: "Our sources say different things about who controls this brand. Each one is shown below.",
+  not_yet_checked: "We haven't finished checking this brand. Owners found so far are shown below.",
+  family_owned: "A person or family owns this brand in their own name.",
+};
+const LABEL = { pe_owned:"PE-owned", pe_minority_stake:"PE minority stake", public_company_owned:"Public company",
+  owner_type_not_confirmed:"Owner type not confirmed", no_pe_evidence_found:"No PE evidence found", sources_disagree:"Sources disagree",
+  not_yet_checked:"Not yet checked", family_owned:"Family-owned" };
+const TONE = { pe_owned:"pe", pe_minority_stake:"pe", public_company_owned:"ok", family_owned:"ok", no_pe_evidence_found:"ok",
+  owner_type_not_confirmed:"warn", sources_disagree:"warn", not_yet_checked:"grey" };
+const FRANCHISE_NOTE = "This page reports who owns the brand. A store can be run by a different company, such as a franchisee.";
+const US_NOTE = "This page covers the brand's US business.";
+const ALT_LINE = "No private equity found in these brands' ownership. That isn't a quality rating.";
+const AFF_LABEL = "We earn a commission if you buy through this link.";
+const DEAD_LINK = (d) => `This page has changed or is gone; the quote was checked against our copy fetched ${d}.`;
+
+// ---- Cases ----
+const CASES = [
+ { key:"dunkin", name:"Dunkin'", real:true, industries:["Restaurants"],
+   cat:"pe_owned", ticker:null, checked:"Nov 2026 (placeholder)", conf:"Verified by an official filing (SEC Schedule TO)",
+   pe:[{ name:"Roark Capital", kind:"private equity firm · reports private equity funds on its SEC Form ADV",
+        role:"controls · no stake stated", since:"since Dec 2020", chain:"Dunkin' → Inspire Brands → Roark Capital (2 companies up)",
+        funds:"through investment funds managed by Roark Capital Management LLC",
+        conf:"Verified by an official filing (SEC Schedule TO)",
+        receipts:[
+         {q:"Parent is an indirect, majority-owned subsidiary of affiliates of investment funds managed by Roark Capital Management LLC(“Roark”).", s:"Inspire Brands, Offer to Purchase (Schedule TO-T exhibit), SEC", d:"published Nov 16, 2020 · last seen Nov 2026"},
+         {q:"Inspire Brands is the franchisor and operator of the Arby’s, Buffalo Wild Wings, Jimmy John’s, SONIC, Dunkin’, and Baskin Robbins brands.", s:"Roark Capital, portfolio page (“Current Investments”)", d:"last seen Nov 5, 2026"} ]}],
+   others:[{ name:"Inspire Brands, Inc.", kind:"company · owner of the Dunkin' brand", role:"owns the brand", since:"since Dec 2020",
+        conf:"Verified by an official filing (SEC Schedule TO)",
+        receipts:[{q:"Accordingly, on December 15, 2020, Parent and Purchaser will consummate the Merger pursuant to Section 251(h) of the DGCL.", s:"Schedule TO-T/A, SEC", d:"published Dec 15, 2020 · last seen Nov 2026"}]}],
+   franchise:true,
+   alts:{ industry:"Restaurants", rows:[["McDonald's","Public company · NYSE: MCD"],["Starbucks","Public company · NASDAQ: SBUX"],["Chipotle Mexican Grill","Public company · NYSE: CMG"]], more:14 },
+   notes:["PE owner line: firm name, owner kind with the Form ADV reason, role, since, the chain with how many companies up, the funds behind it.",
+          "Other owners lists the company in the chain (Inspire) so readers see the path.",
+          "Alternatives: restaurants earn nothing, so no affiliate links; list order is the industry list's own ranking."],
+   open:["Is \"2 companies up\" clear, or should the chain line drop the count? (separation degree)",
+         "Does the verdict line need the firm's name (\"PE-owned · Roark Capital\")?"] },
+
+ { key:"jerseymikes", name:"Jersey Mike's Subs", real:true, industries:["Restaurants"],
+   cat:"pe_owned", ticker:"NYSE: JMKE", checked:"Nov 2026 (placeholder)", conf:"Verified by an official filing (SEC prospectus)",
+   pe:[{ name:"Blackstone", kind:"private equity firm · part of Blackstone Inc. (NYSE: BX) · reports private equity funds on its SEC Form ADV",
+        role:"controls · about 76.5% of the votes at its July 2026 IPO", since:"since Jan 2025", chain:"Jersey Mike's Subs → Blackstone (directly)",
+        funds:"through Blackstone Capital Partners IX L.P. and Blackstone Private Equity Strategies Fund L.P.",
+        conf:"Verified by an official filing (SEC prospectus)",
+        receipts:[
+         {q:"Upon the closing of this offering, our Sponsor will beneficially own approximately 76.5% of the combined voting power of our shares eligible to vote in the election of our directors (or 74.5% if the underwriters exercise in full their option to purchase additional shares of Class A common stock).", s:"Jersey Mike's Subs Inc., prospectus (424B4), SEC", d:"published Jul 31, 2026 · last seen Nov 2026"},
+         {q:"On January 16, 2025, we were acquired by the Buyer (as defined herein) as a new portfolio investment for a purchase price of $6.3 billion.", s:"same prospectus", d:"published Jul 31, 2026"} ]}],
+   others:[], franchise:true,
+   alts:{ industry:"Restaurants", rows:[["McDonald's","Public company · NYSE: MCD"],["Starbucks","Public company · NASDAQ: SBUX"],["Chipotle Mexican Grill","Public company · NYSE: CMG"]], more:14 },
+   notes:["A public company that a PE firm controls reads PE-owned, with its ticker beside the verdict.",
+          "The listed parent is a label on the firm (\"part of Blackstone Inc. (NYSE: BX)\"), not another hop."],
+   open:["The stake is from the IPO date; should the line say \"at its July 2026 IPO\" (as drafted) or show the latest 13G instead when one exists?"] },
+
+ { key:"wendys", name:"Wendy's", real:true, industries:["Restaurants"],
+   cat:"pe_minority_stake", ticker:"NASDAQ: WEN", checked:"Nov 2026 (placeholder)", conf:"Reported by 1 source (assumes a Schedule 13D; see notes)",
+   pe:[], peHolders:[{ name:"Trian Fund Management, L.P.", kind:"investment firm · reports private equity funds on its SEC Form ADV, though it calls itself an activist investor",
+        role:"holds 7.9% of the shares", since:"since: not checked", conf:"Verified by an official filing (SEC proxy statement)",
+        receipts:[{q:"Nelson Peltz, our former Chairman and Chairman Emeritus, Peter May, our Senior Vice Chairman and Matthew Peltz, our former Vice Chairman, beneficially own shares of our outstanding common stock that collectively constitute approximately 16% of the Company’s total voting power as of February 16, 2026.", s:"The Wendy's Company, Form 10-K FY2025, SEC", d:"published Feb 23, 2026"}]}],
+   others:[{ name:"The Wendy's Company", kind:"public company · NASDAQ: WEN", role:"owns the brand", since:"since: not checked", conf:"Verified by an official filing (SEC 10-K)",
+        receipts:[{q:"The Company’s common stock is traded on the Nasdaq Global Select Market (“Nasdaq”) under the symbol “WEN.”", s:"The Wendy's Company, Form 10-K FY2025, SEC", d:"published Feb 23, 2026"}]}],
+   franchise:true,
+   alts:{ industry:"Restaurants", rows:[["McDonald's","Public company · NYSE: MCD"],["Starbucks","Public company · NASDAQ: SBUX"]], more:14 },
+   notes:["Under the engine's rules, Trian's stake counts only if it comes from a Schedule 13D or a non-passive 13G; the research read it from the proxy table, which confirms but never creates the stake. This card assumes a 13D to show the wording.",
+          "\"PE holders of a public company\" is its own section, separate from PE owners."],
+   open:["Section title: \"PE holders of a public company\" or \"Private equity shareholders\"?",
+         "Should the Peltz/May 16% voting line show as another holder (family/individuals)?"] },
+
+ { key:"naturesbounty", name:"Nature's Bounty", real:true, industries:["Vitamins and supplements"],
+   cat:"public_company_owned", ticker:"SIX: NESN", checked:"Nov 2026 (placeholder)", conf:"Reported by 1 source",
+   pe:[], others:[{ name:"Nestlé S.A.", kind:"public company · SIX: NESN (files nothing with the SEC)", role:"owns the brand", since:"since: not in sources read", conf:"Reported by 1 source",
+        receipts:[{q:"The scope of the transaction comprises seven established brands: Nature's Bounty, Osteo Bi-Flex, Ester-C, Gard, Nuun, Puritan's Pride and Sisu", s:"Nestlé, press release (PDF)", d:"published Sep 1, 2026"}]}],
+   pending:{ text:"Pending deal: Yellow Wood Partners agreed to buy this brand on Sep 1, 2026, expected to close by the first half of 2027. It doesn't change the verdict until it closes.",
+             buyer:"Yellow Wood Partners · private equity firm · reports private equity funds on its SEC Form ADV" },
+   franchise:false, affiliate:false,
+   notes:["Nestlé is a company and its own documents are one speaker, so its ownership reads \"Reported by 1 source\" until another independent source confirms it.",
+          "No alternatives block: the brand isn't PE-owned. It would get one if the Yellow Wood deal closes."],
+   open:["Should the pending deal sit right under the verdict instead of in its own section further down?"] },
+
+ { key:"kitchenaid", name:"KitchenAid", real:true, industries:["Cookware"],
+   cat:"public_company_owned", ticker:"NYSE: WHR", checked:"Nov 2026 (placeholder)", conf:"Verified by an official filing (SEC 10-K)",
+   pe:[], others:[{ name:"Whirlpool Corporation", kind:"public company · NYSE: WHR", role:"owns the name and licenses it to other companies", since:"since: not checked", conf:"Verified by an official filing (SEC 10-K)",
+        receipts:[{q:"We receive royalties from licensing our trademarks to third parties who manufacture, sell and service certain products bearing the Whirlpool, Maytag, KitchenAid, and Amana brand names.", s:"Whirlpool Corporation, Form 10-K, SEC", d:"last seen Nov 2026"}]}],
+   franchise:false,
+   notes:["Meyer's \"Our Brands\" listing of KitchenAid is set aside by Whirlpool's license grant (\"Licensed names in v1\") and doesn't show. Licensees aren't shown in v1.",
+          "\"owns the name and licenses it to other companies\" tells the reader why the cookware maker isn't named."],
+   open:["Is \"owns the name and licenses it to other companies\" enough, or does the card need a line such as \"Other companies make products under this name\"?"] },
+
+ { key:"casper", name:"Casper", real:true, industries:["Mattresses"],
+   cat:"owner_type_not_confirmed", ticker:null, checked:"Nov 2026 (placeholder)", conf:"Reported by 1 source",
+   pe:[], others:[{ name:"Carpenter Co.", kind:"company · owner type not confirmed", role:"owns the brand", since:"since 2024", conf:"Reported by 1 source", receipts:[] }],
+   history:"Formerly PE-owned: Durational Capital Management, 2022–2024.",
+   franchise:false,
+   notes:["Combines \"Owner type not confirmed\" with past PE history.",
+          "Receipts omitted here: the audit's quotes for Carpenter and Durational weren't copied into this prototype."],
+   open:["Should history name what happened (\"sold to Carpenter Co. in 2024\") or just the years?"] },
+
+ { key:"pioneerwoman", name:"Pioneer Woman", real:true, industries:["Cookware"],
+   cat:"no_pe_evidence_found", ticker:null, checked:"Nov 17, 2026 (placeholder)", conf:null,
+   pe:[], others:[], franchise:false,
+   notes:["The audit found no owner in primary sources, so nothing names an owner; the verdict is the floor category.",
+          "No owner section at all: an empty \"Owners\" heading would read as a bug."],
+   open:["Should the card say \"No source named an owner\" when no owner was found at all, so readers don't think the owner was hidden?"] },
+
+ { key:"brightway", name:"Brightway Fitness", real:false, industries:["Gyms and fitness studios"],
+   cat:"sources_disagree", ticker:null, checked:"Nov 2026 (placeholder)", conf:null,
+   pe:[], others:[], disputes:[
+     { name:"Harbor Lane Partners", kind:"private equity firm", claim:"says it holds a majority stake", conf:"Reported by 1 source", s:"Harbor Lane Partners, press release", d:"Mar 2026"},
+     { name:"Okafor family", kind:"family", claim:"says it holds 60% of the company", conf:"Reported by 1 source", s:"Regional business journal", d:"May 2026"} ],
+   franchise:true,
+   notes:["Invented brand. Two owners each with a stated majority in the same period can't both be true, and the readings give different categories (PE-owned or family-owned), so the verdict is \"Sources disagree\".",
+          "Each side shows with its own receipt; neither is published as fact."],
+   open:["Should the disputes list say which category each reading would give (\"If Harbor Lane: PE-owned\")?"] },
+
+ { key:"copperline", name:"Copperline Cookware", real:false, industries:["Cookware"],
+   cat:"owner_type_not_confirmed", ticker:null, checked:"Nov 2026 (placeholder)", conf:"Reported by 1 source",
+   reason:"The name is registered to Copperline Brands LLC, which no source links to Northwind Housewares.",
+   pe:[], others:[
+     { name:"Copperline Brands LLC", kind:"company · owner type not confirmed", role:"registered owner of the name", since:"", conf:"Reported by 1 source (US trademark register)", receipts:[{q:"COPPERLINE BRANDS LLC (Delaware limited liability company)", s:"USPTO trademark record, current owner", d:"last seen Nov 2026"}]},
+     { name:"Northwind Housewares", kind:"company · owned by Harbor Lane Partners (private equity)", role:"lists this brand among its brands", since:"", conf:"Reported by 1 source", receipts:[{q:"Our brands: Northwind, Copperline, Saltmeadow", s:"Northwind Housewares, brands page", d:"last seen Nov 2026"}]} ],
+   franchise:false,
+   notes:["Invented brand. The USPTO guard: the only chain to PE starts with a brand listing, and the registered owner is a different, unlinked company, so the brand reads \"Owner type not confirmed\", not PE-owned.",
+          "Accepted trade-off (\"Licensed names in v1\"): a PE-owned brand registered to an unlinked IP subsidiary would also read like this until linked."],
+   open:["Should the listing company still show as an owner line (as drafted), or move under the reason line?"] },
+
+ { key:"fable", name:"Fable Pet Co.", real:false, industries:["Pet food and supplies"],
+   cat:"not_yet_checked", ticker:null, checked:null, conf:null,
+   pe:[], others:[{ name:"Lark Family Holdings", kind:"company · owner type not confirmed", role:"owns the brand", since:"since 2019", conf:"Reported by 1 source", receipts:[]}],
+   franchise:false,
+   notes:["Invented brand. Before its check finishes, a brand shows only PE-owned or PE minority stake if found; otherwise \"Not yet checked\", with owners found so far."],
+   open:["Should \"Not yet checked\" say when the check is expected to finish?"] },
+];
+
+// ---- Rendering ----
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function receipts(list){
+  if(!list || !list.length) return '';
+  return `<details><summary>Receipt${list.length>1?'s':''} (${list.length})</summary>${list.map(r=>
+    `<blockquote>“${esc(r.q)}”<br><span class="src">${esc(r.s)} · ${esc(r.d)} · <a href="#" onclick="return false">link</a></span></blockquote>`).join('')}</details>`;
+}
+function ownerBlock(o, pe){
+  return `<div class="owner"><div><span class="name">${esc(o.name)}</span> <span class="kind">· ${esc(o.kind)}</span></div>
+    <div class="line2">${esc(o.role)}${o.since?` · ${esc(o.since)}`:''} <span class="conf">${esc(o.conf)}</span></div>
+    ${o.chain?`<div class="chain">${esc(o.chain)}</div>`:''}${o.funds?`<div class="chain">${esc(o.funds)}</div>`:''}${receipts(o.receipts)}</div>`;
+}
+function render(i){
+  const c = CASES[i];
+  const ex = typeof EXPLAIN[c.cat]==='function' ? EXPLAIN[c.cat](c.checked) : EXPLAIN[c.cat];
+  let h = `<h1 class="brand">${esc(c.name)}<span class="tag ${c.real?'real':'fake'}">${c.real?'real facts':'invented'}</span></h1>
+    <div class="industries">Industry: ${c.industries.map(esc).join(', ')} · ${esc(US_NOTE)}</div>
+    <div class="verdict ${TONE[c.cat]}"><div class="label">${esc(LABEL[c.cat])}${c.ticker?` · ${esc(c.ticker)}`:''}${c.cat==='no_pe_evidence_found'?` · checked ${esc(c.checked)}`:''}</div>
+      <div class="explain">${esc(ex)}</div>
+      ${c.reason?`<div class="reason">${esc(c.reason)}</div>`:''}
+      <div class="meta">${c.conf?esc(c.conf)+' · ':''}${c.checked&&c.cat!=='no_pe_evidence_found'?'checked '+esc(c.checked):(c.cat==='not_yet_checked'?'check in progress':'')}</div></div>`;
+  if(c.pe && c.pe.length) h += `<h3>Private equity owners</h3>` + c.pe.map(o=>ownerBlock(o,true)).join('');
+  if(c.peHolders && c.peHolders.length) h += `<h3>PE holders of a public company</h3>` + c.peHolders.map(o=>ownerBlock(o,true)).join('');
+  if(c.others && c.others.length) h += `<h3>${c.pe&&c.pe.length?'Other companies in the chain':'Owners'}</h3>` + c.others.map(o=>ownerBlock(o,false)).join('');
+  if(c.disputes) h += `<h3>Where sources disagree</h3>` + c.disputes.map(d=>`<div class="owner"><div><span class="name">${esc(d.name)}</span> <span class="kind">· ${esc(d.kind)}</span></div><div class="line2">${esc(d.claim)} <span class="conf">${esc(d.conf)}</span></div><div class="note">${esc(d.s)} · ${esc(d.d)}</div></div>`).join('');
+  if(c.pending) h += `<h3>Pending deal</h3><div class="owner"><div class="line2">${esc(c.pending.text)}</div><div class="note">${esc(c.pending.buyer)}</div></div>`;
+  if(c.history) h += `<h3>History</h3><div class="owner line2">${esc(c.history)}</div>`;
+  if(c.franchise) h += `<h3>About stores</h3><div class="note">${esc(FRANCHISE_NOTE)}</div>`;
+  if(c.alts) h += `<h3>Alternatives in ${esc(c.alts.industry)}</h3><div class="note">${esc(ALT_LINE)}</div>` +
+     c.alts.rows.map(r=>`<div class="alt"><span>${esc(r[0])}</span><span class="v">${esc(r[1])}</span></div>`).join('') +
+     `<div class="note">Show ${c.alts.more} more · ordered by the industry list's ranking</div>`;
+  h += `<h3>Receipts</h3><div class="note">Each quote is matched word for word against our stored copy. If a source page changes: “${esc(DEAD_LINK('Nov 5, 2026'))}”</div>`;
+  document.getElementById('card').innerHTML = h;
+  document.getElementById('side').innerHTML = `<h4>Case ${i+1} of ${CASES.length}: ${esc(c.name)}</h4>
+    <div class="note">${c.real?'Facts from the category audits; dates marked placeholder.':'Invented brand: the research has no real example of this case.'}</div>
+    <h4 style="margin-top:12px">What this case shows</h4><ul>${c.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>
+    <div class="open"><b>Open wording questions</b><ul>${c.open.map(n=>`<li>${esc(n)}</li>`).join('')}</ul></div>`;
+  document.getElementById('lbl').textContent = `${i+1}/${CASES.length} · ${c.name} · ${LABEL[c.cat]}`;
+  const u = new URL(location.href); u.searchParams.set('case', c.key); history.replaceState(null,'',u);
+}
+let idx = Math.max(0, CASES.findIndex(c => c.key === new URLSearchParams(location.search).get('case')));
+const go = (d) => { idx = (idx + d + CASES.length) % CASES.length; render(idx); window.scrollTo(0,0); };
+document.getElementById('prev').onclick = () => go(-1);
+document.getElementById('next').onclick = () => go(1);
+document.addEventListener('keydown', e => { if(/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return; if(e.key==='ArrowLeft') go(-1); if(e.key==='ArrowRight') go(1); });
+render(idx);
+</script>
+</body>
+</html>
