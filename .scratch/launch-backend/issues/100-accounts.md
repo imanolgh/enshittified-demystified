@@ -16,3 +16,5 @@ How do users sign in, what does the product store about them, how do they delete
 - Options to weigh: email magic link, password, or a third-party sign-in; what follows, alert history and billing state are kept, and for how long; export and deletion; email consent for the digest.
 - The demand log already records searches without accounts (engine "Search and the demand log"); whether signed-in searches are logged differently is part of this ticket.
 - Facts: "Research: Billing and email providers" (sign-in by email link).
+- **From chains "Source-link submissions"** (2026-11-18): the account model: reading never needs an account; a free account is needed only to comment (community notes, its own parked map); paid features in later builds run on the same accounts.
+

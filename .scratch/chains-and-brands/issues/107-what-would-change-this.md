@@ -55,3 +55,7 @@ Handed on:
 - "Source-link submissions": the "Send the link" placement.
 - engine "Brand card, receipt and edge shapes" (amended): the card shape gains the generated lines.
 - "The how-this-works page": may explain that these lines are generated from fixed rules.
+
+### Amended 2026-11-18 (from "Source-link submissions")
+
+- Readers can't submit links in v1, so the "Send the link" line is never used. The section ends instead with "Think this is wrong? Tell us.", linking to the private "Report a mistake" form.
