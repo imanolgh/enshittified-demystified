@@ -1,0 +1,16 @@
+# Task: Draft the how-this-works page
+
+Type: task
+Status: open
+Blocked by: 94, 59, 72  (Brand-level checked: required sources and freshness; Source-link submissions; Legal review before launch)
+Map: [chains-and-brands](../map.md)
+
+## Question
+
+What is the approved text of the how-this-works page?
+
+## Context
+
+- Created 2026-11-18 in "The how-this-works page", whose Answer fixes the eleven sections, their order, question headings, the length (under about 150 words each), the contents list and the stable link names.
+- Sources for each section are the decisions already recorded; the topic list is in "The how-this-works page" Context. Section 3 needs the required source list ("Brand-level checked: required sources and freshness"); section 10 needs the corrections process ("Legal review before launch") and whether readers can submit sources ("Source-link submissions"). Section 11's text is in that ticket's Comments (names Imanol Goikuria; self-funded; affiliate income at launch).
+- AFK then HITL: Claude drafts the page in the card voice (plain words, sentence case, no quality claims, the AI model not named); the developer approves it before launch.
