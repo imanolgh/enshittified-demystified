@@ -81,7 +81,7 @@ _Avoid_: Manager, franchisee (as the general term)
 ## Owners
 
 **Owner kind**:
-What sort of owner an entity is: private equity, venture capital, real estate, other investment fund (hedge, credit and other pooled funds), conglomerate, family, employee-owned, trust, public company, nonprofit, government, or cooperative. It is a fact about the owner, not about any single hop. A fund and the firm that manages it can have different kinds, as when a private equity firm runs a real estate fund.
+What sort of owner an entity is: private equity, venture capital, real estate, other investment fund (hedge, credit and other pooled funds), asset manager, conglomerate, family, employee-owned, trust, public company, nonprofit, government, or cooperative. It is a fact about the owner, not about any single hop. A fund and the firm that manages it can have different kinds, as when a private equity firm runs a real estate fund.
 _Avoid_: Ownership type, owner category
 
 **Certified Independent**:
@@ -93,8 +93,12 @@ What the product shows when an owner's owner kind cannot be established from any
 _Avoid_: Unknown owner, unclassified
 
 **Investment firm**:
-A company that manages funds, as the public knows it, such as KKR or L Catterton, even when it is registered as several advisers. Its owner kind says whether it is a PE firm. A public company that owns an investment firm, such as Blackstone Inc. or The Goldman Sachs Group, is a separate company above it.
-_Avoid_: Sponsor, GP, asset manager (as entity labels)
+A company that manages funds, as the public knows it, such as KKR or L Catterton, even when it is registered as several advisers. Its owner kind says whether it is a PE firm or an asset manager. A public company that owns an investment firm, such as Blackstone Inc. or The Goldman Sachs Group, is a separate company above it.
+_Avoid_: Sponsor, GP (as entity labels)
+
+**Asset manager**:
+An investment firm whose main business is running funds sold to the public, such as mutual funds and ETFs, on a very large scale, for example BlackRock, Vanguard or State Street. It is not a private equity firm even when it also runs private equity funds, though any of its funds known to be a private equity fund still counts as one. A firm that trades under its own name stays its own firm even when an asset manager owns it.
+_Avoid_: Index giant, money manager, PE firm (for these firms)
 
 **Fund**:
 A pool of money that one investment firm manages at a time, and that owns or lends to companies. Most of its money comes from outside investors, so the firm manages the fund without owning it or what it owns. Whether it owns or lends is a relationship, not part of what it is.

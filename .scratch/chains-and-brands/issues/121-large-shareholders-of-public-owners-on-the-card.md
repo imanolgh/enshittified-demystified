@@ -7,7 +7,7 @@ Map: [chains-and-brands](../map.md)
 
 ## Question
 
-When a brand's chain passes through a public company, how does the brand card show that company's large shareholders (the holders of more than 5% from 13D and 13G filings), including the big asset managers?
+When a brand's chain passes through a public company, how does the brand card show that company's large shareholders (the holders of more than 5% from 13D and 13G filings), including the big asset managers? And how does a brand that an asset manager controls read (the label and one-line explanation for `asset_manager_owned`)?
 
 ## Context
 
@@ -26,3 +26,4 @@ When a brand's chain passes through a public company, how does the brand card sh
   - placement on the card;
   - how a holder's label reads before and after "The private equity firm test and asset managers" decides how asset managers are classed;
   - whether the line also covers public companies further up a chain.
+- **From engine "The private equity firm test and asset managers"** (2026-11-20; ADR 0001 amended): new owner kind `asset_manager` (a firm with $50bn or more in registered funds, such as BlackRock, Vanguard, State Street, Fidelity, J.P. Morgan, Goldman Sachs, T. Rowe Price) and new category `asset_manager_owned` (a brand an asset manager controls). This ticket also takes that category's **card label and one-line explanation**. Asset managers are no longer labeled private equity firms, so the large-shareholders line can name them as asset managers.

@@ -18,7 +18,7 @@ Label: wayfinder:map · Tracker: local markdown (`docs/agents/issue-tracker.md`)
   - BDC loans from a manager's own BDCs (BlackRock TCP Capital) are read universe-wide with `managed_by` to the manager.
   - Ended hops and documents are never deleted, so this map can build on what v1 keeps.
 - **Decided in ticket 37 (round 2, 2026-11-20):** BlackRock, Vanguard and State Street are tracked from launch through an operator list (wire-feed matching and Form ADV reads), and the list grows by operator upload. Showing 5%-plus holders of public owners on v1 cards is chains [121](../chains-and-brands/issues/121-large-shareholders-of-public-owners-on-the-card.md). The private equity firm test is engine [120](../engine/issues/120-pe-firm-test-and-asset-managers.md).
-- **Not this map:** the Form ADV rule that classes BlackRock, State Street, Fidelity, J.P. Morgan and T. Rowe Price as private equity firms is a v1 correctness fix in the engine, not parked here.
+- **Settled in v1** (engine [120](../engine/issues/120-pe-firm-test-and-asset-managers.md), 2026-11-20): asset managers are their own owner kind, `asset_manager` (a firm with $50bn or more in registered funds), with the category `asset_manager_owned`. They are no longer classed private equity firms, and Vanguard is loaded from Form ADV.
 - **Research tickets:** findings go to `.scratch/asset-managers/research/<slug>.md`, primary sources only; bot rules as in CLAUDE.md; no OpenAI models.
 
 ## Decisions so far

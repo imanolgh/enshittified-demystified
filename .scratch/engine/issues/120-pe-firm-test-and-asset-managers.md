@@ -1,7 +1,7 @@
 # The private equity firm test and asset managers
 
 Type: grilling
-Status: open
+Status: resolved
 Map: [engine](../map.md)
 
 ## Question
@@ -30,4 +30,38 @@ What rule decides that an investment firm is a private equity firm, so that asse
   - **Investment-company share of regulatory AUM** (Item 5.D, registered file only) is the one measure where the ranges don't overlap. Asset managers run 20% to 97% (Vanguard 97.3%, State Street 96.3%, Fidelity 93.1%; J.P. Morgan AM 41.1%, Wellington 40.9%, Goldman Sachs AM 23.0%, Northern Trust 20.3%). PE firms run 0% to about 3% (KKR 0.5% to 3.2% depending on which registrations count; Apollo 2.3%).
   - **Caveats:** exempt reporting advisers file no Item 5 data, so a firm registered only as one can't be tested this way. RAUM is double-counted across affiliated registrations through subadvice. Affiliates with other names (HPS and GIP under BlackRock, Oaktree under Brookfield, 50 South under Northern Trust) were grouped from general knowledge, not from the file. Which Item 5.D lines count as investment companies (and whether BDCs do) should be checked against the form.
   - **Vanguard reports no private funds** in any of its 7 registrations, so the Form ADV load (advisers with private funds only) never creates it. Tracking it from the operator list (ticket 37 Q14) needs its entity created another way, by CRD from the list or from a 13G claim.
+
+## Comments
+
+**2026-11-20, before round 1:** testing a 10% registered-fund share line against the whole November file (not just the 24 sample firms) flipped 80 advisers that report PE funds, real PE firms among them: Partners Group (USA) 56.8%, Lexington 49.5%, Ardian 35.3%, Pomona 12.7%. They sell PE to retail investors through registered funds. By size, no PE firm passes about $18bn in registered funds (Apollo $17.8bn, Partners Group $16.5bn, Blackstone $16bn, Carlyle $11.6bn, KKR $6bn). Mid-size managers sit between (WCM $34bn, Barrow Hanley $21bn, GMO $19bn), and the big managers run hundreds of billions to trillions.
+
+**Round 1 (developer: yes to all):**
+- Q1: the test is size: $50bn in registered investment companies (Item 5.D(d), BDCs excluded) makes an asset manager. Turned down: $25bn (1.4 times headroom over Apollo), a 10% share line (misclasses Partners Group, Ardian, Lexington, Pomona), a named list (ADR 0002).
+- Q2: new kind `asset_manager` and category `asset_manager_owned`, with the investment-fund kinds in precedence; glossary "Asset manager" added and the term taken off Investment firm's avoid list.
+- Q3: summed over the firm's registrations (ADR 0001's grouping). Firms under their own names (Lexington, HPS, GIP) are tested alone.
+- Q4: a fund's own evidence first; otherwise it inherits the firm's kind.
+- Q5: the Form ADV load adds advisers at or above the line. Counted after the round: 105 registrations, 48 without private funds (Vanguard ×3, BlackRock Fund Advisors, Capital Research, Geode, Schwab, Mellon, Federated, MFS, insurers' fund advisers), not "a few dozen" as first estimated.
+
+**Round 2 (developer: yes to all):**
+- Q6: the size test is the kind's only source (rank 1) and overrides "any PE fund". Self-descriptions never set it; "asset manager" and "alternative asset manager" are unclear terms.
+- Q7: a post-2024 Goldman (or J.P. Morgan) PE fund reads PE-owned once a release or page describes it as a private equity fund, else asset-manager-owned by inheritance.
+- Q8: a buffer: an asset manager from $50bn, back below $40bn; operator alert when a firm classed private equity passes $25bn.
+- Q9: the card label for `asset_manager_owned` goes to chains 121.
+
+## Answer
+
+Resolved 2026-11-20 in a grilling session (two rounds, above). Recorded in ADR 0001 (amended: kinds list, the PE-firm rule, precedence, categories), evidence_layer_plan.md (§4 `owner_kind_evidence`, the Form ADV connector's load, the card note on 13d-1(b) holders) and the glossary ("Asset manager", "Owner kind", "Investment firm").
+
+- **Rule:** a firm with $50bn or more in registered investment companies (Form ADV Item 5.D(d)(3), summed over its registrations; BDCs excluded) is an **asset manager**, however many PE funds it reports. It stays one until those assets fall below $40bn. Every other firm keeps "any PE fund → private equity".
+- **Why size:** fund-count shares overlap (BlackRock 42% PE, Blackstone 39%, Ares 22%). Registered-fund share catches PE firms with retail funds. Size leaves a wide gap: PE firms top out near $18bn, and the asset managers checked run $296bn and up.
+- **Vocabulary:** owner kind `asset_manager`, category `asset_manager_owned`, placed after other investment funds in precedence. The size test, rank 1, is the kind's only source and overrides "any PE fund". "Asset manager" and "alternative asset manager" map to no kind.
+- **Funds:** a fund's own evidence first; otherwise it inherits `asset_manager`. This can miss PE in an asset manager's own PE deals until something describes the fund, but it never wrongly claims PE.
+- **Loading:** advisers at or above the line come into the Form ADV load (48 more in November 2026, Vanguard among them).
+- **Unchanged:** a 13d-1(b) filing never counts; exempt reporting advisers never qualify.
+
+Handed on:
+- chains [121](../../chains-and-brands/issues/121-large-shareholders-of-public-owners-on-the-card.md): the card label and one-line explanation for `asset_manager_owned`, and how asset managers are named among large shareholders.
+- "Operational identity, budgets and guardrail values": the $25bn alert, and the $50bn and $40bn lines as code values.
+- "Events and the public changelog": owner-kind changes from this rule (the buffer keeps them rare).
+- [Asset Managers map](../../asset-managers/map.md): the kind now exists in v1. Firm pages, 13F and N-PORT stay parked.
 
