@@ -216,3 +216,105 @@ Vendor pages that couldn't be read or didn't give the figure:
 - Build: the wayfinder spec, with its parts list and acceptance bars. Then time one connector end to end (Form ADV is small and self-contained) and sum its transcript tokens with the same script. That replaces the assumed $25 to $60 per day and the days per part with a measured unit. The developer's `/usage` bars during that build show whether the current plan holds.
 - Seeding: a free count-only dry run of EDGAR full-text search for all 2,200 to 3,750 names (hit totals and the form and filer mix, no reads), plus token sizes for a sample of about 100 hits. That fixes the largest row. Also a registry-research pilot of about 20 entries with its harness tokens recorded, newsroom archive sizes from the first registry entries, and the extra-batch brand count.
 - Monthly: decide engine 119's cadences, then measure the text-change rate over two consecutive registry passes on the first registry entries. Ticket 118's fetch filter fixes the search rows, and ticket 43's choice fixes hosting. Search traffic and new brands per month can only be measured after launch, from the demand log.
+
+## 9. Revised for "Cost cuts before revenue" (2026-11-21)
+
+Engine "Cost cuts before revenue" (ticket 124) changed several rules this estimate assumed. This section re-prices the seeding and monthly tables under the new rules, then sets out the research behind each cut and what it gives up. The build section doesn't change: on the developer's $100 Max plan the build is plan months, not API dollars.
+
+The new rules, in short:
+
+- EDGAR full-text search: a hit is read whole only when the brand's own company or one of its tracked owners filed it; every other hit is read as windows of about 8,000 characters around each mention of the name, plus the cover page. 10-Qs from the brand's company or owners are read only when filed after the latest 10-K.
+- Newsrooms: every release is still read.
+- A new prompt or model version reads new documents only; re-reads are an operator choice; seeding waits for p10.
+- No timers before revenue: every recurring job is a step of one operator command, the pass.
+- The engine runs on the developer's machine; the static site goes to Cloudflare Pages (free); search is built into the site; the report form is a small free Cloudflare function.
+
+### One seeding pass, revised
+
+Prices: own-side whole reads at $0.003 to $0.005 for an 8-K and $0.019 to $0.030 for a long filing; windowed reads at $0.003 (short filings, no saving) to $0.0073 (long filings), from measurement 2 below; pages at $0.00136 (measured on releases) to $0.003; releases at $0.00136.
+
+| Item | Before | Revised | How it was derived |
+|---|---|---|---|
+| EDGAR full-text search | $600 to $5,625 | $290 to $1,970 | The same 60,000 to 225,000 hits. Leaving out BDC filers, 38% come from the brand's company or owners, read whole; dropping their older 10-Qs (about 18% of them) leaves 31% of hits read whole, averaging $0.0095 to $0.0136 (about two thirds short 8-Ks, a third long filings). The other 62% are read as windows at $0.003 to $0.0073 |
+| DeepSeek Search queries | $3 to $5 | $3 to $5 | Unchanged |
+| DeepSeek Search results read | $52 to $550 | $23 to $375 | 17,250 to 125,000 results at $0.00136 to $0.003. How many results a query keeps is still open ("Past coverage through DeepSeek Search") |
+| Newsroom first crawls | $135 to $660 | $61 to $204 | 45,000 to 150,000 releases at the measured $0.00136 |
+| Portfolio, about and detail pages | $30 to $154 | $14 to $105 | 10,000 to 35,000 pages at $0.00136 to $0.003 |
+| Brand websites | $7 to $33 | $3 to $23 | 2,300 to 7,500 pages at $0.00136 to $0.003 |
+| BDC 10-K Item 1 reads | $2 to $5 | $2 to $5 | Unchanged |
+| Retries | $25 to $703 | $12 to $269 | 3 to 10% |
+| DeepSeek subtotal | $854 to $7,735 | $410 to $2,960 | |
+| List-building and registry research | plan time | plan time | Inside the Max plan |
+
+This replaces the rough "$400 to $3,700" given when ticket 124 was decided; that figure counted the windows but not the 10-Q rule or the measured page price.
+
+### Between passes and per pass, revised
+
+| Item | Before (a typical month) | Revised |
+|---|---|---|
+| Hosting | $65 to $450 | $0: the engine runs on the developer's machine |
+| Website on Cloudflare Pages | $0 | $0: the chains site's 2,500 to 6,000 files fit the free plan |
+| Report function | n/a | $0 on Cloudflare's free tier (limits to be checked in "Hosting, storage and deployment") |
+| Domain | $1 | $1 |
+| Backups (Backblaze B2) | $1 to $5 | $0 to $1 |
+| Claude Code upkeep | $20 to $200 | inside the Max plan |
+| A month with no pass | $110 to $1,730 | about $1 to $2 |
+| A "new deals" pass, when run | n/a | about $2 to $25: wire feeds, new newsroom releases and new deal-type EDGAR filings for tracked names |
+| A full routine pass, per month since the last one | n/a | about $7 to $120: every new EDGAR filing (windowed where third party), new releases and changed pages |
+| A prompt or model version | $850 to $7,700 | $0 unless a re-read is chosen; a full re-read would cost about the revised DeepSeek subtotal, $410 to $2,960 |
+
+### The research behind the cuts
+
+Four measurements, all on 2026-11-20 and 2026-11-21, with $1.37 of DeepSeek in total:
+
+1. Where SEC filings state ownership (`.scratch/engine/research/edgar-quote-distance.md`, code only). In 33 SEC filings from the extraction tests, all filed by the brand's company, its owner or as deal filings, DeepSeek's whole reads found 677 facts. 84% of quotes contain the subject's name and 98% sit within about 2,000 tokens of it. The 12 far facts (2%, in 5 filings) are all a company describing its own controlling owner as "we" or "our Principal Stockholder" (Petco: "We are currently indirectly controlled by certain funds (the "CVC Funds")"; Mister Car Wash: "LGP has more than 50% of the voting power"; Chewy; Unilever on TMICC).
+2. Windows on third-party filings (`.scratch/engine/research/edgar-third-party-windows.md`, $1.13). 10 brands, 2,274 full-text hits: 664 from the brand's company or an owner, 566 deal-type, 532 third party, 512 BDC. 44 third-party filings were read by hand and by DeepSeek, whole and as windows. 7 of 44 (16%) state an owner of the brand and 3 (7%) an investor in its company (KKR and Ontario Teachers' for Heartland Dental in a mortgage-pool prospectus, Align's stake in Heartland's holding company, Sentinel as MB2 Dental's former owner); none of 14 landlord or 3 lender filings does. Every statement sits within 391 characters of a brand mention. Windowed reads missed no brand fact a whole read found (0 of 44); whole reads found 13 brand facts and windowed reads 19, a gap about the size of two reads of the same text. Cost per read $0.0200 whole against $0.0057 windowed; long filings $0.030 against $0.0073. 299 of the 566 deal-type hits came from landlords, REITs and mortgage trusts.
+3. Older 10-Qs (`.scratch/engine/research/ten-q-deals-missing-from-ten-k.md`, code plus reading). In two test pairs (Chewy, Tractor Supply), a 10-Q's only new ownership facts were the quarter's acquisitions (Modern Animal, VIP Petcare). Across 22 consumer companies, 734 10-Qs and 261 10-Ks from 2015 to 2026, about 420 real deals were named in 10-Qs, and the next 10-K named all but one (about 0.2%): Driven Brands' Clearwater Car Wash, about $24 million, folded into "All Other Car Wash", with no 8-K or press release naming it. No brand bought and sold within a year went missing (Hershey's Tyrrells is in the 10-K). Smucker and Clorox restate deals only in the 10-K's Exhibit 13 or 99.1.
+4. Newsroom first-crawl filter (`.scratch/engine/research/newsroom-filter-test.md`, $0.24). 176 releases from Blackstone, TSG Consumer, Serta Simmons Bedding, Pharmavite and Ocean State Job Lot, plus 171 known releases from the research. 37 of the 97 fact-yielding releases state ownership only in the closing About paragraph. The best filters skipped 6% to 25% of releases while losing 3% to 12% of ownership pairs. A release cost $0.00136.
+
+### What each cut gives up, and how much it matters
+
+**1. Third-party EDGAR filings read as windows** (Q1).
+
+- Evidence: measurements 1 and 2. A company's own filings stay whole reads because that's where the 2% of far facts sit.
+- What could be missed:
+  - An ownership statement in a third-party filing far from every mention of the name. None was found in 44 filings, but only 9 of them held any brand fact, so the sample bounds the miss rate only loosely: up to about 7% of third-party filings, or about a third of the fact-bearing ones, at 95% confidence.
+  - Facts about other companies named in those filings. Whole reads returned 631 such facts against 290 for windows, mostly the filer's own structure (a landlord's subsidiaries). A company the engine tracks has its own searches and its own filings read whole; the loss is incidental facts about companies nobody tracks.
+  - Statements that use a name the engine doesn't know (an abbreviation such as "TMICC" or a defined term). Windows only open around names the engine searches for.
+- How much it matters: low. Third-party filings rarely state who owns a brand (7% name an investor), and those facts usually also appear on the owner's portfolio page or in a release. Their extra value is as an official source that verifies a fact alone, and windows kept every such statement in the test.
+
+**2. 10-Qs older than the filer's latest 10-K skipped** (Q7).
+
+- Evidence: measurement 3.
+- What could be missed: a deal named only in an old 10-Q (about 1 in 420, mostly small purchases folded into a larger line in the 10-K); a quarter-level date where the 10-K gives only the year (10-Ks usually give the date). 10-Qs filed since the latest 10-K are still read, so recent deals are kept.
+- How much it matters: very low for brand ownership. The one miss in the sample was a roll-up's purchase of a few sites, not a brand changing hands.
+
+**3. No automatic re-read when the prompt or model changes** (Q4).
+
+- Evidence: the cost alone. A full re-read costs about as much as the seeding pass's DeepSeek reads.
+- What could be missed: improvements a new prompt version brings (a fixed false claim, a newly caught fact) reach only new documents until the developer chooses a re-read. Facts from two approved versions sit side by side. A document that produced no facts under the old version is never looked at again unless a broad re-read runs.
+- How much it matters: low to moderate. Every version passes the same approval check before it ships (known facts, exact quotes, blind precision, no rule breaks; "Extraction prompt rules"), so older facts met the bar of their day. A known kind of error can be fixed with a targeted re-read of the documents that produced it. Seeding waits for p10 so the first pass uses the newest approved prompt.
+
+**4. No timers before revenue: one operator pass** (Q5, Q9).
+
+- Evidence: none needed; it's a choice about when money is spent.
+- What could be missed: freshness. Between passes nothing updates:
+  - a sale or exit isn't reflected, so a card can show a former owner as current until the next pass, and a new PE purchase doesn't appear;
+  - the deal feed shows nothing new;
+  - pending deals don't close in the data;
+  - failed reads wait for the next pass, so a brand can stay "not yet checked" longer;
+  - the drift check and the golden check (a silent model change) run only at pass time.
+- How much it matters: moderate, and it grows with the gap between passes. Cards show "checked {date}", so readers can see the age; after 18 months without confirmation a hop shows "No source has shown this since…". The cheap "new deals" pass (wire feeds, new releases, new deal-type EDGAR filings, roughly $2 to $25) is the mitigation; run regularly, it keeps sales and purchases current.
+
+**5. The engine on the developer's machine, static search, a free report function** (Q6).
+
+- Evidence: none needed; it's a choice about hosting.
+- What could be missed:
+  - search quality: matching on names, owners and industry words only, with no meaning-based ranking;
+  - the demand log (searches that found nothing), unless the small Cloudflare function records them;
+  - updates when the machine is off or fails. The website itself stays up, since it's static on Cloudflare.
+- How much it matters: low for v1, since people look brands up by name. The operational risk of one machine is real; backups (Backblaze B2 with Object Lock) cover the data. Fetching from a home connection is not a loss: research found 90 of 93 PE firm sites readable from a home IP ("Rosters, portfolio pages and the registry").
+
+**6. SEC headers from the first request** (Q8). No data trade-off. If the SEC still refuses, the engine stops SEC requests instead of retrying, and EDGAR facts wait until it's resolved.
+
+**Considered and rejected: a newsroom first-crawl filter** (Q3). Measurement 4 showed every filter that skipped a meaningful share of releases lost 3% to 12% of ownership pairs, mostly facts in About paragraphs, people and charity releases, and deals worded "sell", "purchased" or "invests". At $0.00136 a release, the best filter would have saved about $15 to $50. Every release is still read.

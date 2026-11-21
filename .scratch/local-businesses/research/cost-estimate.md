@@ -447,3 +447,117 @@ The national layer is the same in every scope:
 | 2B sites unchecked unless on a roster | about 264,000 nationally, 15,768 of them in New York | about 264,000, 26,999 of them in the three states | about 257,000 (264,000 less the vets in states with a census) |
 
 A stricter reading changes these counts. The engine's rule is that a business shows "No PE evidence found" only after every source the product requires for it has finished a run (engine "What 'checked' means and coverage states"). How the local coverage states map onto that rule is open (the local map's "Not yet specified"). If the local product made the deep-research sources required for every 2A entity, only deep-researched dental practices would read "No PE evidence found": up to 8,001 in New York, 14,137 in the tri-state and 135,665 in the US. The rest of the national census would read "not yet checked".
+
+## 11. Revised for "Cost cuts before revenue" (2026-11-21)
+
+Engine "Cost cuts before revenue" (ticket 124) changed rules this estimate assumed. This section re-prices the tables above under the new rules, row by row. The build sections don't change.
+
+What changes for the local product:
+
+- EDGAR full-text search: a hit is read whole only when the brand's company or a tracked owner filed it, and every other hit is read as windows around the name. Practices and long-tail rollups are private, so nearly all their hits are third-party filings: priced at $0.003 (short filings, no saving) to $0.0073 (long filings, windowed) instead of $0.010 to $0.025 (`.scratch/engine/research/edgar-third-party-windows.md`).
+- Page price: the newsroom test measured $0.00136 per release on DeepSeek off-peak (`.scratch/engine/research/newsroom-filter-test.md`). Practice sites and search results are assumed to cost about the same: the low case uses $0.00136 and the high case keeps $0.003 (was $0.003 to $0.0044). Release rows use $0.00136 at both ends.
+- No timers before revenue: recurring rows cost nothing between operator passes; each pass is priced when run. The no-evidence refresh runs only when the developer chooses.
+- No automatic version re-reads: the version re-read contingency is $0 unless chosen.
+- Hosting before revenue: the engine runs on the developer's machine, so no host is added. The local pages still exceed Cloudflare Pages' file limits, so the Workers line ($5 to $50 a month) stays. Search is built into the site, so no Google Places calls happen before revenue.
+- Unchanged: paid state data, the FOIL request, DeepSeek Search query counts, and build time on the Max plan.
+
+### One seeding pass, revised
+
+| Row | New York | Tri-state | US |
+|---|---|---|---|
+| Deep research: DeepSeek Search queries | $14 to $34 | $25 to $61 | $255 to $612 |
+| Deep research: pages read | $103 to $1,550 | $182 to $2,734 | $1,850 to $27,510 |
+| Deep research: EDGAR hits, windowed | $8 to $335 | $15 to $591 | $153 to $5,957 |
+| National layer: roster pages ($5 to $240), newsroom first crawls ($4 to $120), about and portfolio pages ($1 to $33), rollups' EDGAR windowed ($7 to $197), rollups' DeepSeek Search ($4 to $121) | $21 to $711 | $21 to $711 | $21 to $711 |
+| Retries, 3 to 10% | $4 to $263 | $7 to $410 | $68 to $3,479 |
+| DeepSeek and search subtotal | $150 to $2,893 | $250 to $4,507 | $2,347 to $38,269 |
+| Records requests and paid data | $0 to $150 (NY FOIL) | $925 to $37,150 (NY FOIL plus New Jersey's registry file) | $8,850 to $84,360 (sampled and other states, as in section 6) |
+| Seeding total, real spend | $150 to $3,043 (was $335 to $5,760) | $1,175 to $41,657 (was $1,472 to $45,660); without New Jersey's file $250 to $4,657 (was $547 to $8,660) | $11,197 to $122,629 (was $13,900 to $153,700); free data only $2,347 to $38,269, without SoS data in 15 to 30 states |
+
+### Between passes, revised (a typical month with no pass run)
+
+| Row | New York | Tri-state | US |
+|---|---|---|---|
+| Hosting, added | $0 (developer's machine) | $0 | $0, but see the storage note below |
+| Website: local pages on Workers and map tiles | $5 to $25 | $5 to $25 | $5 to $50 |
+| Backups of documents and the database (Backblaze B2) | $0 to $2 | $0 to $3 | $2 to $25 |
+| Google Places | $0 (search is built into the site) | $0 | $0 |
+| Claude Code upkeep | inside the Max plan | inside the Max plan | inside the Max plan; the high end may need Ultra (+$100) |
+| Month with no pass | $5 to $27 (was $8 to $2,000) | $5 to $28 (was $17 to $3,560) | $7 to $75 (was $830 to $26,750) |
+
+### Each pass, when run
+
+- A routine pass (new releases, changed roster pages, new EDGAR filings for rollups and practices, staleness sweep, recompute): about $1 to $20 for New York, $1 to $30 for the tri-state, $5 to $250 for the US.
+- A full no-evidence refresh of the launch-state practices, only when chosen: $0 for a roster re-match (code), up to about $500 for New York, $880 for the tri-state and $9,000 for the US with every query run again and a quarter of the pages and hits new.
+- Paid registry updates, only when bought: New Jersey $9 to $370 an update; in the US, re-buying paid files once a year comes to about $9,000 a year at the low end.
+- A prompt or model version: $0 unless a re-read is chosen.
+
+### Trade-offs: the research behind these cuts and what they give up
+
+The same cuts apply to the local product, and the same research backs them. The shared detail first, then what is specific to local businesses.
+
+#### The research behind the cuts
+
+Four measurements, all on 2026-11-20 and 2026-11-21, with $1.37 of DeepSeek in total:
+
+1. Where SEC filings state ownership (`.scratch/engine/research/edgar-quote-distance.md`, code only). In 33 SEC filings from the extraction tests, all filed by the brand's company, its owner or as deal filings, DeepSeek's whole reads found 677 facts. 84% of quotes contain the subject's name and 98% sit within about 2,000 tokens of it. The 12 far facts (2%, in 5 filings) are all a company describing its own controlling owner as "we" or "our Principal Stockholder" (Petco: "We are currently indirectly controlled by certain funds (the "CVC Funds")"; Mister Car Wash: "LGP has more than 50% of the voting power"; Chewy; Unilever on TMICC).
+2. Windows on third-party filings (`.scratch/engine/research/edgar-third-party-windows.md`, $1.13). 10 brands, 2,274 full-text hits: 664 from the brand's company or an owner, 566 deal-type, 532 third party, 512 BDC. 44 third-party filings were read by hand and by DeepSeek, whole and as windows. 7 of 44 (16%) state an owner of the brand and 3 (7%) an investor in its company (KKR and Ontario Teachers' for Heartland Dental in a mortgage-pool prospectus, Align's stake in Heartland's holding company, Sentinel as MB2 Dental's former owner); none of 14 landlord or 3 lender filings does. Every statement sits within 391 characters of a brand mention. Windowed reads missed no brand fact a whole read found (0 of 44); whole reads found 13 brand facts and windowed reads 19, a gap about the size of two reads of the same text. Cost per read $0.0200 whole against $0.0057 windowed; long filings $0.030 against $0.0073. 299 of the 566 deal-type hits came from landlords, REITs and mortgage trusts.
+3. Older 10-Qs (`.scratch/engine/research/ten-q-deals-missing-from-ten-k.md`, code plus reading). In two test pairs (Chewy, Tractor Supply), a 10-Q's only new ownership facts were the quarter's acquisitions (Modern Animal, VIP Petcare). Across 22 consumer companies, 734 10-Qs and 261 10-Ks from 2015 to 2026, about 420 real deals were named in 10-Qs, and the next 10-K named all but one (about 0.2%): Driven Brands' Clearwater Car Wash, about $24 million, folded into "All Other Car Wash", with no 8-K or press release naming it. No brand bought and sold within a year went missing (Hershey's Tyrrells is in the 10-K). Smucker and Clorox restate deals only in the 10-K's Exhibit 13 or 99.1.
+4. Newsroom first-crawl filter (`.scratch/engine/research/newsroom-filter-test.md`, $0.24). 176 releases from Blackstone, TSG Consumer, Serta Simmons Bedding, Pharmavite and Ocean State Job Lot, plus 171 known releases from the research. 37 of the 97 fact-yielding releases state ownership only in the closing About paragraph. The best filters skipped 6% to 25% of releases while losing 3% to 12% of ownership pairs. A release cost $0.00136.
+
+#### What each cut gives up, and how much it matters
+
+**1. Third-party EDGAR filings read as windows** (Q1).
+
+- Evidence: measurements 1 and 2. A company's own filings stay whole reads because that's where the 2% of far facts sit.
+- What could be missed:
+  - An ownership statement in a third-party filing far from every mention of the name. None was found in 44 filings, but only 9 of them held any brand fact, so the sample bounds the miss rate only loosely: up to about 7% of third-party filings, or about a third of the fact-bearing ones, at 95% confidence.
+  - Facts about other companies named in those filings. Whole reads returned 631 such facts against 290 for windows, mostly the filer's own structure (a landlord's subsidiaries). A company the engine tracks has its own searches and its own filings read whole; the loss is incidental facts about companies nobody tracks.
+  - Statements that use a name the engine doesn't know (an abbreviation such as "TMICC" or a defined term). Windows only open around names the engine searches for.
+- How much it matters: low. Third-party filings rarely state who owns a brand (7% name an investor), and those facts usually also appear on the owner's portfolio page or in a release. Their extra value is as an official source that verifies a fact alone, and windows kept every such statement in the test.
+
+**2. 10-Qs older than the filer's latest 10-K skipped** (Q7).
+
+- Evidence: measurement 3.
+- What could be missed: a deal named only in an old 10-Q (about 1 in 420, mostly small purchases folded into a larger line in the 10-K); a quarter-level date where the 10-K gives only the year (10-Ks usually give the date). 10-Qs filed since the latest 10-K are still read, so recent deals are kept.
+- How much it matters: very low for brand ownership. The one miss in the sample was a roll-up's purchase of a few sites, not a brand changing hands.
+
+**3. No automatic re-read when the prompt or model changes** (Q4).
+
+- Evidence: the cost alone. A full re-read costs about as much as the seeding pass's DeepSeek reads.
+- What could be missed: improvements a new prompt version brings (a fixed false claim, a newly caught fact) reach only new documents until the developer chooses a re-read. Facts from two approved versions sit side by side. A document that produced no facts under the old version is never looked at again unless a broad re-read runs.
+- How much it matters: low to moderate. Every version passes the same approval check before it ships (known facts, exact quotes, blind precision, no rule breaks; "Extraction prompt rules"), so older facts met the bar of their day. A known kind of error can be fixed with a targeted re-read of the documents that produced it. Seeding waits for p10 so the first pass uses the newest approved prompt.
+
+**4. No timers before revenue: one operator pass** (Q5, Q9).
+
+- Evidence: none needed; it's a choice about when money is spent.
+- What could be missed: freshness. Between passes nothing updates:
+  - a sale or exit isn't reflected, so a card can show a former owner as current until the next pass, and a new PE purchase doesn't appear;
+  - the deal feed shows nothing new;
+  - pending deals don't close in the data;
+  - failed reads wait for the next pass, so a brand can stay "not yet checked" longer;
+  - the drift check and the golden check (a silent model change) run only at pass time.
+- How much it matters: moderate, and it grows with the gap between passes. Cards show "checked {date}", so readers can see the age; after 18 months without confirmation a hop shows "No source has shown this since…". The cheap "new deals" pass (wire feeds, new releases, new deal-type EDGAR filings, roughly $2 to $25) is the mitigation; run regularly, it keeps sales and purchases current.
+
+**5. The engine on the developer's machine, static search, a free report function** (Q6).
+
+- Evidence: none needed; it's a choice about hosting.
+- What could be missed:
+  - search quality: matching on names, owners and industry words only, with no meaning-based ranking;
+  - the demand log (searches that found nothing), unless the small Cloudflare function records them;
+  - updates when the machine is off or fails. The website itself stays up, since it's static on Cloudflare.
+- How much it matters: low for v1, since people look brands up by name. The operational risk of one machine is real; backups (Backblaze B2 with Object Lock) cover the data. Fetching from a home connection is not a loss: research found 90 of 93 PE firm sites readable from a home IP ("Rosters, portfolio pages and the registry").
+
+**6. SEC headers from the first request** (Q8). No data trade-off. If the SEC still refuses, the engine stops SEC requests instead of retrying, and EDGAR facts wait until it's resolved.
+
+**Considered and rejected: a newsroom first-crawl filter** (Q3). Measurement 4 showed every filter that skipped a meaningful share of releases lost 3% to 12% of ownership pairs, mostly facts in About paragraphs, people and charity releases, and deals worded "sell", "purchased" or "invests". At $0.00136 a release, the best filter would have saved about $15 to $50. Every release is still read.
+
+#### What is specific to the local product
+
+- EDGAR on practice names: practices and long-tail rollups are private, so nearly all their hits are third-party filings (landlords' tenant lists and lenders' schedules for generic names such as "Family Dental"). Measurement 2 found no landlord or lender filing that states an owner, so windows lose little here; the risk is the same as cut 1.
+- The page price: practice websites and local news pages weren't measured. The low ends assume they cost what a press release did ($0.00136); if they cost $0.003, the low ends of the page rows roughly double.
+- Freshness matters more locally. Dental and vet rollups buy practices continuously, so a "No PE evidence found (checked {date})" result ages faster than a national brand's verdict. The main signal of a new acquisition is the practice appearing on a DSO's location roster; a routine pass re-reads changed roster pages for about $1 to $20 in New York, so regular passes keep most local verdicts current without a full no-evidence refresh.
+- The no-evidence refresh runs only when chosen. Between refreshes, an independent practice bought by a DSO that doesn't list it on its roster stays "No PE evidence found" until a refresh or another source catches it.
+- No Google Places before revenue: local search runs on the built-in index over census names and addresses (geocoded free through the Census Geocoder). Places enrichment (opening status, current name) waits for a server, so a closed practice can linger until NPPES deactivates it.
+- Skipping paid state data (New Jersey's registry; 15 to 30 states in the US scope) loses business-registry records in those states. That weakens a second source and officer links where registries list officers, but PE detection itself rests on rosters, NPPES, releases and search, which stay.
+- The US scope may outgrow one machine (up to 3.6 TB of documents and millions of polite fetches); New York and the tri-state fit on a normal desktop.
