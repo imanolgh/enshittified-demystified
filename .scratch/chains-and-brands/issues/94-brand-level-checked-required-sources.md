@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: engine/37  (Retrieval fan-out, tracked entities and refresh cadence)
+Blocked by: engine/37, engine/118, engine/119  (Retrieval fan-out, tracked entities and refresh cadence; Past coverage through DeepSeek Search; Refresh schedule and next-check date)
 Map: [chains-and-brands](../map.md)
 
 ## Question
@@ -18,4 +18,11 @@ Which sources are on a chains-and-brands brand's required list, so that it count
 - 37 launch industries, about 1,100 brands at 30 per list ("Launch industries", amended).
 - **From "Licensed names in v1"** (2026-11-18): two requests. (1) Each brand's own website (about page, product pages) as a required source, because trademark footers name who owns the name. (2) The USPTO licensing check (one lookup of the brand's live registration) as a required source for brands in the seven licensing-prone industries (cookware, clothing and shoes, beauty products, personal care, home furnishings, sporting goods and outdoor gear, pet food and supplies); access is "Task: USPTO access and mark search".
 - **From "Card wording"** (2026-11-18): every checked card shows "What we checked": each required source with its last finished date and how many documents it read for the brand, the documents listed. Source names on the card need plain labels ("SEC full-text search", "Brand website", "US trademark register").
+- **From engine "Retrieval fan-out, tracked entities and refresh cadence"** (2026-11-20; evidence_layer_plan.md §5 Stage 2): what runs for a tracked brand:
+  - EDGAR full-text search on its names;
+  - its registry entry (newsroom, about page) in the registry pass;
+  - wire-feed matching;
+  - DeepSeek Search for past coverage (engine "Past coverage through DeepSeek Search");
+  - the USPTO check in the 7 licensing-prone industries.
 
+  Each owner on its chain gets its own sources (full-text search for companies, 13D/13G for public ones, registry entries, Form ADV for firms), and research stops at investment firms, funds, families and other end owners. A newly tracked entity's sources run at once. A failed re-run leaves the last completed run in force, and failed runs are retried daily for up to 7 days. Whether owners' sources sit on a brand's required list is this ticket's.

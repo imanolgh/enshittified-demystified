@@ -96,7 +96,7 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 
 ## Scenario A3: Ongoing — Scheduled Sponsor-Page Diff Detects a New Acquisition
 
-**Trigger:** Celery Beat, nightly: `crawl_sponsor_registry` iterates ~500 known sponsor/DSO/rollup domains. *(2026-11-12, engine "Rosters, portfolio pages and the registry": the registry is one YAML file per organization; a pass covers every required portfolio, newsroom and about page with detail and paged pages, and its cadence belongs to "Retrieval fan-out, tracked entities and refresh cadence". DSO rosters are parked with local businesses and their selectors with "Selector producers: store locators and rosters".)*
+**Trigger:** Celery Beat, nightly: `crawl_sponsor_registry` iterates ~500 known sponsor/DSO/rollup domains. *(2026-11-12, engine "Rosters, portfolio pages and the registry": the registry is one YAML file per organization; a pass covers every required portfolio, newsroom and about page with detail and paged pages, and its cadence belongs to "Refresh schedule and next-check date" (split off 2026-11-20). DSO rosters are parked with local businesses and their selectors with "Selector producers: store locators and rosters".)*
 
 1. `retrieve_portfolio_pages` refetches each portfolio/locations page → sha256 compare vs. last stored version. Unchanged (majority) → stop, $0 LLM spend. *(2026-11-07, engine "Document storage, fetch log and last-confirmed": the compare is on extracted text, and an unchanged page advances `last_seen_at`. A changed page is a new version that the LLM re-reads whole; the diff only shows what changed, for events.)*
 2. Changed: diff the extracted text. New string detected: *"Hudson Valley Veterinary Group — joined 2026."*
@@ -104,12 +104,12 @@ The 52% "no evidence" entities publish as **"No PE evidence found (checked {date
 4. **Event emission:** publication of a new `acquired_by` edge fires `acquisition_event` → notification fan-out to users following that entity/category/region (the Acquisition Alarm product) and to the public changelog.
 5. Same nightly loop covers DSO rosters (location adds/removals) and Google News RSS per tracked sponsor. *(Google News dropped 2026-11-08, engine "Press and EDGAR full-text connectors".)*
 
-**Beat schedule (PE):**
+**Beat schedule (PE):** *(2026-11-20: history only. Every interval is now engine "Refresh schedule and next-check date"; who is tracked and what runs for each entity is evidence_layer_plan.md §5 Stage 2.)*
 
 | Task | Cadence |
 |---|---|
 | Sponsor portfolio + DSO roster crawl | nightly |
-| Press RSS/GDELT poll per tracked entity *(2026-11-08: GDELT dropped; wire subject feeds are polled for all tracked entities at once, faster than they turn over; intervals in "Retrieval fan-out, tracked entities and refresh cadence")* | every 6h |
+| Press RSS/GDELT poll per tracked entity *(2026-11-08: GDELT dropped; wire subject feeds are polled for all tracked entities at once, faster than they turn over; intervals in "Refresh schedule and next-check date")* | every 6h |
 | EDGAR full-text poll (tracked sponsor names) | daily |
 | SoS re-check for tracked entities | monthly |
 | Re-verify stale `reported` edges (hunt for 2nd source) *(dropped 2026-11-07, engine "Edge lifecycle: ending, retraction and staleness": a second source comes from the brand's normal re-checks)* | weekly |
@@ -157,7 +157,7 @@ Marginal cost per analysis ≈ a few resolution calls + cache misses; the expens
 
 ## Scenario B3: Ongoing — Filing-Season Refresh
 
-**Beat schedule (PC):**
+**Beat schedule (PC):** *(2026-11-20: history only. BDC jobs are set in evidence_layer_plan.md "BDC connector and Schedule parser"; other intervals are engine "Refresh schedule and next-check date"; N-PORT, Form 5500 and CAFR are parked with retirement.)*
 
 | Task | Cadence | Behavior |
 |---|---|---|

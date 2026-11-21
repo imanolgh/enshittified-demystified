@@ -134,6 +134,10 @@ _Avoid_: Verified, researched, scanned
 What a brand, company or location shows before its check is complete, unless private equity has already been found. Any owner found so far is still shown.
 _Avoid_: Unknown, pending, unresearched
 
+**Tracked**:
+Said of a brand listed on an industry page, of every owner on its current or pending ownership chains, and of the investment firms the operator lists for tracking even when no listed brand's chain reaches them, such as BlackRock. Their sources keep being re-read; everything else in the data is kept but not re-read. A holder that has told the SEC it holds a public company's shares only as an ordinary institutional investment is not tracked for that holding.
+_Avoid_: Monitored, watched, followed (following is a reader feature)
+
 **Brand card**:
 Everything a brand's page shows about who owns the brand: the verdict, its owners and their chains, pending deals, and past private equity ownership, each fact backed by a receipt.
 _Avoid_: Claim card, profile, report
