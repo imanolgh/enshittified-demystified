@@ -89,3 +89,14 @@ Handed on:
 - "Brand-level checked: required sources and freshness": the "What we checked" section lists each required source with its last finished date and document count.
 - engine "Brand card, receipt and edge shapes" (amended): the card shape gains the deciding owner on the verdict, a products-under-this-name section, a what-we-checked section (from `source_runs` and `document_reads`) and each dispute reading's category.
 - non-PE owners "Brand licensors and licensees on the brand page": showing licensees moved into v1 in this limited form.
+
+### Amended 2026-11-20 (developer ruling, from "Research: Buy'r's evidence chain")
+
+- **The family-owned label now reads "Founder- or family-owned"**, so a brand its founder still owns reads that way: "Founder- or family-owned · the Cathy family", and a dispute reading shows "If this is right: Founder- or family-owned". The one-line explanation stays "A person or family owns this brand in their own name." The developer chose this over a separate "Founder-owned" label, which would have needed a founder marker on the owner claim and a change to the extraction prompt.
+- **Unchanged:** the owner kind `family` and the category `family_owned`, so there's no schema change. The label applies only where a source names the owner. "No PE evidence found" is never relabeled as founder-owned or anything like it. It means no owner was found, and ADR 0001's rule that the product never calls a brand independent stands.
+- The ruling came after the developer proposed showing "Founder Owned" in place of "No PE evidence found" for brands that aren't family or cooperatively owned, to give readers a green light to buy. Buy'r has a founder-owned tier (8,783 brands, no stated source; `.scratch/chains-and-brands/research/buyr-evidence-chain.md`). The voice rules still apply: a card states the owner type, never that a brand is safe or good to buy.
+
+### Amended 2026-11-20 (from "Large shareholders of public owners on the card")
+
+- **Order of sections:** "Private equity shareholders" becomes "Private equity shareholders of {company}", one list per public company on the brand's current chains. Directly after it comes a new section, "Other large shareholders of {company}", with the fixed line "Holders of more than 5% of {company}'s shares, from their SEC filings. Smaller holdings aren't listed. These holders don't change this brand's verdict." Each row reads "{holder} · {owner kind} · {percent}% of {class} · as of {event date}" with its filing as the receipt, and passive 13G rows carry "Passive: the filer certifies it isn't trying to influence control". Full rules: that ticket's Answer.
+- **Label table gains:** Owned by an asset manager: "An investment firm that mainly runs mutual funds and ETFs sold to the public controls this brand."

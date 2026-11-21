@@ -53,3 +53,7 @@ Handed on:
 - "Task: Draft the how-this-works page" (new).
 - "Website pages and shareable cards": the page, its section link names, and the label links on cards.
 - launch backend map: the no-friction reason for v1 without accounts.
+
+### Amended 2026-11-20 (from "Large shareholders of public owners on the card")
+
+- The topic "why a fund manager's passive holding never counts" now also covers the "Other large shareholders" list: it shows every holder above 5% of a public company in the brand's chain, from SEC 13D and 13G filings; smaller holdings aren't in those filings; the "Passive" tag means the filer certified the shares aren't held to influence control; none of these holders changes a verdict. It belongs in section 6 ("How we decide what counts as private equity").

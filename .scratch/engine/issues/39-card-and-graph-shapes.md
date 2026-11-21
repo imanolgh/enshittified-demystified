@@ -70,6 +70,11 @@ Handed on:
 
 - The brand card shape gains: the deciding owner beside the verdict label (two PE names, then "+N more"); a pending deal placed directly under the verdict; a "Products under this name" section (`licensed_to` claims as "Licensed to {company}", set-aside listing claims as "Also listed among {company}'s brands"); a "What we checked" section (each required source's last completed `source_runs` row with its date and the brand's `document_reads` count, the documents listed); and, in disputes, each reading's resulting category. Section order and wording: chains "Card wording", Answer.
 
+### Amended 2026-11-20 (from chains "Large shareholders of public owners on the card")
+
+- **Round 2 Q6 reversed:** 13G holdings filed under Rule 13d-1(b) now show on the card. The verdict rule is unchanged: they never count toward a category. Wendy's would now list BlackRock and Vanguard under "Other large shareholders of The Wendy's Company", beside Trian under "Private equity shareholders".
+- The brand card shape gains, for every public company on the brand's current chains, an "other large shareholders" list: each current `owned_by` edge from a 13D or 13G holder above 5% that isn't already shown as an owner or a PE shareholder, with holder name, owner kind (or none), percent, class, event date, the rule box from document `meta` (for the passive tag) and the receipt. Unconfirmed and ended edges are left out. Sorted by stake, largest first.
+
 ### Amended 2026-11-18 (from chains "What would change this")
 
 - The brand card shape gains a "What would change this" list: one to three lines from twelve fixed templates chosen by the brand's state (category, confidence, stake, unconfirmed hops, pending deal, USPTO guard, check progress), plus "Next check due {Mon YYYY}" once a refresh cadence exists. Templates and order: chains "What would change this", Answer.

@@ -28,6 +28,10 @@ _Avoid_: Partial PE, PE-invested
 A hop where a cited document states a stake under 50% or calls it a minority investment. A hop with no stated stake counts as control.
 _Avoid_: Partial stake
 
+**Large shareholder**:
+A holder of more than 5% of a public company's shares, as named in its own SEC beneficial-ownership filing. It is listed under the company it holds, not as an owner of the brand, and it changes no category unless it is a private equity firm whose stake counts.
+_Avoid_: Owner (for a passive holder), major shareholder
+
 **Co-owner**:
 One of two or more owners whose hops to the same brand or company overlap, such as THL and Linden at Smile Doctors. An owner who joins does not replace the others unless a source says one of them sold or exited. Co-owners are not sources disagreeing.
 _Avoid_: Partner, joint owner (in user-facing text)
@@ -59,7 +63,7 @@ One place where one company at a time serves customers under zero or more brands
 _Avoid_: Store, site, branch, outlet (as the general term)
 
 **Family**:
-One person or a family who owns a company in their own name, named only as sources name them. It is an owner, never a profile of a person.
+One person or a family who owns a company in their own name, named only as sources name them. It is an owner, never a profile of a person. A founder who still owns the company is a family owner. On cards the category reads "Founder- or family-owned" (chains "Card wording", amended 2026-11-20).
 _Avoid_: Founder, individual, person (as an owner)
 
 **Industry**:
