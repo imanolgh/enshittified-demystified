@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 60, 58, 108, 117, engine/29, engine/40, engine/69  (Website stack and hosting; Card wording; The how-this-works page; Site name and domain; Events and the public changelog; Search and the demand log; Graph endpoint and non-brand output shapes)
+Blocked by: 60, 58, 108, engine/29, engine/40, engine/69  (Website stack and hosting; Card wording; The how-this-works page; Events and the public changelog; Search and the demand log; Graph endpoint and non-brand output shapes)
 Map: [chains-and-brands](../map.md)
 
 ## Question
@@ -25,3 +25,4 @@ Which pages does version 1 have, what does each show, and what does a shareable 
 - **From "The how-this-works page"** (2026-11-18): one public page of eleven question-headed sections with a contents list; each section has a stable link name (`#verified`, `#private-equity-test`) and every label or term on a card links to its section. v1 stays without accounts or sign-in (the developer reaffirmed it: "not having any sort of sign up or login is much better").
 - **From "Website stack and hosting"** (2026-11-18): Astro static pages in `web/` (React islands only where needed), built by Cloudflare Pages from the engine's public read API; share images made at build time with satori from a card template (flexbox-only CSS, fonts as files), whose content is this ticket's; a web app manifest and icons in v1.
 - **From "Large shareholders of public owners on the card"** (2026-11-20): brand cards gain an "Other large shareholders of {company}" section directly after "Private equity shareholders of {company}", one pair per public company on the brand's chains, with a fixed line, sorted holder rows, and a "Passive" tag on passive 13G rows (that ticket's Answer). The asset-manager label "Owned by an asset manager" joins the label table.
+- **From "Site name and domain"** (developer, 2026-11-20): until that ticket settles, the site uses the working name "Enshittified Demystified" in page titles, share images and anywhere else the name appears, so this ticket no longer waits on it. The final name swaps in when it is chosen; that ticket is worked last.

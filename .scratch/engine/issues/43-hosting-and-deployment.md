@@ -2,6 +2,7 @@
 
 Type: grilling
 Status: open
+Blocked by: 122  (Task: Estimate build, seeding and monthly running costs)
 Map: [engine](../map.md)
 
 ## Question

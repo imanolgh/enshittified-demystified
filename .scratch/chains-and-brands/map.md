@@ -15,6 +15,7 @@ Label: wayfinder:map · Tracker: local markdown (`docs/agents/issue-tracker.md`)
 - **Background**: `.scratch/pivot-handoff-2026-11-02.md` holds the pivot proposal and its evidence (competitors, the USDA barcode test, chain examples, the money estimate, the Worse on Purpose review). Its recommendations are proposals until a ticket rules on them (decisions.md §14).
 - **Competitor sites** (Buy'r, Worse on Purpose, Grass, ShopFair, Ethos) are leads a person reads, never sources. WhoIsMyDentist and Private Equity Vet are never fetched automatically (their terms). Reddit is never fetched; the developer pastes threads. The pipeline rule itself is engine "Competitor and third-party data rule".
 - **Research tickets**: findings go to `.scratch/chains-and-brands/research/<slug>.md`, every claim cited to a primary source. Workers read robots.txt before the first request to every host, including redirect targets, and stop and report when the session's permission check refuses a request, never reaching the same host another way (2026-11-17). Worker budgets carry a margin against the harness token count, because workers' own estimates run low (2026-11-17).
+- **Working site name** (developer, 2026-11-20): "Enshittified Demystified", until "Site name and domain", which is worked last.
 
 ## Decisions so far
 

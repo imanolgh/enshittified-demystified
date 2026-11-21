@@ -2,6 +2,7 @@
 
 Type: grilling
 Status: open
+Blocked by: 122  (Task: Estimate build, seeding and monthly running costs)
 Map: [engine](../map.md)
 
 ## Question
@@ -38,3 +39,4 @@ What is the product's public identity for crawling, what are the budget caps and
 - **From chains "Source-link submissions"** (2026-11-18): rate limits for the "Report a mistake" form (per connection, per brand, per day) and its invisible bot check (a hidden field); no third-party CAPTCHA.
 - **From "Retrieval fan-out, tracked entities and refresh cadence"** (2026-11-20; evidence_layer_plan.md §5 Stage 2): (1) research climbs owners up to a **hop cap** against loops from bad data; its value is this ticket's. (2) **Full-text search noise:** EDGAR full-text search on a big brand name returns hundreds to thousands of hits (Aspen Dental 2,095, Natrol 1,543, MB2 Dental 1,408), mostly lenders' schedules, landlords' tenant lists and mortgage-pool prospectuses. Ticket 70 reads every hit whole, so most of that spend goes to noise, and the newest-first 100-hit cap can push older real filings out. Budget it here, or reopen the read-everything ruling with the developer. (3) Failed runs retry daily for up to 7 days, which adds to fetch load.
 - **From "The private equity firm test and asset managers"** (2026-11-20; ADR 0001 amended): code values for the asset-manager test: $50bn in registered funds to become an asset manager, below $40bn to stop being one. An operational alert when a firm classed private equity passes $25bn in registered funds. Where the alert goes is this ticket's.
+- **From chains "Site name and domain"** (developer, 2026-11-20): the bot's user agent uses the working name "Enshittified Demystified" until that ticket settles (worked last); this ticket still sets the user-agent format.
