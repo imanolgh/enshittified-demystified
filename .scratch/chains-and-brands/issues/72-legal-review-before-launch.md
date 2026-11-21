@@ -2,6 +2,7 @@
 
 Type: task
 Status: open
+Blocked by: 125  (Research: Affiliate program approval and sales rules)
 Map: [chains-and-brands](../map.md)
 
 ## Question
@@ -13,6 +14,7 @@ Before the chains-and-brands site launches, what does a lawyer say about the leg
 - Created 2026-11-08 from engine "Press and EDGAR full-text connectors" (Q6, developer ruling). HITL: the developer takes these questions to a lawyer; Claude records the answers and turns any required changes into tickets. It blocks launch, not the current tickets (gate recorded in engine "Testing and acceptance bars").
 - Claude's notes in that ticket are not legal advice; case references there are from memory.
 - **From "Alternatives and affiliate links"** (2026-11-17), questions to add: (a) FTC endorsement-guide disclosure for affiliate links: is "We earn a commission if you buy through this link" next to every link, plus a how-this-works section, enough? (b) Retailer program terms: Amazon Associates' required statement, its rules on where links may point (the plan links only to a brand's own store or product pages) and its Product Advertising API conditions.
+- **From the monetization review** (developer, 2026-11-21): "Research: Affiliate program approval and sales rules" checks the programs' own terms first, so the lawyer gets the actual Amazon, Walmart, Target and network terms rather than Claude's memory of them. If chains "Donations in v1" adds donations, its wording goes here too.
 - **From "Source-link submissions"** (2026-11-18), question to add: the "Report a mistake" form stores free text and links from anonymous readers (free text can contain personal details): what retention, notice and deletion rules apply? Later, community notes (reader comments, including about product quality) will need their own review.
 
 ## Questions for the lawyer

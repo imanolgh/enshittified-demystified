@@ -2,7 +2,7 @@
 
 Type: task
 Status: open
-Blocked by: 94, 59, 72  (Brand-level checked: required sources and freshness; Source-link submissions; Legal review before launch)
+Blocked by: 94, 59, 72, 127  (Brand-level checked: required sources and freshness; Source-link submissions; Legal review before launch; Donations in v1)
 Map: [chains-and-brands](../map.md)
 
 ## Question

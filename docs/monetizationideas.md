@@ -2,6 +2,8 @@
 ### Pricing model for the ownership transparency platform — free/paid line, tier structure, and rejected approaches
 ### Companion to: marketgaps.md (business models), decisions.md (§5, §7), painpoints.md (willingness-to-pay evidence)
 
+> **Out of date (noted 2026-11-21).** §2, §3 and §3A describe the parked local-businesses plan: follows of local businesses, the metro digest, the retirement monitor and deep-dive, priority on-demand research (removed, decisions.md §15), and prices that no ticket has set for chains and brands. The chains-and-brands money model is in ADR 0004 and decisions.md §14; affiliate rules are in chains "Alternatives and affiliate links"; accounts, alerts, prices and the beta are on the parked launch-backend map (`.scratch/launch-backend/map.md`), which rewrites this doc once prices settle. §1 (evidence is free, event frequency), §3B (metering rules), §4 and §6 still apply.
+
 ---
 
 ## 1. The Governing Principle
