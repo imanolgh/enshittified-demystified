@@ -64,3 +64,7 @@ Handed on:
 - "Rosters, portfolio pages and the registry": store closures; dropped listings don't end ownership.
 - "API conventions, internal auth and operator surface": the withdraw command; unknown closing phrases.
 - "Extraction execution": `expected_close_text`.
+
+### Amended 2026-11-21 (from "Cost cuts before revenue")
+
+- The daily sweep that marks a hop `unconfirmed` after 18 months runs as a step of the operator pass, not daily. Between passes nothing changes; a hop crosses the 18-month line at the next pass.

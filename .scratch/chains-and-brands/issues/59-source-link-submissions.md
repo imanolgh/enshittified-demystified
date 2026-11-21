@@ -45,3 +45,7 @@ Handed on:
 - engine "API conventions, internal auth and operator surface": reports in the operator report.
 - engine "Operational identity, budgets and guardrail values": the form's rate limits.
 - "Legal review before launch": what the form stores (free text can contain personal details) and how long it is kept.
+
+### Amended 2026-11-21 (from "Cost cuts before revenue")
+
+- Mechanism only: before revenue the "Report a mistake" form posts to a small free Cloudflare function instead of FastAPI ("Website stack and hosting", amended). Its fields, limits, rate limits, hidden-field bot check and the rule that a report never edits a verdict are unchanged.

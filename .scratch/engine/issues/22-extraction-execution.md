@@ -104,3 +104,7 @@ Handed on:
 - "Testing and acceptance": the weekly golden-document check and the prompt's golden fixtures; the eval harness at `~/.local/share/extraction-eval/`.
 - "Citation verification rules": quotes from windows checked against the whole text; overlap duplicates merge through the claim hash.
 
+### Amended 2026-11-21 (from "Cost cuts before revenue")
+
+- **Q7 replaced:** a new prompt or model version reads new documents only. Re-reading documents an older version read is an operator command and can target a slice (for example the documents that produced claims); a re-read supersedes the old read as Q7 described. Seeding waits until p10 is approved, so the corpus isn't read twice ("Task: Draft prompt p10 and run the approval check").
+- **Timed checks:** the weekly golden-document check runs as a step of the operator pass when the returned model name changed or a week has passed since the last check; the 7-day sweep of unreadable documents also runs as a pass step.

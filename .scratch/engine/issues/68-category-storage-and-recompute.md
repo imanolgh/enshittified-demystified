@@ -49,3 +49,7 @@ Handed on:
 - "Operational identity, budgets and guardrail values": chunk size, drift alert.
 - "API conventions, internal auth and operator surface": drift alerts.
 - chains "Website pages and shareable cards": category pages and shares read the stored rows.
+
+### Amended 2026-11-21 (from "Cost cuts before revenue")
+
+- The nightly drift check runs as a step of the operator pass, right after recompute, instead of nightly.

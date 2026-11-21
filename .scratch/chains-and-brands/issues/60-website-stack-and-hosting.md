@@ -48,3 +48,10 @@ Handed on:
 - engine "API conventions, internal auth and operator surface": the "rebuild the site" command and the skipped-build alert; public read endpoints the build uses, with a stable OpenAPI schema; browser calls to search and the report form from the site's origin.
 - engine "Graph endpoint and non-brand output shapes": the JSON shapes the build reads.
 - chains map Out of scope ("Barcode scanning and a native app"): the store-app notes above.
+
+### Amended 2026-11-21 (from "Cost cuts before revenue")
+
+- **Before revenue:** the engine runs on the developer's machine (the `docker compose` stack), with no public read API. The site is built there at the end of each operator pass and uploaded to Cloudflare Pages (free plan). This replaces the scheduled builds (after the overnight run, 2pm and 8pm) and Cloudflare building from the public read API.
+- **Search** is an index built into the static site at build time (names, owners, industry words) and no longer calls FastAPI from the browser; meaning-based ranking waits for a server ("Search and the demand log").
+- **The "Report a mistake" form** posts to a small free Cloudflare function that emails or stores reports for the operator report; details in engine "Hosting, storage and deployment".
+- A paid host and the public read API return once the site earns money.

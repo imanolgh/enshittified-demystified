@@ -60,3 +60,7 @@ Handed on:
 - **"Celery topology":** the monthly load, the one-time archive load and the PDF parser tasks.
 - **"Operational identity, budgets and guardrail values":** shape-check alerts for the monthly files and the SEC user agent.
 - **"Testing and acceptance":** fixtures, meaning real monthly rows, archive rows and one IAPD PDF.
+
+### Amended 2026-11-21 (from "Cost cuts before revenue")
+
+- The monthly Form ADV load runs as the first step of the operator pass when a new month's file is out, instead of on a monthly schedule; IAPD PDF re-reads on a changed filing date run in the same pass.

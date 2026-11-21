@@ -100,3 +100,6 @@ Handed on:
 - "Celery topology": independent sources.
 - chains "Brand-level checked: required sources and freshness": the routing table and failure rules.
 
+### Amended 2026-11-21 (from "Cost cuts before revenue")
+
+- **No schedule before revenue:** no cadence runs on a timer. Every recurring run here (full-text search refreshes, 13D/13G re-reads, registry passes, the pending-deal speed-up, daily retries of failed runs) is a step of one operator command, the pass, run when the developer chooses. In order, a pass loads a new Form ADV month if one is out, retries failed reads, runs the "new deals" pass if asked (wire feeds, new newsroom releases and new deal-type EDGAR filings for tracked names, roughly $2 to $25 a run), runs the staleness sweep, recomputes categories and the drift check, runs the golden check, and builds and uploads the site. Nothing runs between passes. Scheduled cadences return once the site earns money; their values are "Refresh schedule and next-check date"'s.

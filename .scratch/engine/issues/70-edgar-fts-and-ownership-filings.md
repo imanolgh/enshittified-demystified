@@ -47,3 +47,10 @@ Handed on:
 - "Extraction execution": whole filings across several calls.
 - "BDC discovery and Schedule of Investments parsing": BDC filings stay with the parser.
 - chains "Category brand lists and brand-level checked": full-text search as a candidate required source.
+
+### Amended 2026-11-21 (from "Cost cuts before revenue")
+
+- **Q4 replaced (windows):** a hit is read whole only when the brand's own company or one of its tracked owners filed it. Every other hit (landlords, lenders, mortgage pools, third parties' 8-Ks and deal filings) is read as windows: about 8,000 characters on each side of every mention of the searched name, merged where they overlap, after the filing's first 2,000 characters (the cover page). No filer type is skipped. Measured: in 33 own-side filings, 2% of facts sat far from the name, all a company describing its own owner as "we" (`research/edgar-quote-distance.md`); in 44 third-party filings, windows missed no brand fact a whole read found, at about 28% of the whole-read cost (`research/edgar-third-party-windows.md`).
+- **Q3 narrowed (10-Qs):** a 10-Q filed by the brand's company or one of its owners is read only when it was filed after that filer's latest 10-K; older ones are skipped. A 10-K counts with its exhibits (Smucker and Clorox restate deals in Exhibit 13 or 99.1). Measured: about 1 deal in 420 named in a 10-Q was missing from the next 10-K (`research/ten-q-deals-missing-from-ten-k.md`).
+- **SEC headers:** every SEC request carries the headers the SEC's access guidelines ask for (a user agent and `Accept-Encoding: gzip, deflate`) from the first request, at most 1 a second; a refusal stops SEC requests rather than being retried around.
+- **No schedule before revenue:** first runs and refreshes run inside the operator pass ("Retrieval fan-out, tracked entities and refresh cadence", amended).

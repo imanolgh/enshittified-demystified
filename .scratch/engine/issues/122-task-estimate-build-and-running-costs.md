@@ -1,7 +1,7 @@
 # Task: Estimate build, seeding and monthly running costs
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: none
 Map: [engine](../map.md)
 
@@ -26,3 +26,20 @@ What will the product cost to build, to seed once before launch, and to run each
 - **Monthly running.** Re-reads on real text changes (20), new filings and releases, re-read cadences (37; 119 still open, so use ranges), recompute and the nightly drift check (68), a re-read of everything when a new prompt or model version ships (22: about $45 to $54 per 10,000 documents), search traffic (40), Google Places only on demand, hosting, storage, backups and monitoring (43 open: price two or three realistic options), Cloudflare Pages for the website (60), and the domain (117).
 - **Stale figures to replace:** ticket 42's spend figures (2026-11-04) assume Claude batch pricing for extraction (about $120 to $240 per seeding pass of about 1,000 brands, $20 to $120 a month). Extraction has since moved to DeepSeek.
 - **Rules:** no new paid API calls; use measured figures and published prices. Vendor pricing pages are sources, each cited with the date read. Bot rules as in CLAUDE.md, and stop and report on any permission refusal. No paywalled market data, no OpenAI models. Mark every figure that rests on an open ticket (94, 119, 43, 117) so the estimate can be re-run when they settle.
+
+## Answer
+
+Resolved 2026-11-20 by a background agent (about 256k tokens, no paid API calls). Findings: `.scratch/engine/research/cost-estimate.md`, every figure traced to a ticket or a vendor page read that day.
+
+- **Build:** about $2,100 to $9,200 of Claude Code usage at Opus 5.5 API list prices (about $1,050 to $4,600 at Sonnet 5.5), or $500 to $900 in Max plan fees ($100 a month) or $1,000 to $1,800 on Ultra ($200 a month) over the 5 to 9 months the build would take at the measured pace; 130 to 370 developer hours. Rough to a factor of two either way, since no spec exists: 83 to 152 active days at $25 to $60 a day, against a measured $39 per planning day.
+- **Planning so far (measured):** $746 at Opus 5.5 list prices over 19 active days (2026-10-17 to 2026-11-20; 12 sessions, 70 subagent runs, 1.92 billion tokens, nearly all cache reads). A floor: Claude Code deletes transcripts after 30 days. Research tickets' recorded token counts are worth $28 to $35 per million.
+- **One seeding pass:** about $1,200 to $9,500, of which DeepSeek reads are $850 to $7,700 and Claude list-building and registry research $360 to $1,760.
+- **A typical month at launch:** about $110 to $1,730 (model and API $23 to $1,074; hosting $65 to $450; Claude Code upkeep $20 to $200). Each new prompt or model version re-reads the corpus for another $850 to $7,700.
+- **Biggest drivers:** EDGAR full-text search with every hit read whole (seeding $600 to $5,625, 60,000 to 225,000 filings; a long filing costs about $0.019, not the $0.0044 average); version re-reads; the build; registry research ($325 to $1,700, unmeasured); hosting ($65 Hetzner to about $450 Fly.io, with Backblaze B2 Object Lock at no extra cost).
+- **Prices confirmed:** DeepSeek Flash $0.15 in and $0.60 out per million off-peak, double at peak (21% of the week); DeepSeek Search $0.75 per 1,000; Cloudflare Pages Free covers the site; Places IDs-only Text Search free. Not read: Cloudflare's domain search (403; the .com price came from trade press), AWS RDS and Render (no figures in the page text).
+- **What sharpens it:** a free count-only EDGAR full-text search dry run over all names; timing one connector build from its transcripts; a registry-research pilot of about 20 entries.
+
+Handed on:
+- "Operational identity, budgets and guardrail values": replacement spend figures for the caps; full-text search noise is the single largest swing.
+- "Hosting, storage and deployment": three priced options and Backblaze B2 for storage with Object Lock.
+- "Task: Draft prompt p10 and run the approval check": a version shipped after seeding re-reads everything for $850 to $7,700.
